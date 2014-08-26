@@ -22,3 +22,10 @@ https://forums.alliedmods.net/showthread.php?t=129763
 * A Copy of the latest version of [TF2] Weapon Restrictions by Powerlord
 https://forums.alliedmods.net/showthread.php?p=2120214
 
+
+Optional Addons
+===============
+
+* [TF2] Fire Huntsman while in air
+https://forums.alliedmods.net/showthread.php?t=240497
+
