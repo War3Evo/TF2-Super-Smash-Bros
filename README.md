@@ -22,6 +22,8 @@ https://forums.alliedmods.net/showthread.php?t=129763
 * A Copy of the latest version of [TF2] Weapon Restrictions by Powerlord
 https://forums.alliedmods.net/showthread.php?p=2120214
 
+* The latest build of TF2items https://builds.limetech.org/?p=tf2items
+
 
 Optional Addons
 ===============
