@@ -1,16 +1,15 @@
 TF2-Super-Smash-Bros
 ====================
 
-Current development is playable, but currently still being developed.   It is a alpha version.
+Current is playable.
 
-It will stay in the develop branch until a stable copy is created, then it will be moved to the master branch.
+If you have any issues, pleaes do post them on this GitHub.
 
 
 Sourcemod Plugin Requirements
 =============================
 
-* At least sourcemod version 1.6.2-dev+4558
-You can grab the latest 1.6.* snapshot from here:
+* At least sourcemod 1.7
 http://www.sourcemod.net/snapshots.php
 
 * Sourcemod Metamod (at least 1.10.1)
@@ -23,6 +22,9 @@ https://forums.alliedmods.net/showthread.php?t=129763
 https://forums.alliedmods.net/showthread.php?p=2120214
 
 * The latest build of TF2items https://builds.limetech.org/?p=tf2items
+
+* Chdata's version of [TF2] TF2Attributes (The front page isn't updated yet.)
+https://forums.alliedmods.net/showpost.php?p=2307125&postcount=318
 
 
 Optional Addons
