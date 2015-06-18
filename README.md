@@ -7,6 +7,10 @@ If you have any issues, pleaes do post them on this GitHub.
 
 You can grab a pre-compiled copy from here: http://war3evo.info:8080/job/TF2-Super-Smash-Bros/
 
+Link to Sourcemod Forums:
+
+https://forums.alliedmods.net/showthread.php?t=264551
+
 
 Sourcemod Plugin Requirements
 =============================
