@@ -3,8 +3,46 @@
 #include <tf2>
 #include <tf2_stocks>
 #include <sb_interface>
-#include <DiabloStocks>
+#tryinclude <DiabloStocks>
 #include <sdkhooks>
+
+
+#if !defined _diablostocks_included
+#define STRING(%1) %1, sizeof(%1)
+
+#define LoopIngamePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && !IsFakeClient(%1))
+
+#define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && IsPlayerAlive(%1))
+
+stock bool ValidPlayer(int client, bool check_alive=false, bool alivecheckbyhealth=false) {
+	if(client>0 && client<=MaxClients && IsClientConnected(client) && IsClientInGame(client))
+	{
+		if(check_alive && !IsPlayerAlive(client))
+		{
+			return false;
+		}
+		if(alivecheckbyhealth&&GetClientHealth(client)<1) {
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+
+stock bool IsEntLimitReached()
+{
+	if (GetEntityCount() >= (GetMaxEntities()-16))
+	{
+		PrintToServer("Warning: Entity limit is nearly reached! Please switch or reload the map!");
+		LogError("Entity limit is nearly reached: %d/%d", GetEntityCount(), GetMaxEntities());
+		return true;
+	}
+	else
+		return false;
+}
+#endif
 
 new g_FilteredEntity = -1;
 new Float:g_ClientPosition[MAXPLAYERS+1][3];

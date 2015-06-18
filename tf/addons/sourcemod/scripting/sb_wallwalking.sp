@@ -1,12 +1,26 @@
-//Wall Walking v1.1 by Pinkfairie
-
-//Termination:
 #pragma semicolon 1
 
 //Includes:
 #include <sourcemod>
 #include <sdktools>
-#include <DiabloStocks>
+//#tryinclude <DiabloStocks>
+
+#if !defined _diablostocks_included
+stock bool ValidPlayer(int client, bool check_alive=false, bool alivecheckbyhealth=false) {
+	if(client>0 && client<=MaxClients && IsClientConnected(client) && IsClientInGame(client))
+	{
+		if(check_alive && !IsPlayerAlive(client))
+		{
+			return false;
+		}
+		if(alivecheckbyhealth&&GetClientHealth(client)<1) {
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+#endif
 
 //Definitions:
 #define Speed 200
@@ -268,5 +282,4 @@ public Plugin:myinfo =
 	author = "Pinkfairie & El Diablo",
 	description = "Allows users to cling to walls",
 	version = "1.1",
-	url = "Http://www.myspace.com/josephmaley"
 }

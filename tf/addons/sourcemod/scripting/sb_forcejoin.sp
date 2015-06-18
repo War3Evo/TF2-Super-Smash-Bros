@@ -5,7 +5,24 @@
 // Not compatible with CSS ATM
 // Make sure the Game is set right in switchgamemode.inc in ../includes/switchgamemode.inc
 
-#include <DiabloStocks>
+#tryinclude <DiabloStocks>
+
+#if !defined _diablostocks_included
+stock bool:ValidPlayer(client,bool:check_alive=false,bool:alivecheckbyhealth=false) {
+	if(client>0 && client<=MaxClients && IsClientConnected(client) && IsClientInGame(client))
+	{
+		if(check_alive && !IsPlayerAlive(client))
+		{
+			return false;
+		}
+		if(alivecheckbyhealth&&GetClientHealth(client)<1) {
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+#endif
 
 #define PLUGIN_VERSION "1.00"
 

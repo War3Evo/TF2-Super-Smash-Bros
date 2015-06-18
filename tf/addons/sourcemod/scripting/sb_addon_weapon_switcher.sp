@@ -3,11 +3,16 @@
 #include <sourcemod>
 #include <sdkhooks>
 #include <tf2items>
-#include <DiabloStocks>
+#tryinclude <DiabloStocks>
 #include <tf2attributes>
 //#include <sb_interface>
 
+#if !defined _diablostocks_included
+#include <tf2_stocks>
+#endif
+
 #define TEAM_RED 2
+
 
 stock AddAttribute(client, String:attribute[], Float:value)
 {
