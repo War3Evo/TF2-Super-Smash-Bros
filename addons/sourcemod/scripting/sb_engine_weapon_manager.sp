@@ -66,7 +66,7 @@ Handle sb_weapon_enabled;
 
 public OnPluginStart()
 {
-	RegConsoleCmd("reloadcfg",SB_TESTING_CONFIG,"reloadcfg");
+	RegAdminCmd("reloadcfg", SB_TESTING_CONFIG, ADMFLAG_ROOT);
 
 	sb_weapon_enabled = CreateConVar("sb_weapon_enabled", "1", "0 - disable, 1 - enable", FCVAR_PLUGIN);
 }
