@@ -21,7 +21,9 @@
 
 #define GAME_TITLE "SmashBros"
 
-#define PLUGIN_VERSION "1.3.0"
+#define BUILD_NUMBER "manual" // For Jenkins Builds
+
+#define PLUGIN_VERSION "1.3"...BUILD_NUMBER
 
 #define PLUGIN_VERSION_NUMBER 12
 
