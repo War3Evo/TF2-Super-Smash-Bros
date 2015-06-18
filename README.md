@@ -28,6 +28,9 @@ https://forums.alliedmods.net/showthread.php?p=2120214
 Optional Addons
 ===============
 
+* [TF2] SteamTools Game Description Override - So you can name your game "SmashBros" or "Smash Fortress"
+https://forums.alliedmods.net/showthread.php?p=1583349
+
 * [TF2] Fire Huntsman while in air
 https://forums.alliedmods.net/showthread.php?t=240497
 
