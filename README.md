@@ -42,3 +42,18 @@ https://forums.alliedmods.net/showthread.php?p=1583349
 * [TF2] Fire Huntsman while in air
 https://forums.alliedmods.net/showthread.php?t=240497
 
+
+Extra Information
+=================
+
+For editing the sb_weapons.cfg file, you may want to know some attributes to help balance weapons for your Smash Bros game.  
+
+"ammo regen"	"0.20"
+"maxammo primary reduced"	"0.25"
+"clip size penalty"	"0.25"
+
+,etc, can be found at this link:
+
+https://wiki.teamfortress.com/wiki/List_of_item_attributes
+
+
