@@ -25,6 +25,12 @@
 #include <sourcemod>
 #include <sb_interface>
 
+#define LoopIngameClients(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1))
+
+#define STRING(%1) %1, sizeof(%1)
+
+
 
 new Handle:CountDownTimerMessage;
 new Handle:TargetDamageMessage;
@@ -55,7 +61,7 @@ public OnPluginStart()
 	YourLivesMessage = CreateHudSynchronizer();
 
 	HookEvent("teamplay_round_start", teamplay_round_start);
-	HookEvent("teamplay_round_win", teamplay_round_start);
+	//HookEvent("teamplay_round_win", teamplay_round_start);
 	HookEvent("teamplay_waiting_begins", teamplay_round_start);
 
 
@@ -84,28 +90,94 @@ public Action:Command_jointeam(client, args) {
 	}
 }
 
-public Action:teamplay_round_start(Handle:event,  const String:name[], bool:dontBroadcast) {
-	for(new i=1;i<=MaxClients;++i){
+public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast) {
+	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
 	}
-	for(new i=1;i<=MaxClients;i++) {
-		if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && GetClientTeam(i)==1) {
-			new cred = GetTeamClientCount(2);
-			new cblue = GetTeamClientCount(3);
+	int rand = GetRandomInt(2, 3);
+	for(int i=1;i<=MaxClients;i++)
+	{
+		if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && GetClientTeam(i)==1)
+		{
+			int cred = GetTeamClientCount(2);
+			int cblue = GetTeamClientCount(3);
 			if(cred>cblue) {
 				ChangeClientTeam(i, 3);
 			} else if(cblue<cred) {
 				ChangeClientTeam(i, 2);
 			} else if(GetTeamClientCount(1)>1) {
-				ChangeClientTeam(i, GetRandomInt(2, 3));
+				rand = GetRandomInt(2, 3);
+				ChangeClientTeam(i, rand);
 			} else
 			{
-				new rand = GetRandomInt(2, 3);
+				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
 		}
 		//TF2_RespawnPlayer(i);
 	}
+	//PrintToChatAll("Debug: Start of Balancing");
+
+	int redteamcount = GetTeamClientCount(2);
+	int blueteamcount = GetTeamClientCount(3);
+
+	int ConVarLives = GetConVarInt(FindConVar("sb_lives"));
+	//PrintToChatAll("Debug: sb_lives = %d",ConVarLives);
+	//PrintToChatAll("Debug: redteamcount = %d",redteamcount);
+	//PrintToChatAll("Debug: blueteamcount = %d",blueteamcount);
+	int teambalance = 0;
+	int teamToBalance = 0;
+	if(redteamcount>blueteamcount)
+	{
+		teambalance = redteamcount-blueteamcount;
+		teambalance *= ConVarLives;
+		teamToBalance = 3;
+	}
+	else
+	{
+		teambalance = blueteamcount-redteamcount;
+		teambalance *= ConVarLives;
+		teamToBalance = 2;
+	}
+	//PrintToChatAll("Debug: teamToBalance = %d",teamToBalance);
+	if(teamToBalance == 0) return Plugin_Continue;
+
+	// Randomly spread the love
+	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
+
+	int retry = teambalance;
+
+	char sClientName[32];
+	while(teambalance > 0)
+	{
+		LoopIngameClients(target)
+		{
+			// try not to use same person twice
+			if(TargetGotExtraLiveAlready[target] && retry>0)
+			{
+				retry--;
+				continue;
+			}
+			if(GetClientTeam(target)!=teamToBalance) continue;
+			if(GetRandomFloat(0.0,1.0)>0.75)
+			{
+				TargetGotExtraLiveAlready[target]=true;
+				SB_SetPlayerProp(target,iLives,SB_GetPlayerProp(target,iLives)+1);
+				GetClientName(target,STRING(sClientName));
+				if(teamToBalance==2)
+				{
+					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+				}
+				else
+				{
+					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+				}
+				teambalance--;
+			}
+		}
+	}
+	//PrintToChatAll("Debug: End of Balancing");
+	return Plugin_Continue;
 }
 
 
