@@ -61,7 +61,7 @@ public OnPluginStart()
 	YourLivesMessage = CreateHudSynchronizer();
 
 	HookEvent("teamplay_round_start", teamplay_round_start);
-	//HookEvent("teamplay_round_win", teamplay_round_start);
+	HookEvent("teamplay_round_win", teamplay_round_win);
 	HookEvent("teamplay_waiting_begins", teamplay_round_start);
 
 
@@ -87,6 +87,34 @@ public Action:Command_jointeam(client, args) {
 		g_spec[client] = true;
 	} else {
 		g_spec[client] = false;
+	}
+}
+
+public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroadcast) {
+	for(int i=1;i<=MaxClients;++i){
+		LastPersonAttacked[i]=-1;
+	}
+	int rand = GetRandomInt(2, 3);
+	for(int i=1;i<=MaxClients;i++)
+	{
+		if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && GetClientTeam(i)==1)
+		{
+			int cred = GetTeamClientCount(2);
+			int cblue = GetTeamClientCount(3);
+			if(cred>cblue) {
+				ChangeClientTeam(i, 3);
+			} else if(cblue<cred) {
+				ChangeClientTeam(i, 2);
+			} else if(GetTeamClientCount(1)>1) {
+				rand = GetRandomInt(2, 3);
+				ChangeClientTeam(i, rand);
+			} else
+			{
+				rand = GetRandomInt(2, 3);
+				ChangeClientTeam(i, rand);
+			}
+		}
+		//TF2_RespawnPlayer(i);
 	}
 }
 
