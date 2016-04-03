@@ -1,0 +1,39 @@
+"Phrases"
+{
+	"ghoston"
+	{
+		"en"	"You currently enter the ghost world upon death"
+	}
+	"ghostoff"
+	{
+		"en"	"You spectate other players upon death"
+	}
+	"ghostenable"
+	{
+		"en"	"Become a ghost upon death"
+	}
+	"ghostdisable"
+	{
+		"en"	"Don't become a ghost"
+	}
+	"ghostinfo"
+	{
+		"en"	"This server is running ghost mode. Type !ghost to change your preferences."
+	}
+	"thirdpersonon"
+	{
+		"en"	"Your camera goes into thirdperson as a ghost"
+	}
+	"thirdpersonoff"
+	{
+		"en"	"Your camera goes into firstperson as a ghost"
+	}
+	"thirdpersonenable"
+	{
+		"en"	"Use thirdperson"
+	}
+	"thirdpersondisable"
+	{
+		"en"	"Use firstperson"
+	}
+}
