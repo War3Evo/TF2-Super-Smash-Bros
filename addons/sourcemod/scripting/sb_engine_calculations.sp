@@ -71,7 +71,7 @@ public OnPluginStart()
 }
 
 //CreateTimer(1.2,instaspawn,victim);
-
+/*
 public Action:instaspawn(Handle:timer, any:client)
 {
 	if(SB_ValidPlayer(client))
@@ -79,7 +79,7 @@ public Action:instaspawn(Handle:timer, any:client)
 		//TF2_RespawnPlayer(client);
 		SDKCall(hSpawnPlayer,client);
 	}
-}
+}*/
 
 public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 {
@@ -88,6 +88,23 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 		SB_DamageModPercent(0.0);
 		return;
 	}
+
+	if(SB_ValidPlayer(victim))
+	{
+		if(RoundToCeil(damage)>GetClientHealth(victim))
+		{
+			if(SB_GetPlayerProp(victim,iLives)>0)
+			{
+				SB_DamageModPercent(0.0);
+				SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
+				//CreateTimer(3.0,instaspawn,victim);
+				SDKCall(hSpawnPlayer,victim);
+				return;
+			}
+		}
+		//SDKUnhook(victim,SDKHook_OnTakeDamage,OnTakeDamage);
+	}
+
 	/*
 	int inflictor = SB_GetDamageInflictor();
 
@@ -358,6 +375,7 @@ public OnSB_EventSpawn(client)
 	}
 }
 
+/*
 public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
 {
 	if(SB_ValidPlayer(victim))
@@ -369,7 +387,7 @@ public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
 		}
 		//SDKUnhook(victim,SDKHook_OnTakeDamage,OnTakeDamage);
 	}
-}
+}*/
 
 public Action:Timer_Uber_Regen(Handle:timer, any:user)
 {
