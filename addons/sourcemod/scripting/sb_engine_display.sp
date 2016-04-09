@@ -24,6 +24,7 @@
 
 #include <sourcemod>
 #include <sb_interface>
+#include <sdkhooks>
 
 #define LoopIngameClients(%1) for(new %1=1;%1<=MaxClients;++%1)\
 								if(IsClientInGame(%1))
@@ -117,36 +118,52 @@ public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroa
 		//TF2_RespawnPlayer(i);
 	}
 }
+/*
+remove_entity_all(String:classname[])
+{
+	int ent = -1;
+	while((ent = FindEntityByClassname(ent, classname)) != -1)
+	{
+		PrintToChatAll("classname(%s) %i", classname, ent);
+		AcceptEntityInput(ent, "Kill");
+	}
+}*/
 
-public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast) {
+public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast)
+{
+	//remove_entity_all("trigger_hurt");
+
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
 	}
 	int rand = GetRandomInt(2, 3);
 	for(int i=1;i<=MaxClients;i++)
 	{
-		if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && GetClientTeam(i)==1)
+		if(SB_ValidPlayer(i))
 		{
-			int cred = GetTeamClientCount(2);
-			int cblue = GetTeamClientCount(3);
-			if(cred>cblue) {
-				ChangeClientTeam(i, 3);
-			} else if(cblue<cred) {
-				ChangeClientTeam(i, 2);
-			} else if(GetTeamClientCount(1)>1) {
-				rand = GetRandomInt(2, 3);
-				ChangeClientTeam(i, rand);
-			} else
+			if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && GetClientTeam(i)==1)
 			{
-				rand = GetRandomInt(2, 3);
-				ChangeClientTeam(i, rand);
+				int cred = GetTeamClientCount(2);
+				int cblue = GetTeamClientCount(3);
+				if(cred>cblue) {
+					ChangeClientTeam(i, 3);
+				} else if(cblue<cred) {
+					ChangeClientTeam(i, 2);
+				} else if(GetTeamClientCount(1)>1) {
+					rand = GetRandomInt(2, 3);
+					ChangeClientTeam(i, rand);
+				} else
+				{
+					rand = GetRandomInt(2, 3);
+					ChangeClientTeam(i, rand);
+				}
 			}
 		}
 		//TF2_RespawnPlayer(i);
 	}
 
 	// Created timer so that it doesn't hold up round_start
-	CreateTimer(0.1,TeamBalanceTimer, _);
+	CreateTimer(1.0,TeamBalanceTimer, _);
 
 	return Plugin_Continue;
 }
@@ -338,14 +355,26 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 
 public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
 {
-	new teamred=0;
-	new teamblue=0;
+	/*
+	if(SB_ValidPlayer(victim))
+	{
+		if(SB_GetPlayerProp(victim,iLives)>0)
+		{
+			SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
+			SDKCall(hSpawnPlayer,victim);
+		}
+	}
+	*/
+	int teamred=0;
+	int teamblue=0;
 
-	for(new i=1;i<MaxClients;i++)
+	int TheLives = 0;
+
+	for(int i=1;i<MaxClients;i++)
 	{
 		if(SB_ValidPlayer(i))
 		{
-			new TheLives = SB_GetPlayerProp(i,iLives);
+			TheLives = SB_GetPlayerProp(i,iLives);
 			if(TheLives>0)
 			{
 				if(GetClientTeam(i)==TEAM_RED)
