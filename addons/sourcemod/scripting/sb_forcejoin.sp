@@ -5,6 +5,7 @@
 // Not compatible with CSS ATM
 // Make sure the Game is set right in switchgamemode.inc in ../includes/switchgamemode.inc
 
+#include <sb_constants>
 #tryinclude <DiabloStocks>
 
 #if !defined _diablostocks_included
@@ -23,8 +24,6 @@ stock bool:ValidPlayer(client,bool:check_alive=false,bool:alivecheckbyhealth=fal
 	return false;
 }
 #endif
-
-#define PLUGIN_VERSION "1.00"
 
 #define TEAM_BLUE 3
 #define TEAM_RED 2
@@ -109,6 +108,7 @@ public Action:ClassSelection(Handle:timer, any:client) {
 		} else {
 			PrintToChat(client, "Please open the class selection screen and select the class you wish to play!");
 		}
+	PrintToConsole(client,"Smash Bros version %s", PLUGIN_VERSION);
 }
 
 //public Action:Timer_UpdateInfo(Handle:timer,any:userid)
