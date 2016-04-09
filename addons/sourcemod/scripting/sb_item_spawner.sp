@@ -1004,8 +1004,8 @@ public RandomPowerUp(client, PowerUpType:pUP)
 	//SetHudTextParams(-1.0, -1.0, 3.0, 0, 255, 0, 200); //green
 	//ShowSyncHudText(client, CountDownTimerMessage, "Time %d:%d",Minutes,Seconds);
 
-	//int RandNumber = GetRandomInt(1, 120);
-	int RandNumber = 110;
+	int RandNumber = GetRandomInt(1, 120);
+	//int RandNumber = 110;
 
 	// TFCond_CritCola - mini crits
 	if(RandNumber >= 1 && RandNumber < 20)
