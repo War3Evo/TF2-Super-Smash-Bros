@@ -23,7 +23,7 @@
 
 #define BUILD_NUMBER "m.a.n.u.a.l." // For Jenkins Builds
 
-#define PLUGIN_VERSION "1.3."...BUILD_NUMBER
+#define PLUGIN_VERSION "1.4.beta."...BUILD_NUMBER
 
 #define PLUGIN_VERSION_NUMBER 12
 
