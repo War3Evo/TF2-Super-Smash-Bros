@@ -47,6 +47,14 @@ stock bool IsEntLimitReached()
 new g_FilteredEntity = -1;
 new Float:g_ClientPosition[MAXPLAYERS+1][3];
 
+float PlayerMulti[MAXPLAYERS+1];
+int reapplyspeed[MAXPLAYERSCUSTOM];
+//float gspeedmulti[MAXPLAYERSCUSTOM];
+float speedBefore[MAXPLAYERSCUSTOM];
+float speedWeSet[MAXPLAYERSCUSTOM];
+
+int m_OffsetSpeed=-1;
+
 Handle g_hName;
 Handle g_hPos;
 Handle g_hTime;
@@ -81,6 +89,12 @@ public OnPluginStart()
 	LoadTranslations("common.phrases");
 
 	PowerUPMessage = CreateHudSynchronizer();
+
+	m_OffsetSpeed=FindSendPropOffs("CTFPlayer","m_flMaxspeed");
+	if(m_OffsetSpeed==-1)
+	{
+		PrintToServer("[Smash Bros] Error finding speed offset.");
+	}
 
 	RegAdminCmd("sm_clearitems", ClearItems, ADMFLAG_ROOT);
 	RegAdminCmd("sm_loaditems", LoadItems, ADMFLAG_ROOT);
@@ -963,12 +977,24 @@ stock PosMsg(client, char sMsg[256], float TimeAmount)
 {
 	SetHudTextParams(-1.0, 0.15, TimeAmount, 0, 255, 0, 200);
 	ShowSyncHudText(client, PowerUPMessage, sMsg);
+	PrintToChat(client,sMsg);
 }
 
 stock NegMsg(client, char sMsg[256], float TimeAmount)
 {
 	SetHudTextParams(-1.0, 0.20, TimeAmount, 255, 0, 0, 200);
 	ShowSyncHudText(client, PowerUPMessage, sMsg);
+	PrintToChat(client,sMsg);
+}
+
+public Action:StopSpeedTimer(Handle:timer,any:userid)
+{
+	int client = GetClientOfUserId(userid);
+	if(client)
+	{
+		PlayerMulti[client]=0.0;
+		reapplyspeed[client]++;
+	}
 }
 
 public RandomPowerUp(client, PowerUpType:pUP)
@@ -978,7 +1004,8 @@ public RandomPowerUp(client, PowerUpType:pUP)
 	//SetHudTextParams(-1.0, -1.0, 3.0, 0, 255, 0, 200); //green
 	//ShowSyncHudText(client, CountDownTimerMessage, "Time %d:%d",Minutes,Seconds);
 
-	int RandNumber = GetRandomInt(1, 100);
+	//int RandNumber = GetRandomInt(1, 120);
+	int RandNumber = 110;
 
 	// TFCond_CritCola - mini crits
 	if(RandNumber >= 1 && RandNumber < 20)
@@ -1019,7 +1046,7 @@ public RandomPowerUp(client, PowerUpType:pUP)
 		}
 	}
 	// TFCond_MarkedForDeath
-	else if(RandNumber >= 40 && RandNumber < 50)
+	else if(RandNumber >= 40 && RandNumber < 45)
 	{
 		switch (pUP)
 		{
@@ -1041,7 +1068,7 @@ public RandomPowerUp(client, PowerUpType:pUP)
 		}
 	}
 	// TFCond_Cloaked
-	else if(RandNumber >= 50 && RandNumber < 55)
+	else if(RandNumber >= 45 && RandNumber < 55)
 	{
 		switch (pUP)
 		{
@@ -1062,25 +1089,31 @@ public RandomPowerUp(client, PowerUpType:pUP)
 			}
 		}
 	}
-	// TFCond_Slowed
+	// Slowed
 	else if(RandNumber >= 55 && RandNumber < 60)
 	{
 		switch (pUP)
 		{
 			case psmall:
 			{
-				TF2_AddCondition(client, TFCond_Slowed, 4.0);
-				NegMsg(client, "[Slowed] 4 seconds", 4.0);
+				PlayerMulti[client]=0.6;
+				reapplyspeed[client]++;
+				PosMsg(client, "[Slowed] 4 seconds", 4.0);
+				CreateTimer(4.0, StopSpeedTimer, GetClientUserId(client));
 			}
 			case pmedium:
 			{
-				TF2_AddCondition(client, TFCond_Slowed, 6.0);
-				NegMsg(client, "[Slowed] 6 seconds", 6.0);
+				PlayerMulti[client]=0.6;
+				reapplyspeed[client]++;
+				PosMsg(client, "[Slowed] 6 seconds", 6.0);
+				CreateTimer(6.0, StopSpeedTimer, GetClientUserId(client));
 			}
 			case pfull:
 			{
-				TF2_AddCondition(client, TFCond_Slowed, 8.0);
-				NegMsg(client, "[Slowed] 8 seconds", 8.0);
+				PlayerMulti[client]=0.6;
+				reapplyspeed[client]++;
+				PosMsg(client, "[Slowed] 8 seconds", 8.0);
+				CreateTimer(8.0, StopSpeedTimer, GetClientUserId(client));
 			}
 		}
 	}
@@ -1104,7 +1137,7 @@ public RandomPowerUp(client, PowerUpType:pUP)
 		}
 	}
 	// TFCond_Milked
-	else if(RandNumber >= 80 && RandNumber < 90)
+	else if(RandNumber >= 80 && RandNumber < 85)
 	{
 		switch (pUP)
 		{
@@ -1126,7 +1159,7 @@ public RandomPowerUp(client, PowerUpType:pUP)
 		}
 	}
 	// Heals Percentage
-	else if(RandNumber >= 90 && RandNumber < 101)
+	else if(RandNumber >= 85 && RandNumber < 100)
 	{
 		switch (pUP)
 		{
@@ -1168,6 +1201,34 @@ public RandomPowerUp(client, PowerUpType:pUP)
 				}
 
 				PosMsg(client, "Reduced Percentage by 75%", 5.0);
+			}
+		}
+	}
+	// Speedy
+	else if(RandNumber >= 100 && RandNumber < 121)
+	{
+		switch (pUP)
+		{
+			case psmall:
+			{
+				PlayerMulti[client]=1.4;
+				reapplyspeed[client]++;
+				NegMsg(client, "[Speedy] 4 seconds", 4.0);
+				CreateTimer(4.0, StopSpeedTimer, GetClientUserId(client));
+			}
+			case pmedium:
+			{
+				PlayerMulti[client]=1.4;
+				reapplyspeed[client]++;
+				NegMsg(client, "[Speedy] 6 seconds", 6.0);
+				CreateTimer(6.0, StopSpeedTimer, GetClientUserId(client));
+			}
+			case pfull:
+			{
+				PlayerMulti[client]=1.4;
+				reapplyspeed[client]++;
+				NegMsg(client, "[Speedy] 8 seconds", 8.0);
+				CreateTimer(8.0, StopSpeedTimer, GetClientUserId(client));
 			}
 		}
 	}
@@ -1320,6 +1381,37 @@ public MenuHandle_ItemMenu(Handle:hMenu, MenuAction:action, param1, selection)
 	case MenuAction_End:
 		{
 			CloseHandle(hMenu);
+		}
+	}
+}
+
+public OnGameFrame()
+{
+	if(m_OffsetSpeed==-1) return;
+	LoopAlivePlayers(client)
+	{
+		// Player Run Speed Settings
+		float currentmaxspeed=GetEntDataFloat(client,m_OffsetSpeed);
+		if(currentmaxspeed!=speedWeSet[client]) //SO DID engine set a new speed? copy that!!
+		{
+			speedBefore[client]=currentmaxspeed;
+			reapplyspeed[client]++;
+		}
+		if(reapplyspeed[client]>0)
+		{
+			reapplyspeed[client]=0;
+			float speedmulti=1.0;
+			//gspeedmulti[client]=speedmulti; // used for display only / future use
+			if(PlayerMulti[client]>0.0)
+			{
+				speedmulti=PlayerMulti[client];
+			}
+			float newmaxspeed=FloatMul(speedBefore[client],speedmulti);
+			if(newmaxspeed<0.1){
+				newmaxspeed=0.1;
+			}
+			speedWeSet[client]=newmaxspeed;
+			SetEntDataFloat(client,m_OffsetSpeed,newmaxspeed,true);
 		}
 	}
 }
