@@ -26,6 +26,7 @@
 
 #include <sourcemod>
 #include <sb_interface>
+#include <sdkhooks>
 
 public Plugin:myinfo = {
 	name = "Smash Bros Calculations Engine",
@@ -140,14 +141,31 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 	//{
 		//SB_DP("DMG_CRUSH");
 	//}
+
+	/*
 	if(!(GetEntityFlags(victim) & FL_ONGROUND))
 	{
 		if(SB_GetPlayerProp(victim,iDamage)>10000)
 		{
-			ForcePlayerSuicide(victim);
+			//ForcePlayerSuicide(victim);
+			//SDKHooks_TakeDamage(victim, 0, 0, 999999.9, DMG_GENERIC, -1, NULL_VECTOR, NULL_VECTOR);
+			int pointHurt=CreateEntityByName("point_hurt");
+			if(pointHurt)
+			{
+				DispatchKeyValue(victim,"targetname","sb_hurtme"); //set victim as the target for damage
+				DispatchKeyValue(pointHurt,"Damagetarget","sb_hurtme");
+				DispatchKeyValue(pointHurt,"Damage","99999");
+				DispatchKeyValue(pointHurt,"DamageType","32");
+				DispatchKeyValue(pointHurt,"classname","sb_point_hurt");
+				DispatchSpawn(pointHurt);
+				AcceptEntityInput(pointHurt,"Hurt",-1);
+				DispatchKeyValue(victim,"targetname","sb_donthurtme"); //unset the victim as target for damage
+				RemoveEdict(pointHurt);
+			}
+
 			return;
 		}
-	}
+	}*/
 
 	bool DamageCustom = false;
 
@@ -256,7 +274,8 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 			SB_DP("OUT SIDE OF MAP");
 			SB_DP("OUT SIDE OF MAP");
 			// allow to kill
-			ForcePlayerSuicide(victim);
+			//ForcePlayerSuicide(victim);
+			//SDKHooks_TakeDamage(victim, 0, 0, 999999.9, DMG_GENERIC, -1, NULL_VECTOR, NULL_VECTOR);
 		}
 	}
 	//SB_DP("iItemDefinitionIndex pass");
@@ -416,13 +435,15 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 			}
 		}
 
+		/*
 		if(SB_GetPlayerProp(i,iDamage)>10000)
 		{
 			if(SB_ValidPlayer(i,true,true))
 			{
-				ForcePlayerSuicide(i);
+				//ForcePlayerSuicide(i);
+				SDKHooks_TakeDamage(i, 0, 0, 999999.9, DMG_GENERIC, -1, NULL_VECTOR, NULL_VECTOR);
 			}
-		}
+		}*/
 	}
 }
 
