@@ -891,7 +891,27 @@ public OnBoxTrigger(boxindex, client, behaviorBitFlags, targetBitFlags, bool:isB
 
 	if(HasBitflags(behaviorBitFlags,BEHAVIOR_KILL_ZONE))
 	{
-		ForcePlayerSuicide(client);
+		// Damage instead of kill to help keep lives.
+		//SDKHooks_TakeDamage(client, 0, 0, 999999.9, DMG_GENERIC, -1, NULL_VECTOR, NULL_VECTOR);
+		//ForcePlayerSuicide(client);
+
+
+		// fixed kill zones to work properly:
+
+		int pointHurt=CreateEntityByName("point_hurt");
+		if(pointHurt)
+		{
+			DispatchKeyValue(client,"targetname","sb_hurtme"); //set victim as the target for damage
+			DispatchKeyValue(pointHurt,"Damagetarget","sb_hurtme");
+			DispatchKeyValue(pointHurt,"Damage","99999");
+			DispatchKeyValue(pointHurt,"DamageType","32");
+			DispatchKeyValue(pointHurt,"classname","sb_point_hurt");
+			DispatchSpawn(pointHurt);
+			AcceptEntityInput(pointHurt,"Hurt",-1);
+			DispatchKeyValue(client,"targetname","sb_donthurtme"); //unset the victim as target for damage
+			RemoveEdict(pointHurt);
+		}
+
 		return;
 	}
 	if(HasBitflags(behaviorBitFlags,BEHAVIOR_NO_DAMAGE))
