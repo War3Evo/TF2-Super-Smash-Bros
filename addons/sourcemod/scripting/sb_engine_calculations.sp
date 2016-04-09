@@ -94,7 +94,7 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 	{
 		if(RoundToCeil(damage)>GetClientHealth(victim))
 		{
-			if(SB_GetPlayerProp(victim,iLives)>0)
+			if(SB_GetPlayerProp(victim,iLives)>1)
 			{
 				SB_DamageModPercent(0.0);
 				SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
