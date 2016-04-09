@@ -99,7 +99,35 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 				SB_DamageModPercent(0.0);
 				SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
 				//CreateTimer(3.0,instaspawn,victim);
+
+				int teamred=0;
+				int teamblue=0;
+
+				int TheLives = 0;
+
+				for(int i=1;i<MaxClients;i++)
+				{
+					if(SB_ValidPlayer(i))
+					{
+						TheLives = SB_GetPlayerProp(i,iLives);
+						if(TheLives>0)
+						{
+							if(GetClientTeam(i)==TEAM_RED)
+							{
+								teamred+=TheLives;
+							}
+							else if(GetClientTeam(i)==TEAM_BLUE)
+							{
+								teamblue+=TheLives;
+							}
+						}
+					}
+				}
+
+				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+
 				SDKCall(hSpawnPlayer,victim);
+
 				return;
 			}
 		}
