@@ -365,6 +365,11 @@ public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
 		}
 	}
 	*/
+	if(victim)
+	{
+		SB_SetPlayerProp(victim,iLives,0);
+	}
+
 	int teamred=0;
 	int teamblue=0;
 
