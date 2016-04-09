@@ -144,6 +144,15 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		}
 		//TF2_RespawnPlayer(i);
 	}
+
+	// Created timer so that it doesn't hold up round_start
+	CreateTimer(0.1,TeamBalanceTimer, _);
+
+	return Plugin_Continue;
+}
+
+public Action:TeamBalanceTimer(Handle:timer,any:userid)
+{
 	//PrintToChatAll("Debug: Start of Balancing");
 
 	int redteamcount = GetTeamClientCount(2);
@@ -187,7 +196,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 				continue;
 			}
 			if(GetClientTeam(target)!=teamToBalance) continue;
-			if(GetRandomFloat(0.0,1.0)>0.75)
+			if(GetRandomFloat(0.0,1.0)>=0.50)
 			{
 				TargetGotExtraLiveAlready[target]=true;
 				SB_SetPlayerProp(target,iLives,SB_GetPlayerProp(target,iLives)+1);
@@ -205,6 +214,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		}
 	}
 	//PrintToChatAll("Debug: End of Balancing");
+
 	return Plugin_Continue;
 }
 
