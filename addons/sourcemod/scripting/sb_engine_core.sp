@@ -176,14 +176,14 @@ public Action:teamplay_round_active(Handle:event,  const String:name[], bool:don
 public Action:teamplay_round_win(Handle:event,  const String:name[], bool:dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
+	for(new i=1;i<=MaxClients;++i){
+		ResetClientVars(i);
+	}
 }
 
 public Action:teamplay_waiting_begins(Handle:event,  const String:name[], bool:dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
-	for(new i=1;i<=MaxClients;++i){
-		ResetClientVars(i);
-	}
 }
 
 //CreateTimer(1.2,instaspawn,victim);
