@@ -434,7 +434,7 @@ public OnSB_EventSpawn(client)
 }
 
 /*
-public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
+public void OnSB_EventDeath(int victim, int attacker, int distance, int attacker_hpleft, Handle event)
 {
 	if(SB_ValidPlayer(victim))
 	{
@@ -632,7 +632,7 @@ public Action FakeKillFeedTimer(Handle timer, Handle datapack)
 	PrintToChatAll("victim = %d", victim);
 	int attacker = ReadPackCell(datapack);
 	PrintToChatAll("attacker = %d", attacker);
-	SB_FakeKillFeed(victim, attacker);
+	SB_FakeKillFeed_TEST(victim, attacker);
 	PrintToChatAll("FakeKillFeedTimer end");
 	return Plugin_Continue;
 }

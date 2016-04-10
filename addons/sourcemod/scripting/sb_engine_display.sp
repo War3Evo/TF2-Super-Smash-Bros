@@ -376,7 +376,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 	}
 }
 
-public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
+public void OnSB_EventDeath(int victim, int attacker, int distance, int attacker_hpleft, Handle event)
 {
 	/*
 	if(SB_ValidPlayer(victim))
@@ -388,6 +388,9 @@ public OnSB_EventDeath(victim, attacker, distance, attacker_hpleft)
 		}
 	}
 	*/
+	if(GetEventBool(event, "sourcemod"))
+		return;
+
 	if(victim)
 	{
 		SB_SetPlayerProp(victim,iLives,0);

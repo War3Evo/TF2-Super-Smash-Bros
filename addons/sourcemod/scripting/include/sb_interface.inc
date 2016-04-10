@@ -636,6 +636,33 @@ stock SB_DP(const String:szMessage[], any:...)
 
 }
 
+stock bool SB_FakeKillFeed_TEST(int victim, int attacker)
+{
+	if(attacker > 32 || attacker <=0) attacker = 1;
+	new Handle:event = CreateEvent("player_death");
+	SetEventBool(event, "sourcemod", true);							//claims sourcemod based event
+	if(!attacker)
+	{
+		new String:cAssister[64];
+		new String:arg3[64];
+		GetClientName(attacker,STRING(arg3));
+		Format(cAssister, sizeof(cAssister), "d%s", arg3);
+		SetEventString(event, "assister_fallback", cAssister);
+	}
+	else
+	{
+		new String:cAssister[64];
+		new String:arg3[64];
+		GetClientName(attacker,STRING(arg3));
+		Format(cAssister, sizeof(cAssister), "b%s", arg3);
+		SetEventString(event, "assister_fallback", cAssister);
+		SetEventInt(event, "attacker", GetClientUserId(attacker));
+	}
+	SetEventInt(event, "userid", GetClientUserId(victim));
+	SetEventInt(event, "death_flags", 0);
+	FireEvent(event);
+}
+
 stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflictor_entindex=0, bool headshot=false)
 {
 	//environmental_death player_death
@@ -759,7 +786,8 @@ forward OnSB_EventSpawn(client);
 //when player dies, fires only in SB mode
 //Distance in feet
 //forward OnSBEventDeath(victim, attacker, distance, attacker_hpleft, String:weapon[32]);
-forward OnSB_EventDeath(victim, attacker, distance, attacker_hpleft);
+//forward OnSB_EventDeath(victim, attacker, distance, attacker_hpleft);
+forward void OnSB_EventDeath(int victim, int attacker, int distance, int attacker_hpleft, Handle event);
 
 //very generic damage event
 //derrived from the game engine's posthurt event

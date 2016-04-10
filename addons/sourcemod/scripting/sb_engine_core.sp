@@ -91,7 +91,7 @@ public OnPluginStart()
 	HookEvent("teamplay_waiting_begins", teamplay_waiting_begins);
 
 	g_OnSB_EventSpawnFH=CreateGlobalForward("OnSB_EventSpawn",ET_Ignore,Param_Cell);
-	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
+	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
 }
 
 public OnMapEnd()
@@ -195,17 +195,18 @@ public Action:instaspawn(Handle:timer, any:client)
 	}
 }*/
 
-DoForward_OnSB_EventSpawn(client){
+public void DoForward_OnSB_EventSpawn(client){
 		Call_StartForward(g_OnSB_EventSpawnFH);
 		Call_PushCell(client);
 		Call_Finish(dummyreturn);
 }
-DoForward_OnSB_EventDeath(victim,killer,distance,attacker_hpleft){
+public void DoForward_OnSB_EventDeath(int victim,int killer,int distance,int attacker_hpleft,Handle event){
 		Call_StartForward(g_OnSB_EventDeathFH);
 		Call_PushCell(victim);
 		Call_PushCell(killer);
 		Call_PushCell(distance);
 		Call_PushCell(attacker_hpleft);
+		Call_PushCell(event);
 		Call_Finish(dummyreturn);
 }
 
@@ -310,7 +311,7 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 
 		//post death event actual forward
 		//DoForward_OnSB_EventDeath(victimIndex,attackerIndex,SBVarArr[DeathRace],distance,attacker_hpleft,weapon);
-		DoForward_OnSB_EventDeath(victimIndex,attackerIndex,distance,attacker_hpleft);
+		DoForward_OnSB_EventDeath(victimIndex,attackerIndex,distance,attacker_hpleft,event);
 
 		//DP("restore event %d",event);
 		//then we allow change race AFTER death forward

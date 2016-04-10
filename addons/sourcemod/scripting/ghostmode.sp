@@ -370,6 +370,9 @@ public Action:Event_PlayerDeath(Handle:hEvent, String:strName[], bool:bDontBroad
 	if(g_iCvarEnabled == 2 && !g_bArena)
 		return;
 
+	if(GetEventBool(hEvent, "sourcemod"))
+		return;
+
 	new iFlags = GetEventInt(hEvent, "death_flags");
 	if(iFlags & TF_DEATHFLAG_DEADRINGER)
 		return;
