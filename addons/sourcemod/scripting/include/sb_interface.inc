@@ -636,6 +636,94 @@ stock SB_DP(const String:szMessage[], any:...)
 
 }
 
+stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflictor_entindex=0, bool headshot=false)
+{
+	//environmental_death player_death
+	Handle fakeEvent = CreateEvent("player_death", true);
+	if (fakeEvent != null) // event succeed!
+	{
+		//char sWeapon[32];
+		if(attacker > 32 || attacker <=0) attacker = victim;
+
+		PrintToChatAll("victim %d, attacker %d",victim,attacker);
+
+		//GetClientWeapon(attacker, STRING(sWeapon));
+
+/*		This code is for reference only and do not use here
+
+		This code is for capture in player_death capturing events:
+
+		We should not trigger event_player_death related things if it was an event fired by sourcemod or if it is a deadringer (fake) death.
+		stock bool:IsValidEventDeath(Handle:hEvent)
+		{
+		    return !( (GetEventBool(hEvent, "sourcemod") || (GetEventInt(hEvent, "death_flags") & TF_DEATHFLAG_DEADRINGER)) );
+		}
+*/
+		SetEventBool(fakeEvent, "sourcemod", true);							//claims sourcemod based event
+
+		SetEventInt(fakeEvent, "userid", GetClientUserId(victim)); 								//user ID who died
+		PrintToChatAll("userid %d",GetClientUserId(victim));
+
+		SetEventInt(fakeEvent, "victim_entindex", victim);
+		PrintToChatAll("victim_entindex %d",victim);
+
+
+		SetEventInt(fakeEvent, "assister", -1);
+		SetEventInt(fakeEvent, "kill_streak_total", 1);
+		SetEventInt(fakeEvent, "kill_streak_wep", 1);
+		SetEventInt(fakeEvent, "attacker", GetClientUserId(attacker)); 							//user ID who killed
+		SetEventInt(fakeEvent, "inflictor_entindex", attacker); 		//ent index of inflictor (a sentry, for example)
+		SetEventBool(fakeEvent, "silent_kill", true);
+
+		/*
+		if(assister)
+		{
+			SetEventInt(fakeEvent, "assister", GetClientUserId(assister)); 							//user ID of assister
+			PrintToChatAll("assister %d",GetClientUserId(assister));
+		}
+		else
+		{
+			SetEventInt(fakeEvent, "assister", -1); 							//user ID of assister
+			PrintToChatAll("assister -1");
+		}*/
+
+		/*
+		SetEventInt(fakeEvent, "attacker", GetClientUserId(attacker)); 							//user ID who killed
+		PrintToChatAll("attacker %d",GetClientUserId(attacker));
+
+		if(inflictor_entindex <= 0) inflictor_entindex = attacker;
+		if(inflictor_entindex)
+		{
+			SetEventInt(fakeEvent, "inflictor_entindex", inflictor_entindex); 		//ent index of inflictor (a sentry, for example)
+			PrintToChatAll("inflictor_entindex %d",inflictor_entindex);
+		}*/
+
+		//SetEventInt(fakeEvent, "weapon_def_index", 13);
+
+		//SetEventString(fakeEvent, "weapon", "world");
+		//SetEventInt(fakeEvent, "customkill", TF_CUSTOM_SUICIDE );
+		//SetEventString( fakeEvent, "weapon_logclassname", "world" );
+		//SetEventInt(fakeEvent, "death_flags", TF_DEATHFLAG_KILLERDOMINATION );
+
+		/*
+		SetEventString(fakeEvent, "weapon", sWeapon); 											//weapon name killer used
+		PrintToChatAll("weapon %s",sWeapon);
+		SetEventString(fakeEvent, "weapon_logclassname", sWeapon); 								//weapon name that should be printed on the log
+		PrintToChatAll("weapon_logclassname %s",sWeapon);
+		*/
+
+		//SetEventBool(fakeEvent, "headshot", headshot);
+		//PrintToChatAll("headshot %s",headshot?"true":"false");
+		//SetEventBool(fakeEvent, "silent_kill", false);
+		//PrintToChatAll("heasilent_kill false");
+
+		FireEvent(fakeEvent);
+		return true;
+	}
+	PrintToChatAll("Event Failed");
+	return false;
+}
+
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS

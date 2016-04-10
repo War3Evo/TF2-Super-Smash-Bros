@@ -100,6 +100,10 @@
 #define  TEAM_RED 2
 #define  TEAM_BLUE 3
 
+#if !defined _diablostocks_included
+	#define STRING(%1) %1, sizeof(%1)
+#endif
+
 stock bool:SB_ValidPlayer(client,bool:check_alive=false,bool:alivecheckbyhealth=false) {
 	if(client>0 && client<=MaxClients && IsClientConnected(client) && IsClientInGame(client))
 	{

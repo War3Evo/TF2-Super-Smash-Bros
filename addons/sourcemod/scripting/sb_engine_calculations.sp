@@ -123,10 +123,21 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 						}
 					}
 				}
-
+				// fake death
 				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 
 				SDKCall(hSpawnPlayer,victim);
+
+				PrintToChatAll("fake death start");
+				PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
+
+				Handle pack;
+				if(CreateDataTimer(3.0,FakeKillFeedTimer,pack) != null)
+				{
+					WritePackCell(pack, victim);			// the hacker
+					WritePackCell(pack, attacker);			// The Sentry Owner
+				}
+				PrintToChatAll("fake death end");
 
 				return;
 			}
@@ -610,4 +621,18 @@ public Event_player_healonhit(Handle:event, const String:name[], bool:dontBroadc
 			SB_SetPlayerProp(client,iDamage,CurrentDamage);
 		}
 	}
+}
+
+public Action FakeKillFeedTimer(Handle timer, Handle datapack)
+{
+	PrintToChatAll("FakeKillFeedTimer start");
+	ResetPack(datapack);
+	PrintToChatAll("ResetPack(datapack)");
+	int victim = ReadPackCell(datapack);
+	PrintToChatAll("victim = %d", victim);
+	int attacker = ReadPackCell(datapack);
+	PrintToChatAll("attacker = %d", attacker);
+	SB_FakeKillFeed(victim, attacker);
+	PrintToChatAll("FakeKillFeedTimer end");
+	return Plugin_Continue;
 }
