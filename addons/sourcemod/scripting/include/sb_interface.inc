@@ -638,14 +638,14 @@ stock SB_DP(const String:szMessage[], any:...)
 
 stock bool SB_FakeKillFeed_TEST(int victim, int attacker)
 {
-	if(attacker > 32 || attacker <=0) attacker = 1;
+	if(attacker > 32 || attacker <=0) attacker = victim;
 	new Handle:event = CreateEvent("player_death");
 	SetEventBool(event, "sourcemod", true);							//claims sourcemod based event
 	if(!attacker)
 	{
 		new String:cAssister[64];
 		new String:arg3[64];
-		GetClientName(attacker,STRING(arg3));
+		//GetClientName(attacker,STRING(arg3));
 		Format(cAssister, sizeof(cAssister), "d%s", arg3);
 		SetEventString(event, "assister_fallback", cAssister);
 	}
