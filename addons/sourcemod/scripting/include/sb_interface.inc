@@ -747,7 +747,7 @@ stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflict
 		FireEvent(fakeEvent);
 		return true;
 	}
-	PrintToChatAll("Event Failed");
+	//PrintToChatAll("Event Failed");
 	return false;
 }
 

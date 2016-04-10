@@ -141,7 +141,7 @@ remove_entity_all(String:classname[])
 
 public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast)
 {
-	PrintToChatAll("TEAMPLAY_ROUND_START");
+	//PrintToChatAll("TEAMPLAY_ROUND_START");
 	//remove_entity_all("trigger_hurt");
 
 	for(int i=1;i<=MaxClients;++i){

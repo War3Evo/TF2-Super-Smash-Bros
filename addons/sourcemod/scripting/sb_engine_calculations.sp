@@ -135,8 +135,8 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 
 				SDKCall(hSpawnPlayer,victim);
 
-				PrintToChatAll("fake death start");
-				PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
+				//PrintToChatAll("fake death start");
+				//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
 				/*
 				Handle pack;
 				if(CreateDataTimer(0.1,FakeKillFeedTimer,pack) != null)
@@ -146,10 +146,18 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 				}*/
 				if(attacker > 32)
 				{
-					attacker = LastValidAttacker[victim];
+					if(LastValidAttacker[victim]>0)
+					{
+						attacker = LastValidAttacker[victim];
+					}
+					else
+					{
+						attacker = victim;
+					}
 				}
 				SB_FakeKillFeed_TEST(victim, attacker);
-				PrintToChatAll("fake death end");
+				LastValidAttacker[victim]=0;
+				//PrintToChatAll("fake death end");
 
 				return;
 			}
