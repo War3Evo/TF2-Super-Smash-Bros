@@ -27,7 +27,6 @@
 #include <tf2-weapon-restrictions>
 
 new Handle:sb_round_time;
-new Handle:sb_lives;
 
 new Handle:g_OnSB_EventSpawnFH;
 new Handle:g_OnSB_EventDeathFH;
@@ -72,7 +71,6 @@ public OnPluginStart()
 	CreateConVar("Super_Smash_Bros_version", PLUGIN_VERSION, "Smash Bros version.", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
 	sb_round_time = CreateConVar("sb_roundtime", "300.0", "Round Time in Seconds", FCVAR_PLUGIN);
-	sb_lives = CreateConVar("sb_lives", "3", "Amount of lives a player starts with.", FCVAR_PLUGIN);
 
 	// Events for all games
 	if(!HookEventEx("player_spawn",SB_PlayerSpawnEvent,EventHookMode_Pre)) //,EventHookMode_Pre
@@ -148,7 +146,8 @@ public OnClientPutInServer(client){
 
 public ResetClientVars(i){
 	respawn[i]=0.0;
-	SB_SetPlayerProp(i,iLives,GetConVarInt(sb_lives));
+	// don't set lives here (doing it where sb_engine_display)
+	SB_SetPlayerProp(i,iLives,0);
 	SB_SetPlayerProp(i,iDamage,0);
 	//killPlayer[i]=false;
 	//allowSpawn[i]=false;

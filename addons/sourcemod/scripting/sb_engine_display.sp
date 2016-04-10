@@ -31,17 +31,17 @@
 
 #define STRING(%1) %1, sizeof(%1)
 
+Handle sb_lives;
 
+Handle CountDownTimerMessage;
+Handle TargetDamageMessage;
+Handle YourDamageMessage;
+Handle YourLivesMessage;
 
-new Handle:CountDownTimerMessage;
-new Handle:TargetDamageMessage;
-new Handle:YourDamageMessage;
-new Handle:YourLivesMessage;
-
-new bool:g_spec[MAXPLAYERS+1] = {true, ...};
+bool g_spec[MAXPLAYERS+1] = {true, ...};
 
 //new Float:respawn[MAXPLAYERS+1];
-new LastPersonAttacked[MAXPLAYERSCUSTOM];
+int LastPersonAttacked[MAXPLAYERSCUSTOM];
 
 //new bool:started=false;
 //new bool:playing=false;
@@ -60,6 +60,8 @@ public OnPluginStart()
 	TargetDamageMessage = CreateHudSynchronizer();
 	YourDamageMessage = CreateHudSynchronizer();
 	YourLivesMessage = CreateHudSynchronizer();
+
+	sb_lives = CreateConVar("sb_lives", "3", "Amount of lives a player starts with.", FCVAR_PLUGIN);
 
 	HookEvent("teamplay_round_start", teamplay_round_start);
 	HookEvent("teamplay_round_win", teamplay_round_win);
@@ -144,6 +146,14 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
+		if(SB_ValidPlayer(i) && (GetClientTeam(i)==2 || GetClientTeam(i)==3))
+		{
+			SB_SetPlayerProp(i,iLives,GetConVarInt(sb_lives));
+		}
+		else
+		{
+			SB_SetPlayerProp(i,iLives,0);
+		}
 	}
 	int rand = GetRandomInt(2, 3);
 	for(int i=1;i<=MaxClients;i++)
