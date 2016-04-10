@@ -84,7 +84,7 @@ public OnPluginStart()
 		PrintToServer("[SmashBros] Could not hook the player_death event.");
 	}
 
-	HookEvent("teamplay_round_start", teamplay_round_start);
+	//HookEvent("teamplay_round_start", teamplay_round_start);
 
 	HookEvent("teamplay_round_active", teamplay_round_active);
 	HookEvent("arena_round_start", teamplay_round_active);
@@ -143,6 +143,7 @@ public OnClientDisconnected(client){
 
 public OnClientPutInServer(client){
 	respawn[client]=1.0;
+	ResetClientVars(client);
 }
 
 public ResetClientVars(i){
@@ -160,11 +161,12 @@ public OnRoundEnd(){
 
 }
 
+/*
 public Action:teamplay_round_start(Handle:event,  const String:name[], bool:dontBroadcast) {
 	for(new i=1;i<=MaxClients;++i){
 		ResetClientVars(i);
 	}
-}
+}*/
 
 public Action:teamplay_round_active(Handle:event,  const String:name[], bool:dontBroadcast) {
 	playing=true;
@@ -179,6 +181,9 @@ public Action:teamplay_round_win(Handle:event,  const String:name[], bool:dontBr
 public Action:teamplay_waiting_begins(Handle:event,  const String:name[], bool:dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
+	for(new i=1;i<=MaxClients;++i){
+		ResetClientVars(i);
+	}
 }
 
 //CreateTimer(1.2,instaspawn,victim);
