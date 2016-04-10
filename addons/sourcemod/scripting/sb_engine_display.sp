@@ -104,17 +104,24 @@ public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroa
 			int cred = GetTeamClientCount(2);
 			int cblue = GetTeamClientCount(3);
 			if(cred>cblue) {
-				ChangeClientTeam(i, 3);
-			} else if(cblue<cred) {
-				ChangeClientTeam(i, 2);
-			} else if(GetTeamClientCount(1)>1) {
-				rand = GetRandomInt(2, 3);
-				ChangeClientTeam(i, rand);
-			} else
-			{
+				if(GetClientTeam(i)!=3)
+				{
+					ChangeClientTeam(i, 3);
+				}
+			} else if(cblue>cred) {
+				if(GetClientTeam(i)!=2)
+				{
+					ChangeClientTeam(i, 2);
+				}
+			} else if(GetTeamClientCount(1)>0) {
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
+			/*else
+			{
+				rand = GetRandomInt(2, 3);
+				ChangeClientTeam(i, rand);
+			}*/
 		}
 		//TF2_RespawnPlayer(i);
 	}
@@ -132,6 +139,7 @@ remove_entity_all(String:classname[])
 
 public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast)
 {
+	PrintToChatAll("TEAMPLAY_ROUND_START");
 	//remove_entity_all("trigger_hurt");
 
 	for(int i=1;i<=MaxClients;++i){
@@ -146,17 +154,24 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 			int cred = GetTeamClientCount(2);
 			int cblue = GetTeamClientCount(3);
 			if(cred>cblue) {
-				ChangeClientTeam(i, 3);
-			} else if(cblue<cred) {
-				ChangeClientTeam(i, 2);
-			} else if(GetTeamClientCount(1)>1) {
-				rand = GetRandomInt(2, 3);
-				ChangeClientTeam(i, rand);
-			} else
-			{
+				if(GetClientTeam(i)!=3)
+				{
+					ChangeClientTeam(i, 3);
+				}
+			} else if(cblue>cred) {
+				if(GetClientTeam(i)!=2)
+				{
+					ChangeClientTeam(i, 2);
+				}
+			} else if(GetTeamClientCount(1)>0) {
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
+			/*else
+			{
+				rand = GetRandomInt(2, 3);
+				ChangeClientTeam(i, rand);
+			}*/
 		}
 		//TF2_RespawnPlayer(i);
 	}
