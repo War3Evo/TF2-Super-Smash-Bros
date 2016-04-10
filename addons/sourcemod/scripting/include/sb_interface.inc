@@ -787,7 +787,7 @@ forward OnSB_EventSpawn(client);
 //Distance in feet
 //forward OnSBEventDeath(victim, attacker, distance, attacker_hpleft, String:weapon[32]);
 //forward OnSB_EventDeath(victim, attacker, distance, attacker_hpleft);
-forward void OnSB_EventDeath(int victim, int attacker, int distance, int attacker_hpleft, Handle event);
+forward void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event);
 
 //very generic damage event
 //derrived from the game engine's posthurt event

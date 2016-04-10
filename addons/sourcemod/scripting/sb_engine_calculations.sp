@@ -38,6 +38,8 @@ public Plugin:myinfo = {
 
 new Handle:hSpawnPlayer;
 
+int LastValidAttacker[MAXPLAYERSCUSTOM];
+
 public OnPluginStart()
 {
 	HookEvent("teamplay_round_start", teamplay_round_active);
@@ -82,12 +84,17 @@ public Action:instaspawn(Handle:timer, any:client)
 	}
 }*/
 
-public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
+public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecustom)
 {
 	if(!SB_GetGamePlaying())
 	{
 		SB_DamageModPercent(0.0);
 		return;
+	}
+
+	if(damage>0.0 && (attacker > 0 && attacker < 33))
+	{
+		LastValidAttacker[victim]=attacker;
 	}
 
 	if(SB_ValidPlayer(victim))
@@ -130,13 +137,18 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom)
 
 				PrintToChatAll("fake death start");
 				PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
-
+				/*
 				Handle pack;
-				if(CreateDataTimer(3.0,FakeKillFeedTimer,pack) != null)
+				if(CreateDataTimer(0.1,FakeKillFeedTimer,pack) != null)
 				{
 					WritePackCell(pack, victim);			// the hacker
 					WritePackCell(pack, attacker);			// The Sentry Owner
+				}*/
+				if(attacker > 32)
+				{
+					attacker = LastValidAttacker[victim];
 				}
+				SB_FakeKillFeed_TEST(victim, attacker);
 				PrintToChatAll("fake death end");
 
 				return;
@@ -434,7 +446,7 @@ public OnSB_EventSpawn(client)
 }
 
 /*
-public void OnSB_EventDeath(int victim, int attacker, int distance, int attacker_hpleft, Handle event)
+public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
 {
 	if(SB_ValidPlayer(victim))
 	{
@@ -622,7 +634,7 @@ public Event_player_healonhit(Handle:event, const String:name[], bool:dontBroadc
 		}
 	}
 }
-
+/*
 public Action FakeKillFeedTimer(Handle timer, Handle datapack)
 {
 	PrintToChatAll("FakeKillFeedTimer start");
@@ -636,3 +648,4 @@ public Action FakeKillFeedTimer(Handle timer, Handle datapack)
 	PrintToChatAll("FakeKillFeedTimer end");
 	return Plugin_Continue;
 }
+*/

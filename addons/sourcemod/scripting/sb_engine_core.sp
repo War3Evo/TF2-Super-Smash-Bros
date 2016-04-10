@@ -91,7 +91,7 @@ public OnPluginStart()
 	HookEvent("teamplay_waiting_begins", teamplay_waiting_begins);
 
 	g_OnSB_EventSpawnFH=CreateGlobalForward("OnSB_EventSpawn",ET_Ignore,Param_Cell);
-	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
+	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
 }
 
 public OnMapEnd()
@@ -200,10 +200,11 @@ public void DoForward_OnSB_EventSpawn(client){
 		Call_PushCell(client);
 		Call_Finish(dummyreturn);
 }
-public void DoForward_OnSB_EventDeath(int victim,int killer,int distance,int attacker_hpleft,Handle event){
+public void DoForward_OnSB_EventDeath(int victim,int killer,int assister,int distance,int attacker_hpleft,Handle event){
 		Call_StartForward(g_OnSB_EventDeathFH);
 		Call_PushCell(victim);
 		Call_PushCell(killer);
+		Call_PushCell(assister);
 		Call_PushCell(distance);
 		Call_PushCell(attacker_hpleft);
 		Call_PushCell(event);
@@ -234,18 +235,20 @@ public SB_PlayerSpawnEvent(Handle:event,const String:name[],bool:dontBroadcast)
 
 public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBroadcast)
 {
-	new uid_victim = GetEventInt(event, "userid");
-	new uid_attacker = GetEventInt(event, "attacker");
-	//new uid_entity = GetEventInt(event, "entityid");
+	int uid_victim = GetEventInt(event, "userid");
+	int uid_attacker = GetEventInt(event, "attacker");
+	int uid_assister = GetEventInt(event, "assister");
 
-	new victimIndex = 0;
-	new attackerIndex = 0;
+	int victimIndex = 0;
+	int attackerIndex = 0;
+	int assisterIndex = 0;
 
-	new victim = GetClientOfUserId(uid_victim);
-	new attacker = GetClientOfUserId(uid_attacker);
+	int victim = GetClientOfUserId(uid_victim);
+	int attacker = GetClientOfUserId(uid_attacker);
+	int assister = GetClientOfUserId(uid_assister);
 
-	new distance=0;
-	new attacker_hpleft=0;
+	int distance=0;
+	int attacker_hpleft=0;
 
 	//new String:weapon[32];
 	//GetEventString(event, "weapon", weapon, 32);
@@ -254,8 +257,8 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 	if(victim>0&&attacker>0)
 	{
 		//Get the distance
-		new Float:victimLoc[3];
-		new Float:attackerLoc[3];
+		float victimLoc[3];
+		float attackerLoc[3];
 		GetClientAbsOrigin(victim,victimLoc);
 		GetClientAbsOrigin(attacker,attackerLoc);
 		distance = RoundToNearest(FloatDiv(calcDistance(victimLoc[0],attackerLoc[0], victimLoc[1],attackerLoc[1], victimLoc[2],attackerLoc[2]),12.0));
@@ -271,6 +274,10 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 
 	if(uid_victim>0){
 		victimIndex=GetClientOfUserId(uid_victim);
+	}
+
+	if(uid_assister>0){
+		assisterIndex=GetClientOfUserId(uid_assister);
 	}
 
 	new bool:deadringereath=false;
@@ -311,7 +318,7 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 
 		//post death event actual forward
 		//DoForward_OnSB_EventDeath(victimIndex,attackerIndex,SBVarArr[DeathRace],distance,attacker_hpleft,weapon);
-		DoForward_OnSB_EventDeath(victimIndex,attackerIndex,distance,attacker_hpleft,event);
+		DoForward_OnSB_EventDeath(victimIndex,attackerIndex,assisterIndex,distance,attacker_hpleft,event);
 
 		//DP("restore event %d",event);
 		//then we allow change race AFTER death forward
