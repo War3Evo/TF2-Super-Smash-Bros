@@ -137,6 +137,7 @@ public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroa
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
 	}
+	/*
 	int rand = GetRandomInt(2, 3);
 	for(int i=1;i<=MaxClients;i++)
 	{
@@ -159,14 +160,14 @@ public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroa
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
-			/*else
-			{
-				rand = GetRandomInt(2, 3);
-				ChangeClientTeam(i, rand);
-			}*/
+			//else
+			//{
+				//rand = GetRandomInt(2, 3);
+				//ChangeClientTeam(i, rand);
+			//}
 		}
 		//TF2_RespawnPlayer(i);
-	}
+	}*/
 }
 /*
 remove_entity_all(String:classname[])
