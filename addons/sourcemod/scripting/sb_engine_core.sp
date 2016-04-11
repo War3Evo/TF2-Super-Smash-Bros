@@ -366,14 +366,14 @@ TriggerEvent()
 		}
 	}
 
-	new teamred=0;
-	new teamblue=0;
+	int teamred=0;
+	int teamblue=0;
 
-	for(new i=1;i<MaxClients;i++)
+	for(int i=1;i<MaxClients;i++)
 	{
 		if(SB_ValidPlayer(i))
 		{
-			new TheLives = SB_GetPlayerProp(i,iLives);
+			int TheLives = SB_GetPlayerProp(i,iLives);
 			if(TheLives>0)
 			{
 				if(GetClientTeam(i)==TEAM_RED)
@@ -388,7 +388,7 @@ TriggerEvent()
 		}
 	}
 
-	new iWinningTeam = 0;
+	int iWinningTeam = 0;
 
 	if(teamred>teamblue)
 	{
@@ -398,6 +398,8 @@ TriggerEvent()
 	{
 		iWinningTeam=TEAM_BLUE;
 	}
+
+	SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 
 	SetVariantInt(iWinningTeam);
 	AcceptEntityInput(iEnt, "SetTeam");
