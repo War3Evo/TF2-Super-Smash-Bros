@@ -146,7 +146,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
-		if(SB_ValidPlayer(i) && (GetClientTeam(i)==2 || GetClientTeam(i)==3))
+		if(SB_ValidPlayer(i))
 		{
 			SB_SetPlayerProp(i,iLives,GetConVarInt(sb_lives));
 		}
@@ -185,6 +185,14 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		}
 		//TF2_RespawnPlayer(i);
 	}
+	for(int i=1;i<=MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i) && GetClientTeam(i)!=2 && GetClientTeam(i)!=3)
+		{
+			SB_SetPlayerProp(i,iLives,0);
+		}
+	}
+
 	// Created timer so that it doesn't hold up round_start
 	CreateTimer(1.0,TeamBalanceTimer, _);
 
