@@ -710,13 +710,17 @@ public OnSB_RoundEnd()
 	if(teamred>teamblue)
 	{
 		iWinningTeam=TEAM_RED;
+		SB_ChatMessage(0,"{default}[{yellow}RED TEAM WINS!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 	}
 	else if(teamred<teamblue)
 	{
 		iWinningTeam=TEAM_BLUE;
+		SB_ChatMessage(0,"{default}[{yellow}BLUE TEAM WINS!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 	}
-
-	SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+	else
+	{
+		SB_ChatMessage(0,"{default}[{yellow}STALEMATE!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+	}
 
 	SetVariantInt(iWinningTeam);
 	AcceptEntityInput(iEnt, "SetTeam");
