@@ -355,11 +355,33 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 				ShowSyncHudText(client, YourLivesMessage, "Lives %d",SB_GetPlayerProp(client,iLives));
 
 				//new target=SB_GetTargetInViewCone(client,10000.0,true, 13.0);
-				new target = LastPersonAttacked[client];
-				if(SB_ValidPlayer(target))
+				if(TF2_GetPlayerClass(client) != TFClass_Medic)
 				{
-					SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-					ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%",SB_GetPlayerProp(target,iDamage));
+					int target = LastPersonAttacked[client];
+					if(SB_ValidPlayer(target))
+					{
+						SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
+						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%",SB_GetPlayerProp(target,iDamage));
+					}
+				}
+				else
+				{
+					int target = TF2_GetHealingTarget(client);
+					if(SB_ValidPlayer(target))
+					{
+						SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
+						ShowSyncHudText(client, TargetDamageMessage, "Healing: %d%%",SB_GetPlayerProp(target,iDamage));
+					}
+					else
+					{
+						target = LastPersonAttacked[client];
+						if(SB_ValidPlayer(target))
+						{
+							SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
+							ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%",SB_GetPlayerProp(target,iDamage));
+						}
+					}
+
 				}
 			}
 			else

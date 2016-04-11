@@ -71,7 +71,7 @@ public OnPluginStart()
 	HookEvent("player_healonhit", Event_player_healonhit, EventHookMode_Post);
 	//HookEvent("player_healed", Event_player_healed, EventHookMode_Post);
 
-	CreateTimer(1.0, Timer_Uber_Regen, _, TIMER_REPEAT);
+	CreateTimer(0.2, Timer_Uber_Regen, _, TIMER_REPEAT);
 }
 
 //CreateTimer(1.2,instaspawn,victim);
@@ -490,7 +490,11 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 			//SB_DP("healer %d ... healer victim %d",i,HealVictim);
 			if(SB_GetPlayerProp(HealVictim,iDamage)>0)
 			{
-				new NewDamage = SB_GetPlayerProp(HealVictim,iDamage)-10;
+				new NewDamage = SB_GetPlayerProp(HealVictim,iDamage)-1;
+				if(TF2_IsPlayerInCondition(i, TFCond_MegaHeal))
+				{
+					NewDamage -= 1;
+				}
 				if(NewDamage<0) NewDamage = 0;
 				SB_SetPlayerProp(HealVictim,iDamage,NewDamage);
 			}
