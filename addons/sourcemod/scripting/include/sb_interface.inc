@@ -636,7 +636,7 @@ stock SB_DP(const String:szMessage[], any:...)
 
 }
 
-stock bool SB_FakeKillFeed_TEST(int victim, int attacker)
+stock bool SB_FakeKillFeed_TEST(int victim, int attacker, bool bfirstblood)
 {
 	if(attacker > 32 || attacker <=0) attacker = victim;
 	new Handle:event = CreateEvent("player_death");
@@ -659,7 +659,12 @@ stock bool SB_FakeKillFeed_TEST(int victim, int attacker)
 		SetEventInt(event, "attacker", GetClientUserId(attacker));
 	}
 	SetEventInt(event, "userid", GetClientUserId(victim));
-	SetEventInt(event, "death_flags", 0);
+	int deathFlags;
+	if(bfirstblood)
+	{
+		deathFlags += TF_DEATHFLAG_FIRSTBLOOD;
+	}
+	SetEventInt(event, "death_flags", deathFlags);
 	FireEvent(event);
 }
 

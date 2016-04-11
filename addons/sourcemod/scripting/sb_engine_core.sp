@@ -147,7 +147,7 @@ public OnClientPutInServer(client){
 public ResetClientVars(i){
 	respawn[i]=0.0;
 	// don't set lives here (doing it where sb_engine_display)
-	SB_SetPlayerProp(i,iLives,0);
+	//SB_SetPlayerProp(i,iLives,0);
 	SB_SetPlayerProp(i,iDamage,0);
 	//killPlayer[i]=false;
 	//allowSpawn[i]=false;

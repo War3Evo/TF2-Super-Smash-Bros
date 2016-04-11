@@ -67,11 +67,43 @@ public OnPluginStart()
 	HookEvent("teamplay_round_win", teamplay_round_win);
 	HookEvent("teamplay_waiting_begins", teamplay_round_start);
 
+	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
+
 
 	RegConsoleCmd("jointeam", Command_jointeam);
 	HookEvent("player_team", Event_player_team);
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
+}
+
+public OnClientConnected(client){
+	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+	SB_SetPlayerProp(client,iLives,MaxLives);
+}
+
+public OnClientDisconnected(client){
+	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+	SB_SetPlayerProp(client,iLives,MaxLives);
+}
+
+public OnClientPutInServer(client){
+	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+	SB_SetPlayerProp(client,iLives,MaxLives);
+}
+
+
+public Action:Command_Lives(client, args)
+{
+	for(int i=1;i<MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i))
+		{
+			char sClientName[32];
+			GetClientName(i,STRING(sClientName));
+			PrintToConsole(client,"%s has %d lives.",sClientName,SB_GetPlayerProp(i,iLives));
+		}
+	}
+
 }
 
 public OnClientDisconnect(client) {
@@ -143,17 +175,11 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 {
 	//PrintToChatAll("TEAMPLAY_ROUND_START");
 	//remove_entity_all("trigger_hurt");
-
+	int MaxLives = GetConVarInt(sb_lives);
+	PrintToChatAll("Max lives = %d",MaxLives);
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
-		if(SB_ValidPlayer(i))
-		{
-			SB_SetPlayerProp(i,iLives,GetConVarInt(sb_lives));
-		}
-		else
-		{
-			SB_SetPlayerProp(i,iLives,0);
-		}
+		SB_SetPlayerProp(i,iLives,MaxLives);
 	}
 	int rand = GetRandomInt(2, 3);
 	for(int i=1;i<=MaxClients;i++)
@@ -185,13 +211,6 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		}
 		//TF2_RespawnPlayer(i);
 	}
-	for(int i=1;i<=MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i) && GetClientTeam(i)!=2 && GetClientTeam(i)!=3)
-		{
-			SB_SetPlayerProp(i,iLives,0);
-		}
-	}
 
 	// Created timer so that it doesn't hold up round_start
 	CreateTimer(1.0,TeamBalanceTimer, _);
@@ -206,7 +225,8 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 	int redteamcount = GetTeamClientCount(2);
 	int blueteamcount = GetTeamClientCount(3);
 
-	int ConVarLives = GetConVarInt(FindConVar("sb_lives"));
+	int ConVarLives = GetConVarInt(sb_lives);
+	if(ConVarLives <=0) ConVarLives =1;
 	//PrintToChatAll("Debug: sb_lives = %d",ConVarLives);
 	//PrintToChatAll("Debug: redteamcount = %d",redteamcount);
 	//PrintToChatAll("Debug: blueteamcount = %d",blueteamcount);
@@ -247,7 +267,7 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 			if(GetRandomFloat(0.0,1.0)>=0.50)
 			{
 				TargetGotExtraLiveAlready[target]=true;
-				SB_SetPlayerProp(target,iLives,SB_GetPlayerProp(target,iLives)+1);
+				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
 				GetClientName(target,STRING(sClientName));
 				if(teamToBalance==2)
 				{

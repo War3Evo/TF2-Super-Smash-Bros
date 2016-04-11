@@ -39,6 +39,7 @@ public Plugin:myinfo = {
 new Handle:hSpawnPlayer;
 
 int LastValidAttacker[MAXPLAYERSCUSTOM];
+bool firstblood = false;
 
 public OnPluginStart()
 {
@@ -155,7 +156,8 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 						attacker = victim;
 					}
 				}
-				SB_FakeKillFeed_TEST(victim, attacker);
+				if(!firstblood) firstblood=true;
+				SB_FakeKillFeed_TEST(victim, attacker, firstblood);
 				LastValidAttacker[victim]=0;
 				//PrintToChatAll("fake death end");
 
@@ -589,6 +591,7 @@ stock IsValidClient(client, bool:replaycheck = true)
 
 public Action:teamplay_round_active(Handle:event,  const String:name[], bool:dontBroadcast)
 {
+	firstblood=false;
 	CreateTimer(1.0,RemoveStuff,0);
 }
 
