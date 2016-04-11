@@ -463,7 +463,7 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 
 	for(int i=1;i<MaxClients;i++)
 	{
-		if(SB_ValidPlayer(i))
+		if(SB_ValidPlayer(i,true))
 		{
 			TheLives = SB_GetPlayerProp(i,iLives);
 			if(TheLives>0)

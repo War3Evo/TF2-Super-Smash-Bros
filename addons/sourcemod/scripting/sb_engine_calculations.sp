@@ -115,7 +115,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 
 				for(int i=1;i<MaxClients;i++)
 				{
-					if(SB_ValidPlayer(i))
+					if(SB_ValidPlayer(i,true))
 					{
 						TheLives = SB_GetPlayerProp(i,iLives);
 						if(TheLives>0)
@@ -688,7 +688,7 @@ public OnSB_RoundEnd()
 
 	for(int i=1;i<MaxClients;i++)
 	{
-		if(SB_ValidPlayer(i))
+		if(SB_ValidPlayer(i,true))
 		{
 			int TheLives = SB_GetPlayerProp(i,iLives);
 			if(TheLives>0)
