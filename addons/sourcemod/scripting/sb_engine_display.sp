@@ -75,6 +75,14 @@ public OnPluginStart()
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
 }
+public OnAllPluginsLoaded()
+{
+	for(int i=1;i<MaxClients;i++)
+	{
+		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+		SB_SetPlayerProp(i,iLives,MaxLives);
+	}
+}
 
 public OnClientConnected(client){
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
@@ -421,7 +429,9 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 
 	if(victim)
 	{
-		SB_SetPlayerProp(victim,iLives,0);
+		//SB_SetPlayerProp(victim,iLives,0);
+		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+		SB_SetPlayerProp(victim,iLives,MaxLives);
 	}
 
 	int teamred=0;
