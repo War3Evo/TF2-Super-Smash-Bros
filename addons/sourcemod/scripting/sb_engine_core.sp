@@ -26,25 +26,27 @@
 #include <sb_interface>
 #include <tf2-weapon-restrictions>
 
-new Handle:sb_round_time;
+Handle sb_round_time;
 
-new Handle:g_OnSB_EventSpawnFH;
-new Handle:g_OnSB_EventDeathFH;
+Handle g_OnSB_EventSpawnFH;
+Handle g_OnSB_EventDeathFH;
 
-new Float:respawn[MAXPLAYERS+1];
+Handle FHOnSB_RoundEnd;
+
+float respawn[MAXPLAYERS+1];
 
 //new dummyreturn; //for your not used return values
-new bHasDiedThisFrame[MAXPLAYERSCUSTOM];
+int bHasDiedThisFrame[MAXPLAYERSCUSTOM];
 
-new p_properties[MAXPLAYERSCUSTOM][SBPlayerProp];
+int p_properties[MAXPLAYERSCUSTOM][SBPlayerProp];
 
 //new bool:started=false;
-new bool:playing=false;
+bool playing=false;
 
 
 //new ignoreClient;
 
-new CountDownTimer;
+int CountDownTimer;
 //new Float:RespawnTimer[MAXPLAYERS+1];
 
 public Plugin:myinfo = {
@@ -55,7 +57,7 @@ public Plugin:myinfo = {
 	url = "www.war3evo.info"
 }
 
-public bool:SBInitNativesForwards()
+public bool SBInitNativesForwards()
 {
 	CreateNative("SB_GetCountDownTimer",Native_SB_GetCountDownTimer);
 
@@ -63,6 +65,8 @@ public bool:SBInitNativesForwards()
 
 	CreateNative("SB_SetPlayerProp",NSB_SetPlayerProp);
 	CreateNative("SB_GetPlayerProp",NSB_GetPlayerProp);
+
+	FHOnSB_RoundEnd=CreateGlobalForward("OnSB_RoundEnd",ET_Ignore);
 	return true;
 }
 
@@ -114,7 +118,7 @@ public OnAllPluginsLoaded()
 }
 
 public NSB_GetPlayerProp(Handle:plugin,numParams){
-	new client=GetNativeCell(1);
+	int client=GetNativeCell(1);
 	if (client > 0 && client <= MaxClients)
 	{
 		return p_properties[client][SBPlayerProp:GetNativeCell(2)];
@@ -123,7 +127,7 @@ public NSB_GetPlayerProp(Handle:plugin,numParams){
 		return 0;
 }
 public NSB_SetPlayerProp(Handle:plugin,numParams){
-	new client=GetNativeCell(1);
+	int client=GetNativeCell(1);
 	if (client > 0 && client <= MaxClients)
 	{
 		p_properties[client][SBPlayerProp:GetNativeCell(2)]=GetNativeCell(3);
@@ -167,20 +171,20 @@ public Action:teamplay_round_start(Handle:event,  const String:name[], bool:dont
 	}
 }*/
 
-public Action:teamplay_round_active(Handle:event,  const String:name[], bool:dontBroadcast) {
+public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast) {
 	playing=true;
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
 }
 
-public Action:teamplay_round_win(Handle:event,  const String:name[], bool:dontBroadcast) {
+public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
-	for(new i=1;i<=MaxClients;++i){
+	for(int i=1;i<=MaxClients;++i){
 		ResetClientVars(i);
 	}
 }
 
-public Action:teamplay_waiting_begins(Handle:event,  const String:name[], bool:dontBroadcast) {
+public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
 }
@@ -212,12 +216,12 @@ public void DoForward_OnSB_EventDeath(int victim,int killer,int assister,int dis
 }
 
 
-public SB_PlayerSpawnEvent(Handle:event,const String:name[],bool:dontBroadcast)
+public SB_PlayerSpawnEvent(Handle event,  char[] name, bool dontBroadcast)
 {
-	new userid=GetEventInt(event,"userid");
+	int userid=GetEventInt(event,"userid");
 	if(userid>0)
 	{
-		new client=GetClientOfUserId(userid);
+		int client=GetClientOfUserId(userid);
 		if(SB_ValidPlayer(client,true))
 		{
 
@@ -233,7 +237,7 @@ public SB_PlayerSpawnEvent(Handle:event,const String:name[],bool:dontBroadcast)
 	}
 }
 
-public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBroadcast)
+public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast)
 {
 	int uid_victim = GetEventInt(event, "userid");
 	int uid_attacker = GetEventInt(event, "attacker");
@@ -280,10 +284,10 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 		assisterIndex=GetClientOfUserId(uid_assister);
 	}
 
-	new bool:deadringereath=false;
+	bool deadringereath=false;
 	if(uid_victim>0)
 	{
-		new deathFlags = GetEventInt(event, "death_flags");
+		int deathFlags = GetEventInt(event, "death_flags");
 		if (deathFlags & 32) //TF_DEATHFLAG_DEADRINGER
 		{
 			deadringereath=true;
@@ -329,9 +333,9 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 
 public Float:calcDistance(Float:x1,Float:x2,Float:y1,Float:y2,Float:z1,Float:z2){
 	//Distance between two 3d points
-	new Float:dx = x1-x2;
-	new Float:dy = y1-y2;
-	new Float:dz = z1-z2;
+	float dx = x1-x2;
+	float dy = y1-y2;
+	float dz = z1-z2;
 
 	return(SquareRoot(dx*dx + dy*dy + dz*dz));
 }
@@ -350,60 +354,9 @@ TriggerEvent()
 {
 	playing = false;
 
-	new iEnt = -1;
-	iEnt = FindEntityByClassname(iEnt, "game_round_win");
-
-	if (iEnt < 1)
-	{
-		iEnt = CreateEntityByName("game_round_win");
-		if (IsValidEntity(iEnt))
-			DispatchSpawn(iEnt);
-		else
-		{
-			//ReplyToCommand(client, "Unable to find or create a game_round_win entity!");
-			SB_DP("Unable to find or create a game_round_win entity!");
-			return;
-		}
-	}
-
-	int teamred=0;
-	int teamblue=0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i))
-		{
-			int TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					teamred+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					teamblue+=TheLives;
-				}
-			}
-		}
-	}
-
-	int iWinningTeam = 0;
-
-	if(teamred>teamblue)
-	{
-		iWinningTeam=TEAM_RED;
-	}
-	else if(teamred<teamblue)
-	{
-		iWinningTeam=TEAM_BLUE;
-	}
-
-	SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
-
-	SetVariantInt(iWinningTeam);
-	AcceptEntityInput(iEnt, "SetTeam");
-	AcceptEntityInput(iEnt, "RoundWin");
+	int dummyresult = 0;
+	Call_StartForward(FHOnSB_RoundEnd);
+	Call_Finish(dummyresult);
 }
 
 public OnGameFrame(){

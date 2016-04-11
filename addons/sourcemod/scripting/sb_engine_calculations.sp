@@ -664,3 +664,61 @@ public Action FakeKillFeedTimer(Handle timer, Handle datapack)
 	return Plugin_Continue;
 }
 */
+
+public OnSB_RoundEnd()
+{
+	new iEnt = -1;
+	iEnt = FindEntityByClassname(iEnt, "game_round_win");
+
+	if (iEnt < 1)
+	{
+		iEnt = CreateEntityByName("game_round_win");
+		if (IsValidEntity(iEnt))
+			DispatchSpawn(iEnt);
+		else
+		{
+			//ReplyToCommand(client, "Unable to find or create a game_round_win entity!");
+			SB_DP("Unable to find or create a game_round_win entity!");
+			return;
+		}
+	}
+
+	int teamred=0;
+	int teamblue=0;
+
+	for(int i=1;i<MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i))
+		{
+			int TheLives = SB_GetPlayerProp(i,iLives);
+			if(TheLives>0)
+			{
+				if(GetClientTeam(i)==TEAM_RED)
+				{
+					teamred+=TheLives;
+				}
+				else if(GetClientTeam(i)==TEAM_BLUE)
+				{
+					teamblue+=TheLives;
+				}
+			}
+		}
+	}
+
+	int iWinningTeam = 0;
+
+	if(teamred>teamblue)
+	{
+		iWinningTeam=TEAM_RED;
+	}
+	else if(teamred<teamblue)
+	{
+		iWinningTeam=TEAM_BLUE;
+	}
+
+	SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+
+	SetVariantInt(iWinningTeam);
+	AcceptEntityInput(iEnt, "SetTeam");
+	AcceptEntityInput(iEnt, "RoundWin");
+}

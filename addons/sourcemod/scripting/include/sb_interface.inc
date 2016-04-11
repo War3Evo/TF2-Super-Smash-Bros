@@ -830,3 +830,5 @@ forward OnSB_TakeDmgAllPre(victim,attacker,Float:damage,damagecustom);
 forward OnSB_TakeDmgAll(victim,attacker,Float:damage);
 
 
+forward OnSB_RoundEnd();
+
