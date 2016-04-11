@@ -245,7 +245,7 @@ public  Action:SB_PlayerDeathEvent(Handle:event,const String:name[],bool:dontBro
 
 	int victim = GetClientOfUserId(uid_victim);
 	int attacker = GetClientOfUserId(uid_attacker);
-	int assister = GetClientOfUserId(uid_assister);
+	//int assister = GetClientOfUserId(uid_assister);
 
 	int distance=0;
 	int attacker_hpleft=0;
