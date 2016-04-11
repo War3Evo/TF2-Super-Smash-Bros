@@ -456,6 +456,9 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 		SB_SetPlayerProp(victim,iLives,MaxLives);
 	}
 
+	if(!SB_GetGamePlaying())
+		return;
+
 	int teamred=0;
 	int teamblue=0;
 
