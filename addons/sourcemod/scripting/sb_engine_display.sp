@@ -385,10 +385,64 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 		teamToBalance = 2;
 	}
 	//PrintToChatAll("Debug: teamToBalance = %d",teamToBalance);
-	if(teamToBalance == 0) return Plugin_Continue;
+	if(teamToBalance == 0)
+	{
+		int teamred=0;
+		int teamblue=0;
+
+		int TheLives = 0;
+
+		for(int i=1;i<MaxClients;i++)
+		{
+			if(SB_ValidPlayer(i,true))
+			{
+				TheLives = SB_GetPlayerProp(i,iLives);
+				if(TheLives>0)
+				{
+					if(GetClientTeam(i)==TEAM_RED)
+					{
+						teamred+=TheLives;
+					}
+					else if(GetClientTeam(i)==TEAM_BLUE)
+					{
+						teamblue+=TheLives;
+					}
+				}
+			}
+		}
+
+		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		return Plugin_Continue;
+	}
 
 	// Randomly spread the love
 	SpreadLives(teamToBalance, teambalance);
+
+	int teamred=0;
+	int teamblue=0;
+
+	int TheLives = 0;
+
+	for(int i=1;i<MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i,true))
+		{
+			TheLives = SB_GetPlayerProp(i,iLives);
+			if(TheLives>0)
+			{
+				if(GetClientTeam(i)==TEAM_RED)
+				{
+					teamred+=TheLives;
+				}
+				else if(GetClientTeam(i)==TEAM_BLUE)
+				{
+					teamblue+=TheLives;
+				}
+			}
+		}
+	}
+
+	SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 
 	// Keep here just incase SpreadLives doesn't work right:
 	/*
