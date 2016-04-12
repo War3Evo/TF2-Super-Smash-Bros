@@ -81,7 +81,7 @@ public OnPluginStart()
 	HookEvent("player_team", Event_player_team);
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
-	CreateTimer(0.5,DisplayInformation2,_,TIMER_REPEAT);
+	CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
 }
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
