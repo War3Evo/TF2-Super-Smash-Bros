@@ -74,7 +74,7 @@ public OnPluginStart()
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
 
 	AddCommandListener(Command_InterceptSpectate, "spectate");
-	AddCommandListener(Command_InterceptJoinTeam, "jointeam");
+	//AddCommandListener(Command_InterceptJoinTeam, "jointeam");
 
 
 	RegConsoleCmd("jointeam", Command_jointeam);
@@ -128,7 +128,7 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 	}
 	return SpreadSuccess;
 }
-
+/*
 public Action Command_InterceptJoinTeam(int client, char[] command, int args)
 {
 	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
@@ -162,7 +162,7 @@ public Action:Force_Jointeam(Handle:timer, any:client)
 		ChangeClientTeam(client, 1);
 		ShowVGUIPanel(client, PANEL_TEAM);
 	}
-}
+}*/
 
 public Action Command_InterceptSpectate(int client, char[] command, int args)
 {
