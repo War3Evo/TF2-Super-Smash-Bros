@@ -71,7 +71,25 @@ public OnPluginStart()
 	HookEvent("player_healonhit", Event_player_healonhit, EventHookMode_Post);
 	//HookEvent("player_healed", Event_player_healed, EventHookMode_Post);
 
+	AddCommandListener(Command_InterceptSuicide, "kill");
+	AddCommandListener(Command_InterceptSuicide, "explode");
+
 	CreateTimer(0.2, Timer_Uber_Regen, _, TIMER_REPEAT);
+}
+
+public Action Command_InterceptSuicide(int client, char[] command, int args)
+{
+	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
+	{
+		return Plugin_Continue;
+	}
+
+	// Player used "kill" or "explode"
+
+	// Suicide attempt was intercepted
+	FakeDeath(client,client);
+
+	return Plugin_Handled;
 }
 
 //CreateTimer(1.2,instaspawn,victim);
@@ -84,6 +102,70 @@ public Action:instaspawn(Handle:timer, any:client)
 		SDKCall(hSpawnPlayer,client);
 	}
 }*/
+
+public FakeDeath(int victim, int attacker)
+{
+	if(SB_ValidPlayer(victim))
+	{
+		SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
+		//CreateTimer(3.0,instaspawn,victim);
+
+		int teamred=0;
+		int teamblue=0;
+
+		int TheLives = 0;
+
+		for(int i=1;i<MaxClients;i++)
+		{
+			if(SB_ValidPlayer(i,true))
+			{
+				TheLives = SB_GetPlayerProp(i,iLives);
+				if(TheLives>0)
+				{
+					if(GetClientTeam(i)==TEAM_RED)
+					{
+						teamred+=TheLives;
+					}
+					else if(GetClientTeam(i)==TEAM_BLUE)
+					{
+						teamblue+=TheLives;
+					}
+				}
+			}
+		}
+		// fake death
+		SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+
+		SDKCall(hSpawnPlayer,victim);
+
+		//PrintToChatAll("fake death start");
+		//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
+		/*
+		Handle pack;
+		if(CreateDataTimer(0.1,FakeKillFeedTimer,pack) != null)
+		{
+			WritePackCell(pack, victim);			// the hacker
+			WritePackCell(pack, attacker);			// The Sentry Owner
+		}*/
+		if(attacker > 32)
+		{
+			if(attacker!=victim && LastValidAttacker[victim]>0)
+			{
+				attacker = LastValidAttacker[victim];
+			}
+			else
+			{
+				attacker = victim;
+			}
+		}
+		if(!firstblood) firstblood=true;
+		SB_FakeKillFeed_TEST(victim, attacker, firstblood);
+		LastValidAttacker[victim]=0;
+		//PrintToChatAll("fake death end");
+
+		return;
+	}
+}
 
 public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecustom)
 {
@@ -105,66 +187,9 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 			if(SB_GetPlayerProp(victim,iLives)>1)
 			{
 				SB_DamageModPercent(0.0);
-				SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
-				//CreateTimer(3.0,instaspawn,victim);
-
-				int teamred=0;
-				int teamblue=0;
-
-				int TheLives = 0;
-
-				for(int i=1;i<MaxClients;i++)
-				{
-					if(SB_ValidPlayer(i,true))
-					{
-						TheLives = SB_GetPlayerProp(i,iLives);
-						if(TheLives>0)
-						{
-							if(GetClientTeam(i)==TEAM_RED)
-							{
-								teamred+=TheLives;
-							}
-							else if(GetClientTeam(i)==TEAM_BLUE)
-							{
-								teamblue+=TheLives;
-							}
-						}
-					}
-				}
-				// fake death
-				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
-
-				SDKCall(hSpawnPlayer,victim);
-
-				//PrintToChatAll("fake death start");
-				//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
-				/*
-				Handle pack;
-				if(CreateDataTimer(0.1,FakeKillFeedTimer,pack) != null)
-				{
-					WritePackCell(pack, victim);			// the hacker
-					WritePackCell(pack, attacker);			// The Sentry Owner
-				}*/
-				if(attacker > 32)
-				{
-					if(LastValidAttacker[victim]>0)
-					{
-						attacker = LastValidAttacker[victim];
-					}
-					else
-					{
-						attacker = victim;
-					}
-				}
-				if(!firstblood) firstblood=true;
-				SB_FakeKillFeed_TEST(victim, attacker, firstblood);
-				LastValidAttacker[victim]=0;
-				//PrintToChatAll("fake death end");
-
-				return;
+				FakeDeath(victim, attacker);
 			}
 		}
-		//SDKUnhook(victim,SDKHook_OnTakeDamage,OnTakeDamage);
 	}
 
 	/*
