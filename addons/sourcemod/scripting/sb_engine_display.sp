@@ -508,12 +508,54 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage)
 }
 
 
+stock void SendDialogToOne(client,  String:text[], any:...)
+{
+	char message[100];
+	VFormat(message, sizeof(message), text, 4);
+
+	Handle kv = CreateKeyValues("Stuff", "title", message);
+	KvSetColor(kv, "color", 255, 255, 255, 255);
+	KvSetNum(kv, "level", 1);
+	KvSetNum(kv, "time", 1);
+
+	CreateDialog(client, kv, DialogType_Msg);
+
+	CloseHandle(kv);
+}
+
+
 public Action:DisplayInformation(Handle:timer,any:userid)
 {
+	int teamred=0;
+	int teamblue=0;
+
+	int TheLives = 0;
+
+	for(int i=1;i<MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i,true))
+		{
+			TheLives = SB_GetPlayerProp(i,iLives);
+			if(TheLives>0)
+			{
+				if(GetClientTeam(i)==TEAM_RED)
+				{
+					teamred+=TheLives;
+				}
+				else if(GetClientTeam(i)==TEAM_BLUE)
+				{
+					teamblue+=TheLives;
+				}
+			}
+		}
+	}
+
 	for(new client=1;client<=MaxClients;client++)
 	{
 		if(SB_ValidPlayer(client))
 		{
+			SendDialogToOne(client, "Red Team %d Blue Team %d", teamred, teamblue);
+
 			// COUNT DOWN TIMER
 			SetHudTextParams(-1.0, 0.85, 0.11, 255, 255, 255, 255);
 			if(SB_GetGamePlaying())
