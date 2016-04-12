@@ -81,6 +81,7 @@ public OnPluginStart()
 	HookEvent("player_team", Event_player_team);
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
+	CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
 }
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
@@ -516,15 +517,14 @@ stock void SendDialogToOne(client, String:text[], any:...)
 	Handle kv = CreateKeyValues("Stuff", "title", message);
 	KvSetColor(kv, "color", 255, 255, 255, 255);
 	KvSetNum(kv, "level", 1);
-	KvSetNum(kv, "time", 10);
+	KvSetNum(kv, "time", 1);
 
 	CreateDialog(client, kv, DialogType_Msg);
 
 	CloseHandle(kv);
 }
 
-
-public Action:DisplayInformation(Handle:timer,any:userid)
+public Action:DisplayInformation2(Handle:timer,any:userid)
 {
 	int teamred=0;
 	int teamblue=0;
@@ -555,7 +555,16 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 		if(SB_ValidPlayer(client))
 		{
 			SendDialogToOne(client, "Red Team %d Blue Team %d", teamred, teamblue);
+		}
+	}
+}
 
+public Action:DisplayInformation(Handle:timer,any:userid)
+{
+	for(new client=1;client<=MaxClients;client++)
+	{
+		if(SB_ValidPlayer(client))
+		{
 			// COUNT DOWN TIMER
 			SetHudTextParams(-1.0, 0.85, 0.11, 255, 255, 255, 255);
 			if(SB_GetGamePlaying())
