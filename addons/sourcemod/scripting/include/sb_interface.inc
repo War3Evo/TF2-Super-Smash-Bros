@@ -832,3 +832,28 @@ forward OnSB_TakeDmgAll(victim,attacker,Float:damage);
 
 forward OnSB_RoundEnd();
 
+
+
+stock void CalculateTeamScores(int &RedTeam, int &BlueTeam)
+{
+	int TheLives = 0;
+
+	for(int i=1;i<MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i,true))
+		{
+			TheLives = SB_GetPlayerProp(i,iLives);
+			if(TheLives>0)
+			{
+				if(GetClientTeam(i)==TEAM_RED)
+				{
+					RedTeam+=TheLives;
+				}
+				else if(GetClientTeam(i)==TEAM_BLUE)
+				{
+					BlueTeam+=TheLives;
+				}
+			}
+		}
+	}
+}

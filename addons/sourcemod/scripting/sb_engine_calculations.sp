@@ -115,31 +115,11 @@ public bool FakeDeath(int victim, int attacker)
 			SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
 			//CreateTimer(3.0,instaspawn,victim);
 
-			int teamred=0;
-			int teamblue=0;
+			int RedTeam, BlueTeam;
+			CalculateTeamScores(RedTeam,BlueTeam);
 
-			int TheLives = 0;
-
-			for(int i=1;i<MaxClients;i++)
-			{
-				if(SB_ValidPlayer(i,true))
-				{
-					TheLives = SB_GetPlayerProp(i,iLives);
-					if(TheLives>0)
-					{
-						if(GetClientTeam(i)==TEAM_RED)
-						{
-							teamred+=TheLives;
-						}
-						else if(GetClientTeam(i)==TEAM_BLUE)
-						{
-							teamblue+=TheLives;
-						}
-					}
-				}
-			}
 			// fake death
-			SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+			SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
 
 			SDKCall(hSpawnPlayer,victim);
 
@@ -715,27 +695,8 @@ public OnSB_RoundEnd()
 		}
 	}
 
-	int teamred=0;
-	int teamblue=0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i,true))
-		{
-			int TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					teamred+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					teamblue+=TheLives;
-				}
-			}
-		}
-	}
+	int teamred, teamblue;
+	CalculateTeamScores(teamred,teamblue);
 
 	int iWinningTeam = 0;
 
