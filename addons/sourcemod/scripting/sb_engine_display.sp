@@ -81,7 +81,7 @@ public OnPluginStart()
 	HookEvent("player_team", Event_player_team);
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
-	CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
+	//CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
 }
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
@@ -388,62 +388,20 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 	//PrintToChatAll("Debug: teamToBalance = %d",teamToBalance);
 	if(teamToBalance == 0)
 	{
-		int teamred=0;
-		int teamblue=0;
+		int RedTeam, BlueTeam;
+		CalculateTeamScores(RedTeam,BlueTeam);
 
-		int TheLives = 0;
-
-		for(int i=1;i<MaxClients;i++)
-		{
-			if(SB_ValidPlayer(i,true))
-			{
-				TheLives = SB_GetPlayerProp(i,iLives);
-				if(TheLives>0)
-				{
-					if(GetClientTeam(i)==TEAM_RED)
-					{
-						teamred+=TheLives;
-					}
-					else if(GetClientTeam(i)==TEAM_BLUE)
-					{
-						teamblue+=TheLives;
-					}
-				}
-			}
-		}
-
-		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
 		return Plugin_Continue;
 	}
 
 	// Randomly spread the love
 	SpreadLives(teamToBalance, teambalance);
 
-	int teamred=0;
-	int teamblue=0;
+	int RedTeam, BlueTeam;
+	CalculateTeamScores(RedTeam,BlueTeam);
 
-	int TheLives = 0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i,true))
-		{
-			TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					teamred+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					teamblue+=TheLives;
-				}
-			}
-		}
-	}
-
-	SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+	SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
 
 	// Keep here just incase SpreadLives doesn't work right:
 	/*
@@ -523,32 +481,11 @@ stock void SendDialogToOne(client, String:text[], any:...)
 
 	CloseHandle(kv);
 }
-
+/*
 public Action:DisplayInformation2(Handle:timer,any:userid)
 {
-	int teamred=0;
-	int teamblue=0;
-
-	int TheLives = 0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i,true))
-		{
-			TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					teamred+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					teamblue+=TheLives;
-				}
-			}
-		}
-	}
+	int RedTeam, BlueTeam;
+	CalculateTeamScores(RedTeam,BlueTeam);
 
 	for(new client=1;client<=MaxClients;client++)
 	{
@@ -557,10 +494,13 @@ public Action:DisplayInformation2(Handle:timer,any:userid)
 			SendDialogToOne(client, "Red Team %d Blue Team %d", teamred, teamblue);
 		}
 	}
-}
+}*/
 
 public Action:DisplayInformation(Handle:timer,any:userid)
 {
+	int RedTeam, BlueTeam;
+	CalculateTeamScores(RedTeam,BlueTeam);
+
 	for(new client=1;client<=MaxClients;client++)
 	{
 		if(SB_ValidPlayer(client))
@@ -594,7 +534,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 				ShowSyncHudText(client, YourDamageMessage, "You: %d%%",SB_GetPlayerProp(client,iDamage));
 
 				SetHudTextParams(-1.0, 0.88, 0.11, 255, 255, 255, 255);
-				ShowSyncHudText(client, YourLivesMessage, "Lives %d",SB_GetPlayerProp(client,iLives));
+				ShowSyncHudText(client, YourLivesMessage, "Lives %d\nRed %d - Blue %d",SB_GetPlayerProp(client,iLives),RedTeam,BlueTeam);
 
 				//new target=SB_GetTargetInViewCone(client,10000.0,true, 13.0);
 				if(TF2_GetPlayerClass(client) != TFClass_Medic)
