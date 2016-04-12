@@ -81,7 +81,7 @@ public OnPluginStart()
 	HookEvent("player_team", Event_player_team);
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
-	CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
+	CreateTimer(0.5,DisplayInformation2,_,TIMER_REPEAT);
 }
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
@@ -517,7 +517,7 @@ stock void SendDialogToOne(client, String:text[], any:...)
 	Handle kv = CreateKeyValues("Stuff", "title", message);
 	KvSetColor(kv, "color", 255, 255, 255, 255);
 	KvSetNum(kv, "level", 1);
-	KvSetNum(kv, "time", 1000);
+	KvSetNum(kv, "time", 500);
 
 	CreateDialog(client, kv, DialogType_Msg);
 
