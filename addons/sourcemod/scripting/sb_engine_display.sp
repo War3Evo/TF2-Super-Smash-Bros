@@ -69,12 +69,84 @@ public OnPluginStart()
 
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
 
+	AddCommandListener(Command_InterceptSpectate, "spectate");
+
 
 	RegConsoleCmd("jointeam", Command_jointeam);
 	HookEvent("player_team", Event_player_team);
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
 }
+
+public SpreadLives(int teamToGetLives, int GiveLives)
+{
+	// Randomly spread the love
+	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
+
+	int retry = GiveLives;
+
+	char sClientName[32];
+	while(GiveLives > 0)
+	{
+		LoopIngameClients(target)
+		{
+			// try not to use same person twice
+			if(TargetGotExtraLiveAlready[target] && retry>0)
+			{
+				retry--;
+				continue;
+			}
+			if(GetClientTeam(target)!=teamToGetLives) continue;
+			if(GetRandomFloat(0.0,1.0)>=0.50)
+			{
+				TargetGotExtraLiveAlready[target]=true;
+				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
+				GetClientName(target,STRING(sClientName));
+				if(teamToGetLives==2)
+				{
+					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+				}
+				else
+				{
+					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+				}
+				GiveLives--;
+			}
+		}
+	}
+}
+
+public Action Command_InterceptSpectate(int client, char[] command, int args)
+{
+	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
+	{
+		return Plugin_Continue;
+	}
+
+	if(SB_GetGamePlaying())
+	{
+		int CurrentLives = SB_GetPlayerProp(client,iLives);
+		char sClientName[32];
+		GetClientName(client,STRING(sClientName));
+		SB_ChatMessage(0,"{yellow}%s is going spectate! {default}Now spreading out their lives.",sClientName);
+		SpreadLives(GetClientTeam(client), CurrentLives);
+		PrintToChat(client,"Giving your lives away to your team, then you'll be moved to spectate.");
+		CreateTimer(1.5,SendToSpectate,client);
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+public Action SendToSpectate(Handle timer, any client)
+{
+	if(SB_ValidPlayer(client) && GetClientTeam(client)>1)
+	{
+		ChangeClientTeam(client, 1);
+		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+		SB_SetPlayerProp(client,iLives,MaxLives);
+	}
+}
+
 public OnAllPluginsLoaded()
 {
 	for(int i=1;i<MaxClients;i++)
@@ -89,7 +161,15 @@ public OnClientConnected(client){
 	SB_SetPlayerProp(client,iLives,MaxLives);
 }
 
-public OnClientDisconnected(client){
+public void OnClientDisconnect(int client)
+{
+	g_spec[client] = true;
+
+	if(SB_GetGamePlaying())
+	{
+		int CurrentLives = SB_GetPlayerProp(client,iLives);
+		SpreadLives(GetClientTeam(client), CurrentLives);
+	}
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
 }
@@ -114,9 +194,7 @@ public Action:Command_Lives(client, args)
 
 }
 
-public OnClientDisconnect(client) {
-	g_spec[client] = true;
-}
+
 public Action:Event_player_team(Handle:event, const String:name[], bool:dontBroadcast) {
 	if(GetEventInt(event, "team")>1) {
 		g_spec[GetClientOfUserId(GetEventInt(event, "userid"))] = false;
@@ -190,7 +268,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		LastPersonAttacked[i]=-1;
 		SB_SetPlayerProp(i,iLives,MaxLives);
 	}
-	int rand = GetRandomInt(2, 3);
+	//int rand = GetRandomInt(2, 3);
 	for(int i=1;i<=MaxClients;i++)
 	{
 		//if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && !(GetClientTeam(i)==1))
@@ -259,6 +337,11 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 	if(teamToBalance == 0) return Plugin_Continue;
 
 	// Randomly spread the love
+	SpreadLives(teamToBalance, teambalance);
+
+	// Keep here just incase SpreadLives doesn't work right:
+	/*
+
 	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
 
 	int retry = teambalance;
@@ -292,7 +375,7 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 			}
 		}
 	}
-	//PrintToChatAll("Debug: End of Balancing");
+	//PrintToChatAll("Debug: End of Balancing");*/
 
 	return Plugin_Continue;
 }
