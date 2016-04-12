@@ -119,7 +119,10 @@ public bool FakeDeath(int victim, int attacker)
 			CalculateTeamScores(RedTeam,BlueTeam);
 
 			// fake death
-			SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
+			if(GetConVarBool(FindConVar("sb_chatmsg")))
+			{
+				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
+			}
 
 			SDKCall(hSpawnPlayer,victim);
 
@@ -703,16 +706,25 @@ public OnSB_RoundEnd()
 	if(teamred>teamblue)
 	{
 		iWinningTeam=TEAM_RED;
-		SB_ChatMessage(0,"{default}[{yellow}RED TEAM WINS!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		if(GetConVarBool(FindConVar("sb_chatmsg")))
+		{
+			SB_ChatMessage(0,"{default}[{yellow}RED TEAM WINS!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		}
 	}
 	else if(teamred<teamblue)
 	{
 		iWinningTeam=TEAM_BLUE;
-		SB_ChatMessage(0,"{default}[{yellow}BLUE TEAM WINS!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		if(GetConVarBool(FindConVar("sb_chatmsg")))
+		{
+			SB_ChatMessage(0,"{default}[{yellow}BLUE TEAM WINS!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		}
 	}
 	else
 	{
-		SB_ChatMessage(0,"{default}[{yellow}STALEMATE!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		if(GetConVarBool(FindConVar("sb_chatmsg")))
+		{
+			SB_ChatMessage(0,"{default}[{yellow}STALEMATE!{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+		}
 	}
 
 	SetVariantInt(iWinningTeam);

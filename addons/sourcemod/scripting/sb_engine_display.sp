@@ -36,6 +36,8 @@
 #define STRING(%1) %1, sizeof(%1)
 
 Handle sb_lives;
+Handle sb_chatmsg;
+Handle sb_chatmsg_balance;
 
 Handle CountDownTimerMessage;
 Handle TargetDamageMessage;
@@ -66,6 +68,8 @@ public OnPluginStart()
 	YourLivesMessage = CreateHudSynchronizer();
 
 	sb_lives = CreateConVar("sb_lives", "3", "Amount of lives a player starts with.", FCVAR_PLUGIN);
+	sb_chatmsg = CreateConVar("sb_chatmsg", "0", "Enable chat messages of team scores in chat.", FCVAR_PLUGIN);
+	sb_chatmsg_balance = CreateConVar("sb_chatmsg_balance", "1", "Enable showing player balance information of lives during beginning of round.", FCVAR_PLUGIN);
 
 	HookEvent("teamplay_round_start", teamplay_round_start);
 	HookEvent("teamplay_round_win", teamplay_round_win);
@@ -115,12 +119,18 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 				GetClientName(target,STRING(sClientName));
 				if(teamToGetLives==2)
 				{
-					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					if(GetConVarBool(sb_chatmsg_balance))
+					{
+						SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					}
 					SpreadSuccess=true;
 				}
 				else if(teamToGetLives==3)
 				{
-					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					if(GetConVarBool(sb_chatmsg_balance))
+					{
+						SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					}
 					SpreadSuccess=true;
 				}
 				GiveLives--;
@@ -386,7 +396,7 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 		teamToBalance = 2;
 	}
 	//PrintToChatAll("Debug: teamToBalance = %d",teamToBalance);
-	if(teamToBalance == 0)
+	if(GetConVarBool(sb_chatmsg) && teamToBalance == 0)
 	{
 		int RedTeam, BlueTeam;
 		CalculateTeamScores(RedTeam,BlueTeam);
@@ -398,10 +408,13 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 	// Randomly spread the love
 	SpreadLives(teamToBalance, teambalance);
 
-	int RedTeam, BlueTeam;
-	CalculateTeamScores(RedTeam,BlueTeam);
+	if(GetConVarBool(sb_chatmsg))
+	{
+		int RedTeam, BlueTeam;
+		CalculateTeamScores(RedTeam,BlueTeam);
 
-	SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
+		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
+	}
 
 	// Keep here just incase SpreadLives doesn't work right:
 	/*
@@ -642,29 +655,11 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 	if(!SB_GetGamePlaying())
 		return;
 
-	int teamred=0;
-	int teamblue=0;
+	if(!GetConVarBool(sb_chatmsg))
+		return;
 
-	int TheLives = 0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i,true))
-		{
-			TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					teamred+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					teamblue+=TheLives;
-				}
-			}
-		}
-	}
+	int teamred, teamblue;
+	CalculateTeamScores(teamred,teamblue);
 
 	SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 /*
