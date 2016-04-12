@@ -29,6 +29,10 @@
 #define LoopIngameClients(%1) for(new %1=1;%1<=MaxClients;++%1)\
 								if(IsClientInGame(%1))
 
+#define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && IsPlayerAlive(%1))
+
+
 #define STRING(%1) %1, sizeof(%1)
 
 Handle sb_lives;
@@ -79,18 +83,23 @@ public OnPluginStart()
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
 }
 
-public SpreadLives(int teamToGetLives, int GiveLives)
+stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 {
+	if(GetTeamClientCount(teamToGetLives)<=1) return false;
+
 	// Randomly spread the love
 	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
+
+	bool SpreadSuccess = false;
 
 	int retry = GiveLives;
 
 	char sClientName[32];
 	while(GiveLives > 0)
 	{
-		LoopIngameClients(target)
+		LoopAlivePlayers(target)
 		{
+			if(target==iClient) continue;
 			// try not to use same person twice
 			if(TargetGotExtraLiveAlready[target] && retry>0)
 			{
@@ -106,15 +115,18 @@ public SpreadLives(int teamToGetLives, int GiveLives)
 				if(teamToGetLives==2)
 				{
 					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					SpreadSuccess=true;
 				}
-				else
+				else if(teamToGetLives==3)
 				{
 					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					SpreadSuccess=true;
 				}
 				GiveLives--;
 			}
 		}
 	}
+	return SpreadSuccess;
 }
 
 public Action Command_InterceptJoinTeam(int client, char[] command, int args)
@@ -129,12 +141,15 @@ public Action Command_InterceptJoinTeam(int client, char[] command, int args)
 		int CurrentLives = SB_GetPlayerProp(client,iLives);
 		char sClientName[32];
 		GetClientName(client,STRING(sClientName));
-		SB_ChatMessage(0,"{yellow}%s is switching teams! {default}Now spreading out their lives.",sClientName);
-		SpreadLives(GetClientTeam(client), CurrentLives);
-		PrintToChat(client,"Giving your lives away to your team, then you'll be switched.");
+		SB_ChatMessage(0,"{yellow}%s is switching teams!",sClientName);
+		if(SpreadLives(GetClientTeam(client), CurrentLives, client))
+		{
+			SB_ChatMessage(client,"{yellow}Gived away your lives, please wait while we give you the team menu!");
+		}
 		CreateTimer(1.5, Force_Jointeam, client);
 		return Plugin_Handled;
 	}
+	return Plugin_Continue;
 }
 
 #define PANEL_TEAM "team"
@@ -161,9 +176,11 @@ public Action Command_InterceptSpectate(int client, char[] command, int args)
 		int CurrentLives = SB_GetPlayerProp(client,iLives);
 		char sClientName[32];
 		GetClientName(client,STRING(sClientName));
-		SB_ChatMessage(0,"{yellow}%s is going spectate! {default}Now spreading out their lives.",sClientName);
-		SpreadLives(GetClientTeam(client), CurrentLives);
-		PrintToChat(client,"Giving your lives away to your team, then you'll be moved to spectate.");
+		SB_ChatMessage(0,"{yellow}%s is going spectate!",sClientName);
+		if(SpreadLives(GetClientTeam(client), CurrentLives, client))
+		{
+			SB_ChatMessage(client,"{yellow}Gived away your lives, please wait while prepare you for spectate!");
+		}
 		CreateTimer(1.5,SendToSpectate,client);
 		return Plugin_Handled;
 	}
@@ -202,7 +219,7 @@ public void OnClientDisconnect(int client)
 	if(SB_GetGamePlaying())
 	{
 		int CurrentLives = SB_GetPlayerProp(client,iLives);
-		SpreadLives(GetClientTeam(client), CurrentLives);
+		SpreadLives(GetClientTeam(client), CurrentLives, client);
 	}
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
