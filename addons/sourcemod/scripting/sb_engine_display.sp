@@ -517,7 +517,7 @@ stock void SendDialogToOne(client, String:text[], any:...)
 	Handle kv = CreateKeyValues("Stuff", "title", message);
 	KvSetColor(kv, "color", 255, 255, 255, 255);
 	KvSetNum(kv, "level", 1);
-	KvSetNum(kv, "time", 500);
+	KvSetNum(kv, "time", 1000);
 
 	CreateDialog(client, kv, DialogType_Msg);
 
