@@ -508,10 +508,10 @@ public OnSB_TakeDmgAllPre(victim,attacker,Float:damage)
 }
 
 
-stock void SendDialogToOne(client,  String:text[], any:...)
+stock void SendDialogToOne(client, String:text[], any:...)
 {
 	char message[100];
-	VFormat(message, sizeof(message), text, 4);
+	VFormat(message, sizeof(message), text, 3);
 
 	Handle kv = CreateKeyValues("Stuff", "title", message);
 	KvSetColor(kv, "color", 255, 255, 255, 255);
