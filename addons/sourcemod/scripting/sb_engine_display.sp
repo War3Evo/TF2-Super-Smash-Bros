@@ -70,6 +70,7 @@ public OnPluginStart()
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
 
 	AddCommandListener(Command_InterceptSpectate, "spectate");
+	AddCommandListener(Command_InterceptJoinTeam, "jointeam");
 
 
 	RegConsoleCmd("jointeam", Command_jointeam);
@@ -116,6 +117,38 @@ public SpreadLives(int teamToGetLives, int GiveLives)
 	}
 }
 
+public Action Command_InterceptJoinTeam(int client, char[] command, int args)
+{
+	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
+	{
+		return Plugin_Continue;
+	}
+
+	if(SB_GetGamePlaying())
+	{
+		int CurrentLives = SB_GetPlayerProp(client,iLives);
+		char sClientName[32];
+		GetClientName(client,STRING(sClientName));
+		SB_ChatMessage(0,"{yellow}%s is switching teams! {default}Now spreading out their lives.",sClientName);
+		SpreadLives(GetClientTeam(client), CurrentLives);
+		PrintToChat(client,"Giving your lives away to your team, then you'll be switched.");
+		CreateTimer(1.5, Force_Jointeam, client);
+		return Plugin_Handled;
+	}
+}
+
+#define PANEL_TEAM "team"
+public Action:Force_Jointeam(Handle:timer, any:client)
+{
+	// Make sure client is still in game and didn't rage quit
+	if(IsClientInGame(client))
+	{
+		ForcePlayerSuicide(client);
+		ChangeClientTeam(client, 1);
+		ShowVGUIPanel(client, PANEL_TEAM);
+	}
+}
+
 public Action Command_InterceptSpectate(int client, char[] command, int args)
 {
 	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
@@ -141,9 +174,10 @@ public Action SendToSpectate(Handle timer, any client)
 {
 	if(SB_ValidPlayer(client) && GetClientTeam(client)>1)
 	{
+		ForcePlayerSuicide(client);
 		ChangeClientTeam(client, 1);
-		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		SB_SetPlayerProp(client,iLives,MaxLives);
+		//int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+		//SB_SetPlayerProp(client,iLives,MaxLives);
 	}
 }
 
