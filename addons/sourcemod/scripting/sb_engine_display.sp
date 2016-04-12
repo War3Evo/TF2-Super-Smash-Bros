@@ -569,6 +569,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 */
 		}
 	}
+
 }
 
 public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
