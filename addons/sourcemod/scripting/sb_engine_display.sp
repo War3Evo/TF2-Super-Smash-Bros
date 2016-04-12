@@ -185,7 +185,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 	//PrintToChatAll("TEAMPLAY_ROUND_START");
 	//remove_entity_all("trigger_hurt");
 	int MaxLives = GetConVarInt(sb_lives);
-	PrintToChatAll("Max lives = %d",MaxLives);
+	//PrintToChatAll("Max lives = %d",MaxLives);
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
 		SB_SetPlayerProp(i,iLives,MaxLives);
@@ -208,11 +208,13 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 				{
 					ChangeClientTeam(i, 2);
 				}
-			} else if(GetTeamClientCount(1)>0) {
+			}
+			/*
+			else if(GetTeamClientCount(1)>0) {
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
-			/*else
+			else
 			{
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
