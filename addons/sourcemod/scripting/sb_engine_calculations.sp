@@ -87,9 +87,12 @@ public Action Command_InterceptSuicide(int client, char[] command, int args)
 	// Player used "kill" or "explode"
 
 	// Suicide attempt was intercepted
-	FakeDeath(client,client);
+	if(FakeDeath(client,client))
+	{
+		return Plugin_Handled;
+	}
 
-	return Plugin_Handled;
+	return Plugin_Continue;
 }
 
 //CreateTimer(1.2,instaspawn,victim);
@@ -103,68 +106,72 @@ public Action:instaspawn(Handle:timer, any:client)
 	}
 }*/
 
-public FakeDeath(int victim, int attacker)
+public bool FakeDeath(int victim, int attacker)
 {
 	if(SB_ValidPlayer(victim))
 	{
-		SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
-		//CreateTimer(3.0,instaspawn,victim);
-
-		int teamred=0;
-		int teamblue=0;
-
-		int TheLives = 0;
-
-		for(int i=1;i<MaxClients;i++)
+		if(SB_GetPlayerProp(victim,iLives)>1)
 		{
-			if(SB_ValidPlayer(i,true))
+			SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
+			//CreateTimer(3.0,instaspawn,victim);
+
+			int teamred=0;
+			int teamblue=0;
+
+			int TheLives = 0;
+
+			for(int i=1;i<MaxClients;i++)
 			{
-				TheLives = SB_GetPlayerProp(i,iLives);
-				if(TheLives>0)
+				if(SB_ValidPlayer(i,true))
 				{
-					if(GetClientTeam(i)==TEAM_RED)
+					TheLives = SB_GetPlayerProp(i,iLives);
+					if(TheLives>0)
 					{
-						teamred+=TheLives;
-					}
-					else if(GetClientTeam(i)==TEAM_BLUE)
-					{
-						teamblue+=TheLives;
+						if(GetClientTeam(i)==TEAM_RED)
+						{
+							teamred+=TheLives;
+						}
+						else if(GetClientTeam(i)==TEAM_BLUE)
+						{
+							teamblue+=TheLives;
+						}
 					}
 				}
 			}
-		}
-		// fake death
-		SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
+			// fake death
+			SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
 
-		SDKCall(hSpawnPlayer,victim);
+			SDKCall(hSpawnPlayer,victim);
 
-		//PrintToChatAll("fake death start");
-		//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
-		/*
-		Handle pack;
-		if(CreateDataTimer(0.1,FakeKillFeedTimer,pack) != null)
-		{
-			WritePackCell(pack, victim);			// the hacker
-			WritePackCell(pack, attacker);			// The Sentry Owner
-		}*/
-		if(attacker > 32)
-		{
-			if(attacker!=victim && LastValidAttacker[victim]>0)
+			//PrintToChatAll("fake death start");
+			//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
+			/*
+			Handle pack;
+			if(CreateDataTimer(0.1,FakeKillFeedTimer,pack) != null)
 			{
-				attacker = LastValidAttacker[victim];
-			}
-			else
+				WritePackCell(pack, victim);			// the hacker
+				WritePackCell(pack, attacker);			// The Sentry Owner
+			}*/
+			if(attacker > 32)
 			{
-				attacker = victim;
+				if(attacker!=victim && LastValidAttacker[victim]>0)
+				{
+					attacker = LastValidAttacker[victim];
+				}
+				else
+				{
+					attacker = victim;
+				}
 			}
-		}
-		if(!firstblood) firstblood=true;
-		SB_FakeKillFeed_TEST(victim, attacker, firstblood);
-		LastValidAttacker[victim]=0;
-		//PrintToChatAll("fake death end");
+			if(!firstblood) firstblood=true;
+			SB_FakeKillFeed_TEST(victim, attacker, firstblood);
+			LastValidAttacker[victim]=0;
+			//PrintToChatAll("fake death end");
 
-		return;
+			return true;
+		}
 	}
+	return false;
 }
 
 public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecustom)
