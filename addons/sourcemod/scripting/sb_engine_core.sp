@@ -238,9 +238,15 @@ public Action:instaspawn(Handle:timer, any:client)
 
 public void DoForward_OnSB_EventSpawn(client)
 {
+		Action returnVal = Plugin_Continue;
 		Call_StartForward(g_OnSB_EventSpawnFH);
 		Call_PushCell(client);
-		Call_Finish(dummyreturn);
+		Call_Finish(returnVal);
+
+		if(returnVal != Plugin_Continue)
+		{
+			return;
+		}
 
 		Call_StartForward(g_OnSB_EventSpawnFH_Post);
 		Call_PushCell(client);

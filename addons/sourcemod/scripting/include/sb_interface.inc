@@ -167,6 +167,8 @@ native SB_GetCountDownTimer();
 
 native SB_SpawnPlayer(int client);
 
+native SB_ApplyWeapons(int client);
+
 
 /* is a normal engine cvar empty (zero length, "") ? */
 stock bool:CvarEmpty(Handle:sourcemod_convar) {
@@ -788,10 +790,11 @@ stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflict
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
 
 //when player spawns, fires only in SB mode
-forward OnSB_EventSpawn(client);
+// Return anything but Plugin_Continue will prevent OnSB_EventSpawn_Post from triggering
+forward Action OnSB_EventSpawn(client);
 
 // Fires after EventSpawn
-forward OnSB_EventSpawn_Post(client);
+forward void OnSB_EventSpawn_Post(client);
 
 
 //when player dies, fires only in SB mode

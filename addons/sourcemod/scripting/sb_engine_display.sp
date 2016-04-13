@@ -866,6 +866,8 @@ public OnSB_SpawnPlayer(int client)
 
 		CreateTimer(1.0, Remove_Cond_44, GetClientUserId(client));
 		PlayerNextClass[client]=TFClass_Unknown;
+
+		SB_ApplyWeapons(client);
 	}
 }
 

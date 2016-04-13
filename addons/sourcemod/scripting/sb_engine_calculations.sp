@@ -444,7 +444,7 @@ public OnSBEventPostHurt(victim,attacker,dmgamount,const String:weapon[32])
 	}
 }
 
-public OnSB_EventSpawn(client)
+public Action OnSB_EventSpawn(client)
 {
 	if(SB_ValidPlayer(client))
 	{
@@ -452,6 +452,7 @@ public OnSB_EventSpawn(client)
 		//SDKHook(client,SDKHook_WeaponSwitchPost,SDK_OnWeaponSwitchPost);
 		SpawnProtect(client);
 	}
+	return Plugin_Continue;
 }
 
 /*

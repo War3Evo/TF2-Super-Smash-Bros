@@ -64,6 +64,14 @@ enum
 
 Handle sb_weapon_enabled;
 
+public bool SBInitNativesForwards()
+{
+	CreateNative("SB_ApplyWeapons",Native_SB_ApplyWeapons);
+
+	return true;
+}
+
+
 public OnPluginStart()
 {
 	RegAdminCmd("reloadcfg", SB_TESTING_CONFIG, ADMFLAG_ROOT);
@@ -106,7 +114,7 @@ public Action:SB_TESTING_CONFIG(client,args)
 	}
 }
 
-public OnSB_EventSpawn_Post(client)
+stock void ApplyWeaponsOnClient(int client)
 {
 	if(!GetConVarBool(sb_weapon_enabled)) return;
 
@@ -138,6 +146,11 @@ public OnSB_EventSpawn_Post(client)
 			CloseTheFile(kv);
 		}
 	}
+}
+
+public void OnSB_EventSpawn_Post(client)
+{
+	ApplyWeaponsOnClient(client);
 }
 
 public Handle PrePareTheFile()
@@ -255,4 +268,13 @@ public ApplyWeaponValues(Handle kv, client, weapon_index, weapon_entity, bool re
 	} while (KvGotoNextKey(kv, false));
 
 	//PrintToChatAll("Finished");
+}
+
+public Native_SB_ApplyWeapons(Handle:plugin,numParams)
+{
+	int client=GetNativeCell(1);
+	if(SB_ValidPlayer(client,true))
+	{
+		ApplyWeaponsOnClient(client);
+	}
 }

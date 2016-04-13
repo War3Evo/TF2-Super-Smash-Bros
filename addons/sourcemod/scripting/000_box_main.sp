@@ -170,11 +170,12 @@ public OnMapEnd()
 	Box_ClearBoxes();
 }
 
-public void OnSB_EventSpawn (int client)
+public Action OnSB_EventSpawn (int client)
 {
 	TriggerClientMenu[client]=-1;
 	CanDoNoDamage[client]=false;
 	NoShooting[client]=false;
+	return Plugin_Continue;
 }
 
 public Action:Command_BoxesSave(client, args)
