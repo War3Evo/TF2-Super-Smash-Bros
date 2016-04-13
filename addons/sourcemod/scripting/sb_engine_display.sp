@@ -214,6 +214,11 @@ public Action Command_InterceptSpectate(int client, char[] command, int args)
 		return Plugin_Continue;
 	}
 
+	if(!SB_GetPlayerProp(client,SpawnedOnce))
+	{
+		return Plugin_Continue;
+	}
+
 	if(SB_GetGamePlaying())
 	{
 		int CurrentLives = SB_GetPlayerProp(client,iLives);
