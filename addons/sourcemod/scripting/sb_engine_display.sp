@@ -133,7 +133,7 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 
 	//int retry = 2;
 
-	int ChanceInt = 3;
+	//int ChanceInt = 3;
 
 	char sClientName[32];
 	while(GiveLives > 0)
@@ -148,35 +148,35 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 				//continue;
 			//}
 			if(GetClientTeam(target)!=teamToGetLives) continue;
-			if(GetRandomInt(1,10)>=ChanceInt)
+			//if(GetRandomInt(1,10)>=ChanceInt)
+			//{
+			//TargetGotExtraLiveAlready[target]=true;
+			SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
+			if(teamToGetLives==2)
 			{
-				//TargetGotExtraLiveAlready[target]=true;
-				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
-				if(teamToGetLives==2)
+				if(B_sb_chatmsg_balance)
 				{
-					if(B_sb_chatmsg_balance)
-					{
-						GetClientName(target,STRING(sClientName));
-						SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
-					}
-					SpreadSuccess=true;
+					GetClientName(target,STRING(sClientName));
+					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
 				}
-				else if(teamToGetLives==3)
-				{
-					if(B_sb_chatmsg_balance)
-					{
-						GetClientName(target,STRING(sClientName));
-						SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
-					}
-					SpreadSuccess=true;
-				}
-				GiveLives--;
+				SpreadSuccess=true;
 			}
-			else
+			else if(teamToGetLives==3)
 			{
-				ChanceInt -= 1;
-				if(ChanceInt<= 1) ChanceInt = 1;
+				if(B_sb_chatmsg_balance)
+				{
+					GetClientName(target,STRING(sClientName));
+					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+				}
+				SpreadSuccess=true;
 			}
+			GiveLives--;
+			//}
+			//else
+			//{
+				//ChanceInt -= 1;
+				//if(ChanceInt<= 1) ChanceInt = 1;
+			//}
 		}
 	}
 	return SpreadSuccess;
