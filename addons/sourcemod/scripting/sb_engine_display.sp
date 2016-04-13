@@ -129,9 +129,11 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 
 	bool SpreadSuccess = false;
 
+	bool B_sb_chatmsg_balance = GetConVarBool(sb_chatmsg_balance);
+
 	//int retry = 2;
 
-	float ChanceFloat = 0.60;
+	float ChanceFloat = 0.50;
 
 	char sClientName[32];
 	while(GiveLives > 0)
@@ -150,19 +152,20 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 			{
 				//TargetGotExtraLiveAlready[target]=true;
 				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
-				GetClientName(target,STRING(sClientName));
 				if(teamToGetLives==2)
 				{
-					if(GetConVarBool(sb_chatmsg_balance))
+					if(B_sb_chatmsg_balance)
 					{
+						GetClientName(target,STRING(sClientName));
 						SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
 					}
 					SpreadSuccess=true;
 				}
 				else if(teamToGetLives==3)
 				{
-					if(GetConVarBool(sb_chatmsg_balance))
+					if(B_sb_chatmsg_balance)
 					{
+						GetClientName(target,STRING(sClientName));
 						SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
 					}
 					SpreadSuccess=true;
@@ -171,7 +174,7 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 			}
 			else
 			{
-				ChanceFloat -= 0.01;
+				ChanceFloat -= 0.05;
 				if(ChanceFloat<= 0.0) ChanceFloat = 0.0;
 			}
 		}
@@ -234,7 +237,7 @@ public Action Command_InterceptSpectate(int client, char[] command, int args)
 		SB_ChatMessage(0,"{yellow}%s is going spectate!",sClientName);
 		if(SpreadLives(GetClientTeam(client), CurrentLives, client))
 		{
-			SB_ChatMessage(client,"{yellow}Gived away your lives, please wait while prepare you for spectate!");
+			SB_ChatMessage(client,"{yellow}Gave away your lives, please wait while prepare you for spectate!");
 		}
 		CreateTimer(1.5,SendToSpectate,client);
 		return Plugin_Handled;
@@ -799,6 +802,7 @@ public OnSB_SpawnPlayer(int client)
 	if(SB_ValidPlayer(client) && PlayerNextClass[client]!=TFClass_Unknown)
 	{
 		TF2_RemoveCondition(client, TFCond:44);
+
 		int oldAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
 		int oldAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
 
@@ -814,7 +818,9 @@ public OnSB_SpawnPlayer(int client)
 		int oldMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
 		int oldMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
 
+
 		TF2_SetPlayerClass(client, PlayerNextClass[client], false, true);
+
 		SetEntityHealth(client, 1);
 		TF2_RegeneratePlayer(client);
 
@@ -857,10 +863,12 @@ public OnSB_SpawnPlayer(int client)
 		if ((slot = GetPlayerWeaponSlot(client, 0)) > -1)
 			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", slot);
 
+
 		CreateTimer(1.0, Remove_Cond_44, GetClientUserId(client));
 		PlayerNextClass[client]=TFClass_Unknown;
 	}
 }
+
 
 // force removal of heavy crits
 public Action:Remove_Cond_44(Handle:timer, any:userid)

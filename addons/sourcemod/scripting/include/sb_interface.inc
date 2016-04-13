@@ -790,6 +790,10 @@ stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflict
 //when player spawns, fires only in SB mode
 forward OnSB_EventSpawn(client);
 
+// Fires after EventSpawn
+forward OnSB_EventSpawn_Post(client);
+
+
 //when player dies, fires only in SB mode
 //Distance in feet
 //forward OnSBEventDeath(victim, attacker, distance, attacker_hpleft, String:weapon[32]);

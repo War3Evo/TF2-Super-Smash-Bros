@@ -106,7 +106,7 @@ public Action:SB_TESTING_CONFIG(client,args)
 	}
 }
 
-public OnSB_EventSpawn(client)
+public OnSB_EventSpawn_Post(client)
 {
 	if(!GetConVarBool(sb_weapon_enabled)) return;
 

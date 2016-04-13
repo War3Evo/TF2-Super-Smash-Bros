@@ -29,6 +29,7 @@
 Handle sb_round_time;
 
 Handle g_OnSB_EventSpawnFH;
+Handle g_OnSB_EventSpawnFH_Post;
 Handle g_OnSB_EventDeathFH;
 
 Handle FHOnSB_SpawnPlayer;
@@ -116,7 +117,8 @@ public OnPluginStart()
 	HookEvent("teamplay_round_win", teamplay_round_win);
 	HookEvent("teamplay_waiting_begins", teamplay_waiting_begins);
 
-	g_OnSB_EventSpawnFH=CreateGlobalForward("OnSB_EventSpawn",ET_Ignore,Param_Cell);
+	g_OnSB_EventSpawnFH=CreateGlobalForward("OnSB_EventSpawn",ET_Hook,Param_Cell);
+	g_OnSB_EventSpawnFH_Post=CreateGlobalForward("OnSB_EventSpawn_Post",ET_Ignore,Param_Cell);
 	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
 }
 
@@ -234,8 +236,13 @@ public Action:instaspawn(Handle:timer, any:client)
 	}
 }*/
 
-public void DoForward_OnSB_EventSpawn(client){
+public void DoForward_OnSB_EventSpawn(client)
+{
 		Call_StartForward(g_OnSB_EventSpawnFH);
+		Call_PushCell(client);
+		Call_Finish(dummyreturn);
+
+		Call_StartForward(g_OnSB_EventSpawnFH_Post);
 		Call_PushCell(client);
 		Call_Finish(dummyreturn);
 }
