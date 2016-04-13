@@ -803,8 +803,8 @@ public OnSB_SpawnPlayer(int client)
 	{
 		TF2_RemoveCondition(client, TFCond:44);
 
-		int oldAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
-		int oldAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
+		//int oldAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
+		//int oldAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
 
 		int oldFlags = GetEntityFlags(client);
 		SetEntityFlags(client, oldFlags & ~FL_NOTARGET);	// Remove notarget if it was there
@@ -815,8 +815,8 @@ public OnSB_SpawnPlayer(int client)
 		TF2_RegeneratePlayer(client);
 
 		// now get the maxs, since the current ammo = max
-		int oldMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
-		int oldMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
+		//int oldMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
+		//int oldMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
 
 
 		TF2_SetPlayerClass(client, PlayerNextClass[client], false, true);
@@ -824,44 +824,44 @@ public OnSB_SpawnPlayer(int client)
 		SetEntityHealth(client, 1);
 		TF2_RegeneratePlayer(client);
 
-		int newMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
-		int newMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
+		//int newMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
+		//int newMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
 
-		int scaled1 = RoundFloat(oldMaxAmmo1 == oldAmmo1 ? float(newMaxAmmo1) :
-			float(oldAmmo1) * (float(newMaxAmmo1) / float(oldMaxAmmo1)));
+		//int scaled1 = RoundFloat(oldMaxAmmo1 == oldAmmo1 ? float(newMaxAmmo1) :
+			//float(oldAmmo1) * (float(newMaxAmmo1) / float(oldMaxAmmo1)));
 
-		int scaled2 = RoundFloat(oldMaxAmmo2 == oldAmmo2 ? float(newMaxAmmo2) :
-			float(oldAmmo2) * (float(newMaxAmmo2) / float(oldMaxAmmo2)));
+		//int scaled2 = RoundFloat(oldMaxAmmo2 == oldAmmo2 ? float(newMaxAmmo2) :
+			//float(oldAmmo2) * (float(newMaxAmmo2) / float(oldMaxAmmo2)));
 
-		int ws1 = GetPlayerWeaponSlot(client, 0);
-		int ws2 = GetPlayerWeaponSlot(client, 1);
-		int clipMain = -1, clip2nd = -1;
-		if (ws1 > 0)
-			clipMain = GetEntData(ws1, FindSendPropInfo("CTFWeaponBase", "m_iClip1"));
-		if (ws2 > 0)
-			clip2nd = GetEntData(ws2, FindSendPropInfo("CTFWeaponBase", "m_iClip1"));
+		//int ws1 = GetPlayerWeaponSlot(client, 0);
+		//int ws2 = GetPlayerWeaponSlot(client, 1);
+		//int clipMain = -1, clip2nd = -1;
+		//if (ws1 > 0)
+			//clipMain = GetEntData(ws1, FindSendPropInfo("CTFWeaponBase", "m_iClip1"));
+		//if (ws2 > 0)
+			//clip2nd = GetEntData(ws2, FindSendPropInfo("CTFWeaponBase", "m_iClip1"));
 
 		// Do not Permit new clip (you get ammo from nothing)
 		// Setting to 0 bugs certain weapons
-		if (clipMain > -1)
-			SetEntData(ws1, FindSendPropInfo("CTFWeaponBase", "m_iClip1"), 1);
-		if (clip2nd > -1)
-			SetEntData(ws2, FindSendPropInfo("CTFWeaponBase", "m_iClip1"), 1);
+		//if (clipMain > -1)
+			//SetEntData(ws1, FindSendPropInfo("CTFWeaponBase", "m_iClip1"), 1);
+		//if (clip2nd > -1)
+			//SetEntData(ws2, FindSendPropInfo("CTFWeaponBase", "m_iClip1"), 1);
 
-		SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4,
-			scaled1);
-		SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8,
-			scaled2);
+		//SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4,
+			//scaled1);
+		//SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8,
+			//scaled2);
 
 		// Engies shouldn't get ammo
-		if (PlayerNextClass[client] == TFClass_Engineer)
-			SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 12, 0, 4);
+		//if (PlayerNextClass[client] == TFClass_Engineer)
+			//SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 12, 0, 4);
 
 		//SetEntityHealth(client,oldHealth);
 
-		int slot;
-		if ((slot = GetPlayerWeaponSlot(client, 0)) > -1)
-			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", slot);
+		//int slot;
+		//if ((slot = GetPlayerWeaponSlot(client, 0)) > -1)
+			//SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", slot);
 
 
 		CreateTimer(1.0, Remove_Cond_44, GetClientUserId(client));
