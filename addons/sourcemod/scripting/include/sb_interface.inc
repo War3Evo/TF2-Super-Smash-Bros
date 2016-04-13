@@ -832,6 +832,8 @@ forward OnSB_TakeDmgAll(victim,attacker,Float:damage);
 
 forward OnSB_RoundEnd();
 
+forward OnSB_SpawnPlayer(int client);
+
 
 
 stock void CalculateTeamScores(int &RedTeam, int &BlueTeam)

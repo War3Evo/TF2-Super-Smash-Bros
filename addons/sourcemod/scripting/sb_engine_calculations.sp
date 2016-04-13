@@ -36,8 +36,6 @@ public Plugin:myinfo = {
 	url = "www.war3evo.info"
 }
 
-new Handle:hSpawnPlayer;
-
 int LastValidAttacker[MAXPLAYERSCUSTOM];
 bool firstblood = false;
 
@@ -48,20 +46,6 @@ public OnPluginStart()
 	HookEvent("arena_round_start", teamplay_round_active);
 
 	RegConsoleCmd("allowengineering",SB_ENGINEERING,"allowengineering");
-
-	new Handle:hGameConf=INVALID_HANDLE;
-	hGameConf=LoadGameConfigFile("sm-tf2.games");
-	if(hGameConf)
-	{
-		StartPrepSDKCall(SDKCall_Entity);
-		PrepSDKCall_SetFromConf(hGameConf,SDKConf_Virtual,"ForceRespawn");
-		hSpawnPlayer=EndPrepSDKCall();
-		CloseHandle(hGameConf);
-	}
-	else
-	{
-		PrintToServer("[SmashBros] Error, could not find configuration file for game.");
-	}
 
 	//HookEvent("player_healed", Event_player_healed);
 
@@ -124,7 +108,7 @@ public bool FakeDeath(int victim, int attacker)
 				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
 			}
 
-			SDKCall(hSpawnPlayer,victim);
+			SB_SpawnPlayer(victim);
 
 			//PrintToChatAll("fake death start");
 			//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);

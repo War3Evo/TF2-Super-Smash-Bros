@@ -31,6 +31,8 @@ Handle sb_round_time;
 Handle g_OnSB_EventSpawnFH;
 Handle g_OnSB_EventDeathFH;
 
+Handle FHOnSB_SpawnPlayer;
+
 Handle FHOnSB_RoundEnd;
 
 float respawn[MAXPLAYERS+1];
@@ -42,6 +44,8 @@ int p_properties[MAXPLAYERSCUSTOM][SBPlayerProp];
 
 //new bool:started=false;
 bool playing=false;
+
+Handle hSpawnPlayer;
 
 
 //new ignoreClient;
@@ -66,7 +70,11 @@ public bool SBInitNativesForwards()
 	CreateNative("SB_SetPlayerProp",NSB_SetPlayerProp);
 	CreateNative("SB_GetPlayerProp",NSB_GetPlayerProp);
 
+	CreateNative("SB_SpawnPlayer",NSB_SpawnPlayer);
+
 	FHOnSB_RoundEnd=CreateGlobalForward("OnSB_RoundEnd",ET_Ignore);
+
+	FHOnSB_SpawnPlayer=CreateGlobalForward("OnSB_SpawnPlayer",ET_Ignore, Param_Cell);
 	return true;
 }
 
@@ -84,6 +92,20 @@ public OnPluginStart()
 	if(!HookEventEx("player_death",SB_PlayerDeathEvent,EventHookMode_Pre))
 	{
 		PrintToServer("[SmashBros] Could not hook the player_death event.");
+	}
+
+	Handle hGameConf=INVALID_HANDLE;
+	hGameConf=LoadGameConfigFile("sm-tf2.games");
+	if(hGameConf)
+	{
+		StartPrepSDKCall(SDKCall_Entity);
+		PrepSDKCall_SetFromConf(hGameConf,SDKConf_Virtual,"ForceRespawn");
+		hSpawnPlayer=EndPrepSDKCall();
+		CloseHandle(hGameConf);
+	}
+	else
+	{
+		PrintToServer("[SmashBros] Error, could not find configuration file for game.");
 	}
 
 	//HookEvent("teamplay_round_start", teamplay_round_start);
@@ -134,6 +156,19 @@ public NSB_SetPlayerProp(Handle:plugin,numParams){
 	}
 }
 
+public NSB_SpawnPlayer(Handle:plugin,numParams){
+	int client=GetNativeCell(1);
+	if (SB_ValidPlayer(client))
+	{
+		SDKCall(hSpawnPlayer,client);
+		Call_StartForward(FHOnSB_SpawnPlayer);
+		Call_PushCell(client);
+		Call_Finish();
+		return 1;
+	}
+	else
+		return 0;
+}
 
 public OnClientConnected(client){
 	ResetClientVars(client);
