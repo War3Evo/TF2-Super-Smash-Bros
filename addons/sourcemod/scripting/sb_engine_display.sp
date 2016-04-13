@@ -110,7 +110,7 @@ public OnPluginStart()
 	AddCommandListener(Command_InterceptSpectate, "spectate");
 	//AddCommandListener(Command_InterceptJoinTeam, "jointeam");
 
-	AddCommandListener(Command_ChangeClass, "sm_sbclass");
+	RegConsoleCmd("sm_sbclass",Command_ChangeClass);
 
 
 	RegConsoleCmd("jointeam", Command_jointeam);
@@ -129,7 +129,7 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 
 	bool SpreadSuccess = false;
 
-	int retry = GiveLives;
+	int retry = 2;
 
 	char sClientName[32];
 	while(GiveLives > 0)
@@ -708,9 +708,17 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 }
 
 
-public Action Command_ChangeClass(int client, char[] command, int args)
+public Action Command_ChangeClass(int client, int args)
 {
+	//PrintToChatAll("Command_ChangeClass");
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	ChangeClass(client);
+
+	return Plugin_Handled;
+}
+stock ChangeClass(int client)
+{
+//	PrintToChatAll("ChangeClass");
 
 	Handle hMenu = CreateMenu(MenuHandle_PickClass_Menu);
 	SetMenuExitBackButton(hMenu, false);
@@ -718,17 +726,23 @@ public Action Command_ChangeClass(int client, char[] command, int args)
 	SetMenuExitButton(hMenu, true);
 	SetMenuTitle(hMenu,"Pick New Class:");
 
-	char IntToStr[12];
+	char Buffer[64];
+
+	char IntToStr[8];
 	for(int i=1; i<=9; i++)
 	{
 		int myint = view_as<int>(TF2_GetPlayerClass(client));
 		if(myint==i) continue;
 
 		IntToString(i, STRING(IntToStr));
-		AddMenuItem(hMenu,IntToStr,ClassList[i],ITEMDRAW_DEFAULT);
+		Format(STRING(Buffer), "%s", ClassList[i-1]);
+		AddMenuItem(hMenu,IntToStr,Buffer,ITEMDRAW_DEFAULT);
+
+		//PrintToChatAll("i %d, IntToStr %s, ClassList %s",i,IntToStr,ClassList[i-1]);
 	}
 
-	return Plugin_Handled;
+	DisplayMenu(hMenu, client, MENU_TIME_FOREVER);
+	//PrintToChatAll("DisplayMenu");
 }
 public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, selection)
 {
@@ -737,9 +751,11 @@ public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, select
 		case MenuAction_Cancel:
 		{
 			//MenuAction_Cancel
+			//PrintToChatAll("MenuAction_Cancel");
 		}
 		case MenuAction_Select:
 		{
+			//PrintToChatAll("MenuAction_Select");
 			char SelectionInfo[8];
 			char SelectionDispText[2048];
 
@@ -753,11 +769,12 @@ public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, select
 			if(SB_ValidPlayer(client))
 			{
 				PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-				SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber]);
+				SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
 			}
 		}
 		case MenuAction_End:
 		{
+			//PrintToChatAll("MenuAction_End");
 			CloseHandle(hMenu);
 		}
 	}
@@ -776,7 +793,7 @@ public OnSB_SpawnPlayer(int client)
 															// for whatever reason, weapons won't be
 															// regenerated if FL_NOTARGET is set.
 
-		int oldHealth = GetClientHealth(client);
+		//int oldHealth = GetClientHealth(client);
 		TF2_RegeneratePlayer(client);
 
 		// now get the maxs, since the current ammo = max
@@ -820,7 +837,7 @@ public OnSB_SpawnPlayer(int client)
 		if (PlayerNextClass[client] == TFClass_Engineer)
 			SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 12, 0, 4);
 
-		SetEntityHealth(client,oldHealth);
+		//SetEntityHealth(client,oldHealth);
 
 		int slot;
 		if ((slot = GetPlayerWeaponSlot(client, 0)) > -1)
