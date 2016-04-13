@@ -253,6 +253,7 @@ public OnAllPluginsLoaded()
 public OnClientConnected(client){
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
+	PlayerNextClass[client]=TFClass_Unknown;
 }
 
 public void OnClientDisconnect(int client)
@@ -271,6 +272,7 @@ public void OnClientDisconnect(int client)
 public OnClientPutInServer(client){
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
+	PlayerNextClass[client]=TFClass_Unknown;
 }
 
 
@@ -782,7 +784,7 @@ public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, select
 
 public OnSB_SpawnPlayer(int client)
 {
-	if(SB_ValidPlayer(client) && PlayerNextClass[client])
+	if(SB_ValidPlayer(client) && PlayerNextClass[client]!=TFClass_Unknown)
 	{
 		TF2_RemoveCondition(client, TFCond:44);
 		int oldAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
@@ -844,6 +846,7 @@ public OnSB_SpawnPlayer(int client)
 			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", slot);
 
 		CreateTimer(1.0, Remove_Cond_44, GetClientUserId(client));
+		PlayerNextClass[client]=TFClass_Unknown;
 	}
 }
 
