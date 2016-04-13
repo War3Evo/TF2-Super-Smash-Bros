@@ -35,6 +35,36 @@
 
 #define STRING(%1) %1, sizeof(%1)
 
+/*
+enum TFClassType
+{
+	TFClass_Unknown = 0,
+	TFClass_Scout,
+	TFClass_Sniper,
+	TFClass_Soldier,
+	TFClass_DemoMan,
+	TFClass_Medic,
+	TFClass_Heavy,
+	TFClass_Pyro,
+	TFClass_Spy,
+	TFClass_Engineer
+};*/
+
+char ClassList[][] =
+{
+	"Scout", //1
+	"Sniper", //2
+	"Soldier", //3
+	"Demoman", //4
+	"Medic", //5
+	"Heavy", //6
+	"Pyro", //7
+	"Spy", //8
+	"Engineer" //9
+};
+
+TFClassType PlayerNextClass[MAXPLAYERSCUSTOM];
+
 Handle sb_lives;
 Handle sb_chatmsg;
 Handle sb_chatmsg_balance;
@@ -79,6 +109,8 @@ public OnPluginStart()
 
 	AddCommandListener(Command_InterceptSpectate, "spectate");
 	//AddCommandListener(Command_InterceptJoinTeam, "jointeam");
+
+	AddCommandListener(Command_ChangeClass, "sm_sbclass");
 
 
 	RegConsoleCmd("jointeam", Command_jointeam);
@@ -673,4 +705,137 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 	{
 		iWinningTeam=TEAM_BLUE;
 	}*/
+}
+
+
+public Action Command_ChangeClass(int client, char[] command, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+
+	Handle hMenu = CreateMenu(MenuHandle_PickClass_Menu);
+	SetMenuExitBackButton(hMenu, false);
+	SetMenuPagination(hMenu, MENU_NO_PAGINATION);
+	SetMenuExitButton(hMenu, true);
+	SetMenuTitle(hMenu,"Pick New Class:");
+
+	char IntToStr[12];
+	for(int i=1; i<=9; i++)
+	{
+		int myint = view_as<int>(TF2_GetPlayerClass(client));
+		if(myint==i) continue;
+
+		IntToString(i, STRING(IntToStr));
+		AddMenuItem(hMenu,IntToStr,ClassList[i],ITEMDRAW_DEFAULT);
+	}
+
+	return Plugin_Handled;
+}
+public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, selection)
+{
+	switch (action)
+	{
+		case MenuAction_Cancel:
+		{
+			//MenuAction_Cancel
+		}
+		case MenuAction_Select:
+		{
+			char SelectionInfo[8];
+			char SelectionDispText[2048];
+
+			int SelectionStyle;
+			GetMenuItem(hMenu,selection,SelectionInfo,sizeof(SelectionInfo),SelectionStyle, SelectionDispText,sizeof(SelectionDispText));
+
+			int itemnumber=StringToInt(SelectionInfo);
+
+			int client=param1;
+
+			if(SB_ValidPlayer(client))
+			{
+				PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+				SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber]);
+			}
+		}
+		case MenuAction_End:
+		{
+			CloseHandle(hMenu);
+		}
+	}
+}
+
+public OnSB_SpawnPlayer(int client)
+{
+	if(SB_ValidPlayer(client) && PlayerNextClass[client])
+	{
+		TF2_RemoveCondition(client, TFCond:44);
+		int oldAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
+		int oldAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
+
+		int oldFlags = GetEntityFlags(client);
+		SetEntityFlags(client, oldFlags & ~FL_NOTARGET);	// Remove notarget if it was there
+															// for whatever reason, weapons won't be
+															// regenerated if FL_NOTARGET is set.
+
+		int oldHealth = GetClientHealth(client);
+		TF2_RegeneratePlayer(client);
+
+		// now get the maxs, since the current ammo = max
+		int oldMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
+		int oldMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
+
+		TF2_SetPlayerClass(client, PlayerNextClass[client], false, true);
+		SetEntityHealth(client, 1);
+		TF2_RegeneratePlayer(client);
+
+		int newMaxAmmo1 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4, 4);
+		int newMaxAmmo2 = GetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8, 4);
+
+		int scaled1 = RoundFloat(oldMaxAmmo1 == oldAmmo1 ? float(newMaxAmmo1) :
+			float(oldAmmo1) * (float(newMaxAmmo1) / float(oldMaxAmmo1)));
+
+		int scaled2 = RoundFloat(oldMaxAmmo2 == oldAmmo2 ? float(newMaxAmmo2) :
+			float(oldAmmo2) * (float(newMaxAmmo2) / float(oldMaxAmmo2)));
+
+		int ws1 = GetPlayerWeaponSlot(client, 0);
+		int ws2 = GetPlayerWeaponSlot(client, 1);
+		int clipMain = -1, clip2nd = -1;
+		if (ws1 > 0)
+			clipMain = GetEntData(ws1, FindSendPropInfo("CTFWeaponBase", "m_iClip1"));
+		if (ws2 > 0)
+			clip2nd = GetEntData(ws2, FindSendPropInfo("CTFWeaponBase", "m_iClip1"));
+
+		// Do not Permit new clip (you get ammo from nothing)
+		// Setting to 0 bugs certain weapons
+		if (clipMain > -1)
+			SetEntData(ws1, FindSendPropInfo("CTFWeaponBase", "m_iClip1"), 1);
+		if (clip2nd > -1)
+			SetEntData(ws2, FindSendPropInfo("CTFWeaponBase", "m_iClip1"), 1);
+
+		SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 4,
+			scaled1);
+		SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 8,
+			scaled2);
+
+		// Engies shouldn't get ammo
+		if (PlayerNextClass[client] == TFClass_Engineer)
+			SetEntData(client, FindSendPropOffs("CTFPlayer", "m_iAmmo") + 12, 0, 4);
+
+		SetEntityHealth(client,oldHealth);
+
+		int slot;
+		if ((slot = GetPlayerWeaponSlot(client, 0)) > -1)
+			SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", slot);
+
+		CreateTimer(1.0, Remove_Cond_44, GetClientUserId(client));
+	}
+}
+
+// force removal of heavy crits
+public Action:Remove_Cond_44(Handle:timer, any:userid)
+{
+	new client = GetClientOfUserId(userid);
+	if(SB_ValidPlayer(client) && TF2_IsPlayerInCondition(client, TFCond:44))
+	{
+		TF2_RemoveCondition(client, TFCond:44);
+	}
 }
