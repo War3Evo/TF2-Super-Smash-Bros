@@ -122,7 +122,7 @@ public OnPluginStart()
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 {
-	if(GetTeamClientCount(teamToGetLives)<=1) return false;
+	if(GetTeamClientCount(teamToGetLives)<1) return false;
 
 	// Randomly spread the love
 	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
