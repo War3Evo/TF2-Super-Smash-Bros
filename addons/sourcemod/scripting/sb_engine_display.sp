@@ -125,11 +125,13 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 	if(GetTeamClientCount(teamToGetLives)<1) return false;
 
 	// Randomly spread the love
-	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
+	//bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
 
 	bool SpreadSuccess = false;
 
-	int retry = 2;
+	//int retry = 2;
+
+	float ChanceFloat = 0.60;
 
 	char sClientName[32];
 	while(GiveLives > 0)
@@ -138,15 +140,15 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 		{
 			if(target==iClient) continue;
 			// try not to use same person twice
-			if(TargetGotExtraLiveAlready[target] && retry>0)
-			{
-				retry--;
-				continue;
-			}
+			//if(TargetGotExtraLiveAlready[target] && retry>0)
+			//{
+				//retry--;
+				//continue;
+			//}
 			if(GetClientTeam(target)!=teamToGetLives) continue;
-			if(GetRandomFloat(0.0,1.0)>=0.50)
+			if(GetRandomFloat(0.0,1.0)>=ChanceFloat)
 			{
-				TargetGotExtraLiveAlready[target]=true;
+				//TargetGotExtraLiveAlready[target]=true;
 				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
 				GetClientName(target,STRING(sClientName));
 				if(teamToGetLives==2)
@@ -166,6 +168,11 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 					SpreadSuccess=true;
 				}
 				GiveLives--;
+			}
+			else
+			{
+				ChanceFloat -= 0.01;
+				if(ChanceFloat<= 0.0) ChanceFloat = 0.0;
 			}
 		}
 	}
