@@ -133,7 +133,7 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 
 	//int retry = 2;
 
-	float ChanceFloat = 0.50;
+	int ChanceInt = 3;
 
 	char sClientName[32];
 	while(GiveLives > 0)
@@ -148,7 +148,7 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 				//continue;
 			//}
 			if(GetClientTeam(target)!=teamToGetLives) continue;
-			if(GetRandomFloat(0.0,1.0)>=ChanceFloat)
+			if(GetRandomInt(1,10)>=ChanceInt)
 			{
 				//TargetGotExtraLiveAlready[target]=true;
 				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
@@ -174,8 +174,8 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 			}
 			else
 			{
-				ChanceFloat -= 0.05;
-				if(ChanceFloat<= 0.0) ChanceFloat = 0.0;
+				ChanceInt -= 1;
+				if(ChanceInt<= 1) ChanceInt = 1;
 			}
 		}
 	}
