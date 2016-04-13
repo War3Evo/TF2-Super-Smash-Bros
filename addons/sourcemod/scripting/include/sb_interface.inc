@@ -165,6 +165,8 @@ native bool:SB_GetGamePlaying();
 
 native SB_GetCountDownTimer();
 
+native SB_SpawnPlayer(int client);
+
 
 /* is a normal engine cvar empty (zero length, "") ? */
 stock bool:CvarEmpty(Handle:sourcemod_convar) {
