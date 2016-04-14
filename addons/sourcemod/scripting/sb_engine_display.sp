@@ -76,6 +76,9 @@ Handle YourLivesMessage;
 
 bool g_spec[MAXPLAYERS+1] = {true, ...};
 
+bool displayedHelp[MAXPLAYERSCUSTOM];
+
+
 //new Float:respawn[MAXPLAYERS+1];
 int LastPersonAttacked[MAXPLAYERSCUSTOM];
 
@@ -395,6 +398,7 @@ public OnClientPutInServer(client){
 	SB_SetPlayerProp(client,iLives,MaxLives);
 	PlayerNextClass[client]=TFClass_Unknown;
 	SB_SetPlayerProp(client,iStartingTeam,0);
+	displayedHelp[client]=false;
 }
 
 
@@ -812,6 +816,7 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 		//SB_SetPlayerProp(victim,iLives,0);
 		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 		SB_SetPlayerProp(victim,iLives,MaxLives);
+		SB_SetPlayerProp(victim,iStartingTeam,0);
 	}
 
 	if(!SB_GetGamePlaying())
@@ -910,6 +915,15 @@ public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, select
 	}
 }
 
+public void OnSB_EventSpawn_Post(client)
+{
+	if(!displayedHelp[client])
+	{
+		displayedHelp[client]=true;
+		StartingHelpMenu(client);
+	}
+}
+
 public OnSB_SpawnPlayer(int client)
 {
 	if(SB_ValidPlayer(client) && PlayerNextClass[client]!=TFClass_Unknown)
@@ -995,3 +1009,43 @@ public Action:Remove_Cond_44(Handle:timer, any:userid)
 	}
 }
 
+stock StartingHelpMenu(int client)
+{
+	Handle hMenu = CreateMenu(MenuHandle_Help_Menu);
+	SetMenuExitBackButton(hMenu, false);
+	SetMenuPagination(hMenu, MENU_NO_PAGINATION);
+	SetMenuExitButton(hMenu, true);
+	SetMenuTitle(hMenu,"Super Smash Bros!");
+
+	AddMenuItem(hMenu,"1","Type !sbclass in chat to pick your next class on spawn.",ITEMDRAW_DISABLED);
+
+	DisplayMenu(hMenu, client, MENU_TIME_FOREVER);
+}
+public MenuHandle_Help_Menu(Handle:hMenu, MenuAction:action, param1, selection)
+{
+	switch (action)
+	{
+		case MenuAction_Cancel:
+		{
+			//MenuAction_Cancel
+			//PrintToChatAll("MenuAction_Cancel");
+		}
+		case MenuAction_Select:
+		{
+			//PrintToChatAll("MenuAction_Select");
+			char SelectionInfo[8];
+			char SelectionDispText[2048];
+
+			int SelectionStyle;
+			GetMenuItem(hMenu,selection,SelectionInfo,sizeof(SelectionInfo),SelectionStyle, SelectionDispText,sizeof(SelectionDispText));
+
+			//int itemnumber=StringToInt(SelectionInfo);
+			//int client=param1;
+		}
+		case MenuAction_End:
+		{
+			//PrintToChatAll("MenuAction_End");
+			CloseHandle(hMenu);
+		}
+	}
+}
