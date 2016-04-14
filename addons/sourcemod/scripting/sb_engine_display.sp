@@ -109,6 +109,7 @@ public OnPluginStart()
 	//HookEvent("teamplay_waiting_begins", teamplay_round_start);
 
 	HookEvent("teamplay_round_active", teamplay_round_active);
+	HookEvent("arena_round_start", teamplay_round_active);
 
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
 
@@ -533,7 +534,9 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
 {
+	PrintToChatAll("teamplay_round_active : %s",name);
 	TeamBalanceTimer();
+	return Plugin_Continue;
 }
 
 
