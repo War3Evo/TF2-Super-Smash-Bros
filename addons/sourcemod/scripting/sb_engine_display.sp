@@ -103,7 +103,7 @@ public OnPluginStart()
 
 	HookEvent("teamplay_round_start", teamplay_round_start);
 	HookEvent("teamplay_round_win", teamplay_round_win);
-	HookEvent("teamplay_waiting_begins", teamplay_round_start);
+	//HookEvent("teamplay_waiting_begins", teamplay_round_start);
 
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
 
@@ -122,90 +122,148 @@ public OnPluginStart()
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 {
-	PrintToChatAll("SpreadLives");
+	//PrintToChatAll("SpreadLives");
+	if(teamToGetLives <=0 || teamToGetLives > 3)
+	{
+		//PrintToChatAll("invalid teamToGetLives");
+		return false;
+	}
+	if(iClient>0 && !SB_ValidPlayer(iClient,true))
+	{
+		//PrintToChatAll("iClient is not valid, returning false");
+		return false;
+	}
+
+	if(GiveLives <= 0)
+	{
+		//PrintToChatAll("GiveLives <= 0");
+		return false;
+	}
 	if(GetTeamClientCount(teamToGetLives)<1) return false;
+	//PrintToChatAll("GetTeamClientCount(teamToGetLives)>=1");
 
 	// Randomly spread the love
 	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
 
-	bool SpreadSuccess = false;
+	int SpreadSuccess = 0;
 
 	bool B_sb_chatmsg_balance = GetConVarBool(sb_chatmsg_balance);
 
-	int retry = 1;
+	int retry = 2;
 
 	float ChanceFloat = 0.60;
 
 	int LivePlayerCount = 0;
 	int LivePlayers[MAXPLAYERSCUSTOM];
 	int LivePlayersTeam[MAXPLAYERSCUSTOM];
+	//PrintToChatAll("LoopAlivePlayers before");
 	LoopAlivePlayers(target)
 	{
-		LivePlayers[LivePlayerCount++]=target;
-		LivePlayersTeam[LivePlayerCount++]=GetClientTeam(target);
+		if(SB_GetPlayerProp(target,iStartingTeam)<=1)
+		{
+			//PrintToChatAll("SB_GetPlayerProp(target,iStartingTeam) %d",SB_GetPlayerProp(target,iStartingTeam));
+			continue;
+		}
+		LivePlayers[LivePlayerCount]=target;
+		LivePlayersTeam[LivePlayerCount]=SB_GetPlayerProp(target,iStartingTeam);
+		LivePlayerCount++;
+		//PrintToChatAll("LivePlayerCount %d",LivePlayerCount);
+	}
+	//PrintToChatAll("LoopAlivePlayers after");
+
+	if(LivePlayerCount<=1)
+	{
+		//PrintToChatAll("LivePlayerCount<=1");
+		return false;
+	}
+	else
+	{
+		//PrintToChatAll("LivePlayerCount>1");
 	}
 
 
 	char sClientName[32];
+	//PrintToChatAll("char sClientName[32];");
 	int target = 0;
-	for(int igive=1;igive<=GiveLives;++igive)
+	//PrintToChatAll("target = 0");
+	int OldGiveLives = GiveLives;
+	//PrintToChatAll("OldGiveLives = GiveLives which is %d", OldGiveLives);
+	//for(int igive=1;igive<=GiveLives;++igive)
+	while(GiveLives > 0)
 	{
-		PrintToChatAll("GiveLives:%d",GiveLives);
+		//PrintToChatAll("GiveLives:%d",GiveLives);
 		ChanceFloat = 0.60;
-		for(new i=1;i<=LivePlayerCount;++i)
+		for(new i=0;i<=LivePlayerCount;++i)
 		{
+			//PrintToChatAll("i %d",i);
 			target=LivePlayers[i];
-			PrintToChatAll("target %d",target);
+			if(!SB_ValidPlayer(target,true))
+			{
+				//PrintToChatAll("i %d not valid player",i);
+				continue;
+			}
+			//PrintToChatAll("target %d",target);
 
 			if(target==iClient) continue;
 			// try not to use same person twice
 			if(TargetGotExtraLiveAlready[target] && retry>0)
 			{
-				PrintToChatAll("retry %d",retry);
+				//PrintToChatAll("retry %d",retry);
 				retry--;
 				continue;
 			}
 			if(LivePlayersTeam[i]!=teamToGetLives) continue;
 			if(GetRandomFloat(0.0,1.0)<=ChanceFloat)
 			{
-				PrintToChatAll("GetRandomFloat success");
+				//PrintToChatAll("GetRandomFloat success");
 				TargetGotExtraLiveAlready[target]=true;
 				if(teamToGetLives==2)
 				{
-					PrintToChatAll("teamToGetLives==2");
+					//PrintToChatAll("teamToGetLives==2");
 					SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
 					if(B_sb_chatmsg_balance)
 					{
 						GetClientName(target,STRING(sClientName));
 						SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
 					}
-					SpreadSuccess=true;
+					SpreadSuccess++;
 					GiveLives--;
 					break;
 				}
 				else if(teamToGetLives==3)
 				{
-					PrintToChatAll("teamToGetLives==3");
+					//PrintToChatAll("teamToGetLives==3");
 					SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
 					if(B_sb_chatmsg_balance)
 					{
 						GetClientName(target,STRING(sClientName));
 						SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
 					}
-					SpreadSuccess=true;
+					SpreadSuccess++;
 					GiveLives--;
 					break;
 				}
 			}
 			else
 			{
-				PrintToChatAll("GetRandomFloat fail");
+				//PrintToChatAll("GetRandomFloat fail");
 				ChanceFloat += 0.05;
 				if(ChanceFloat>1.0) ChanceFloat = 1.0;
 			}
 		}
 	}
-	return SpreadSuccess;
+
+	//PrintToChatAll("after while");
+
+	if(OldGiveLives - SpreadSuccess == 0)
+	{
+		return true;
+	}
+	else
+	{
+		//PrintToChatAll("SpreadLives failed!");
+		return false;
+	}
 }
 /*
 public Action Command_InterceptJoinTeam(int client, char[] command, int args)
@@ -303,53 +361,40 @@ int ClientDisconnectTeam[MAXPLAYERSCUSTOM];
 
 public void OnClientDisconnect(int client)
 {
-	PrintToChatAll("OnClientDisconnect");
+	//PrintToChatAll("OnClientDisconnect");
 	g_spec[client] = true;
 
 	ClientDisconnectDisconnected[client]=true;
 	ClientDisconnectLives[client] = SB_GetPlayerProp(client,iLives);
-	ClientDisconnectTeam[client] = GetClientTeam(client);
+	ClientDisconnectTeam[client] = SB_GetPlayerProp(client,iStartingTeam);
 
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
 }
 public void OnClientDisconnect_Post(int client)
 {
-	PrintToChatAll("OnClientDisconnect_Post");
+	//PrintToChatAll("OnClientDisconnect_Post");
 	if(SB_GetGamePlaying())
 	{
 		if(ClientDisconnectDisconnected[client])
 		{
 			ClientDisconnectDisconnected[client]=false;
-
-			DataPack dataPack = new DataPack();
-			CreateDataTimer(0.1,SpreadLivesTimer, dataPack);
-			dataPack.WriteCell(ClientDisconnectTeam[client]);
-			dataPack.WriteCell(ClientDisconnectLives[client]);
+			SpreadLives(ClientDisconnectTeam[client], ClientDisconnectLives[client]);
 		}
 	}
-
+	ClientDisconnectDisconnected[client] = false;
+	ClientDisconnectTeam[client] = 0;
+	ClientDisconnectLives[client] = 0;
 
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
-}
-public Action SpreadLivesTimer(Handle timer, DataPack dataPack)
-{
-	PrintToChatAll("SpreadLivesTimer");
-	if(SB_GetGamePlaying())
-	{
-		dataPack.Reset(false);
-		int ClientTeam = dataPack.ReadCell();
-		int CurrentLives = dataPack.ReadCell();
-
-		SpreadLives(ClientTeam, CurrentLives);
-	}
 }
 
 public OnClientPutInServer(client){
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 	SB_SetPlayerProp(client,iLives,MaxLives);
 	PlayerNextClass[client]=TFClass_Unknown;
+	SB_SetPlayerProp(client,iStartingTeam,0);
 }
 
 
@@ -387,6 +432,7 @@ public Action:Command_jointeam(client, args) {
 public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroadcast) {
 	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
+		SB_SetPlayerProp(i,iStartingTeam,0);
 	}
 	/*
 	int rand = GetRandomInt(2, 3);
@@ -470,6 +516,8 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}*/
+
+			SB_SetPlayerProp(i,iStartingTeam,GetClientTeam(i));
 		}
 		//TF2_RespawnPlayer(i);
 	}
@@ -517,7 +565,10 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 	}
 
 	// Randomly spread the love
-	SpreadLives(teamToBalance, teambalance);
+	if(teambalance != 0)
+	{
+		SpreadLives(teamToBalance, teambalance);
+	}
 
 	if(GetConVarBool(sb_chatmsg))
 	{

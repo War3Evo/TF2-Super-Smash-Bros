@@ -125,6 +125,7 @@ enum SBPlayerProp
 	iDamage,
 	bool:SpawnedOnce,
 	bool:bStatefulSpawn, //set true if spawn is a non repeated spawn. set to true on join and death, set false after spawn forward is finished.
+	iStartingTeam,
 }
 
 native SB_SetPlayerProp(client,SBPlayerProp:property,any:value);
