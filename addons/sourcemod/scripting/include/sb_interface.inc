@@ -794,7 +794,7 @@ stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflict
 forward Action OnSB_EventSpawn(client);
 
 // Fires after EventSpawn
-forward void OnSB_EventSpawn_Post(client);
+forward void OnSB_EventSpawn_Post(int client);
 
 
 //when player dies, fires only in SB mode
