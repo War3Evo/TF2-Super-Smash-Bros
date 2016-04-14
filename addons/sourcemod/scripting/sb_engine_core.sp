@@ -75,6 +75,7 @@ public bool SBInitNativesForwards()
 
 	FHOnSB_RoundEnd=CreateGlobalForward("OnSB_RoundEnd",ET_Ignore);
 
+	// only triggered when native SB_SpawnPlayer is triggered
 	FHOnSB_SpawnPlayer=CreateGlobalForward("OnSB_SpawnPlayer",ET_Ignore, Param_Cell);
 	return true;
 }
