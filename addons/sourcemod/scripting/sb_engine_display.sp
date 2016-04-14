@@ -108,6 +108,8 @@ public OnPluginStart()
 	HookEvent("teamplay_round_win", teamplay_round_win);
 	//HookEvent("teamplay_waiting_begins", teamplay_round_start);
 
+	HookEvent("teamplay_round_active", teamplay_round_active);
+
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
 
 	AddCommandListener(Command_InterceptSpectate, "spectate");
@@ -526,13 +528,16 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		//TF2_RespawnPlayer(i);
 	}
 
-	// Created timer so that it doesn't hold up round_start
-	CreateTimer(1.0,TeamBalanceTimer, _);
-
 	return Plugin_Continue;
 }
 
-public Action:TeamBalanceTimer(Handle:timer,any:userid)
+public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
+{
+	TeamBalanceTimer();
+}
+
+
+public void TeamBalanceTimer()
 {
 	//PrintToChatAll("Debug: Start of Balancing");
 
@@ -565,7 +570,7 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 		CalculateTeamScores(RedTeam,BlueTeam);
 
 		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
-		return Plugin_Continue;
+		return;
 	}
 
 	// Randomly spread the love
@@ -620,7 +625,7 @@ public Action:TeamBalanceTimer(Handle:timer,any:userid)
 	}
 	//PrintToChatAll("Debug: End of Balancing");*/
 
-	return Plugin_Continue;
+	return;
 }
 
 
