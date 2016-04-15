@@ -78,6 +78,7 @@ bool g_spec[MAXPLAYERS+1] = {true, ...};
 
 bool displayedHelp[MAXPLAYERSCUSTOM];
 
+bool NewMap = true;
 
 //new Float:respawn[MAXPLAYERS+1];
 int LastPersonAttacked[MAXPLAYERSCUSTOM];
@@ -124,6 +125,11 @@ public OnPluginStart()
 
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
 	//CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
+}
+
+public OnMapStart()
+{
+	NewMap=true;
 }
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
@@ -534,7 +540,13 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
 {
-	PrintToChatAll("teamplay_round_active : %s",name);
+	PrintToChatAll("%s",name);
+	if(NewMap)
+	{
+		NewMap = false;
+		SB_ChatMessage(0,"First Round of the Map [{red}SUDDEN DEATH{yellow}]");
+		return Plugin_Continue;
+	}
 	TeamBalanceTimer();
 	return Plugin_Continue;
 }
@@ -546,6 +558,8 @@ public void TeamBalanceTimer()
 
 	int redteamcount = GetTeamClientCount(2);
 	int blueteamcount = GetTeamClientCount(3);
+
+	SB_ChatMessage(0,"Red Team Count %d / Blue Team Count %d",redteamcount,blueteamcount);
 
 	int ConVarLives = GetConVarInt(sb_lives);
 	if(ConVarLives <=0) ConVarLives =1;
