@@ -39,6 +39,12 @@ public Plugin:myinfo = {
 int LastValidAttacker[MAXPLAYERSCUSTOM];
 bool firstblood = false;
 
+Handle sb_angles;
+Handle sb_upward_force;
+
+float g_fsb_angles;
+float g_fsb_upward_force;
+
 public OnPluginStart()
 {
 	HookEvent("teamplay_round_start", teamplay_round_active);
@@ -46,6 +52,15 @@ public OnPluginStart()
 	HookEvent("arena_round_start", teamplay_round_active);
 
 	RegConsoleCmd("allowengineering",SB_ENGINEERING,"allowengineering");
+
+	sb_angles = CreateConVar("sb_angles", "50.0", "Advanced options", FCVAR_PLUGIN);
+	g_fsb_angles = GetConVarFloat(sb_angles);
+
+	sb_upward_force= CreateConVar("sb_upward_force", "1.5", "Advanced options", FCVAR_PLUGIN);
+	g_fsb_upward_force = GetConVarFloat(sb_upward_force);
+
+	HookConVarChange(sb_angles, OnConVarChange);
+	HookConVarChange(sb_upward_force, OnConVarChange);
 
 	//HookEvent("player_healed", Event_player_healed);
 
@@ -59,6 +74,14 @@ public OnPluginStart()
 	AddCommandListener(Command_InterceptSuicide, "explode");
 
 	CreateTimer(0.2, Timer_Uber_Regen, _, TIMER_REPEAT);
+}
+
+public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:strNewValue[])
+{
+	if(hConvar == sb_angles)
+		g_fsb_angles = GetConVarFloat(sb_angles);
+	else if(hConvar == sb_upward_force)
+		g_fsb_upward_force = GetConVarFloat(sb_upward_force);
 }
 
 public Action Command_InterceptSuicide(int client, char[] command, int args)
@@ -432,11 +455,11 @@ public OnSBEventPostHurt(victim,attacker,dmgamount,const String:weapon[32])
 			//{
 				//vAngles[0] = 89.0;
 			//}
-			vAngles[0] = 50.0;
+			vAngles[0] = g_fsb_angles; //50.0
 
 			vReturn[0] = FloatMul( Cosine( DegToRad(vAngles[1])  ) , totaldamage);
 			vReturn[1] = FloatMul( Sine( DegToRad(vAngles[1])  ) , totaldamage);
-			vReturn[2] = FloatMul( Sine( DegToRad(vAngles[0])  ) , FloatMul(totaldamage,1.5)); //upward force
+			vReturn[2] = FloatMul( Sine( DegToRad(vAngles[0])  ) , FloatMul(totaldamage,g_fsb_upward_force)); //upward force 1.5
 
 			TeleportEntity(victim, NULL_VECTOR, NULL_VECTOR, vReturn);
 		}
