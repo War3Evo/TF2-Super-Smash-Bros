@@ -750,7 +750,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 					if(SB_ValidPlayer(target))
 					{
 						SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%",SB_GetPlayerProp(target,iDamage));
+						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
 					}
 				}
 				else
@@ -759,7 +759,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 					if(SB_ValidPlayer(target))
 					{
 						SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "Healing: %d%%",SB_GetPlayerProp(target,iDamage));
+						ShowSyncHudText(client, TargetDamageMessage, "Healing: %d%%\nLives: %d",SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
 					}
 					else
 					{
@@ -767,7 +767,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 						if(SB_ValidPlayer(target))
 						{
 							SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-							ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%",SB_GetPlayerProp(target,iDamage));
+							ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
 						}
 					}
 
@@ -775,24 +775,24 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 			}
 			else
 			{
-				new target = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+				int target = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
 				if(!SB_ValidPlayer(target))
 				{
 					target=SB_GetTargetInViewCone(client,10000.0,true, 13.0);
 				}
 				if(SB_ValidPlayer(target))
 				{
-					new String:PlayerName[256];
+					char PlayerName[256];
 					GetClientName(target,PlayerName,sizeof(PlayerName));
 
-					new TargetOfTarget = SB_GetTargetInViewCone(target,10000.0,true, 13.0);
-					if(SB_ValidPlayer(TargetOfTarget))
+					int TargetOfTarget = SB_GetTargetInViewCone(target,10000.0,true, 13.0);
+					if(SB_ValidPlayer(TargetOfTarget,true))
 					{
 						SetHudTextParams(0.67, 0.80, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%",PlayerName,SB_GetPlayerProp(TargetOfTarget,iDamage));
+						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",PlayerName,SB_GetPlayerProp(TargetOfTarget,iDamage),SB_GetPlayerProp(target,iLives));
 					}
 					SetHudTextParams(0.27, 0.80, 0.11, 255, 255, 255, 255);
-					ShowSyncHudText(client, YourDamageMessage, "%s: %d%%",PlayerName,SB_GetPlayerProp(target,iDamage));
+					ShowSyncHudText(client, YourDamageMessage, "%s: %d%%\nLives: %d",PlayerName,SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
 				}
 			}
 
