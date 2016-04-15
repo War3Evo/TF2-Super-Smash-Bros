@@ -506,8 +506,9 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		//if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && !(GetClientTeam(i)==1))
 		if(SB_ValidPlayer(i))
 		{
-			int cred = SB_CountTeams(2);
-			int cblue = SB_CountTeams(3);
+			// dont change GetTeamClientCount() to new method as it is required to balance everyone!
+			int cred = GetTeamClientCount(2);
+			int cblue = GetTeamClientCount(3);
 			if(cred>cblue) {
 				if(GetClientTeam(i)!=3)
 				{
@@ -549,7 +550,7 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 		}
 
 		NewMap = false;
-		SB_ChatMessage(0,"First Round of the Map [{red}SUDDEN DEATH{yellow}]");
+		SB_ChatMessage(0,"First Round of the Map {yellow}[{red}SUDDEN DEATH{yellow}]");
 		return Plugin_Continue;
 	}
 	TeamBalanceTimer();
