@@ -543,6 +543,11 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 	PrintToChatAll("%s",name);
 	if(NewMap)
 	{
+		for(int i=1;i<=MaxClients;++i){
+			LastPersonAttacked[i]=-1;
+			SB_SetPlayerProp(i,iLives,1);
+		}
+
 		NewMap = false;
 		SB_ChatMessage(0,"First Round of the Map [{red}SUDDEN DEATH{yellow}]");
 		return Plugin_Continue;
