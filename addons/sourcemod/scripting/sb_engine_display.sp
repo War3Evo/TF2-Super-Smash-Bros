@@ -151,8 +151,8 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 		//PrintToChatAll("GiveLives <= 0");
 		return false;
 	}
-	if(GetTeamClientCount(teamToGetLives)<1) return false;
-	//PrintToChatAll("GetTeamClientCount(teamToGetLives)>=1");
+	if(SB_CountTeams(teamToGetLives)<1) return false;
+	//PrintToChatAll("SB_CountTeams(teamToGetLives)>=1");
 
 	// Randomly spread the love
 	bool TargetGotExtraLiveAlready[MAXPLAYERSCUSTOM];
@@ -454,8 +454,8 @@ public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroa
 		//if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && !(GetClientTeam(i)==1))
 		if(SB_ValidPlayer(i))
 		{
-			int cred = GetTeamClientCount(2);
-			int cblue = GetTeamClientCount(3);
+			int cred = SB_CountTeams(2);
+			int cblue = SB_CountTeams(3);
 			if(cred>cblue) {
 				if(GetClientTeam(i)!=3)
 				{
@@ -466,7 +466,7 @@ public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroa
 				{
 					ChangeClientTeam(i, 2);
 				}
-			} else if(GetTeamClientCount(1)>0) {
+			} else if(SB_CountTeams(1)>0) {
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
@@ -506,8 +506,8 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 		//if(!g_spec[i] && SB_ValidPlayer(i) && !IsFakeClient(i) && !(GetClientTeam(i)==1))
 		if(SB_ValidPlayer(i))
 		{
-			int cred = GetTeamClientCount(2);
-			int cblue = GetTeamClientCount(3);
+			int cred = SB_CountTeams(2);
+			int cblue = SB_CountTeams(3);
 			if(cred>cblue) {
 				if(GetClientTeam(i)!=3)
 				{
@@ -520,7 +520,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 				}
 			}
 			/*
-			else if(GetTeamClientCount(1)>0) {
+			else if(SB_CountTeams(1)>0) {
 				rand = GetRandomInt(2, 3);
 				ChangeClientTeam(i, rand);
 			}
@@ -561,8 +561,8 @@ public void TeamBalanceTimer()
 {
 	//PrintToChatAll("Debug: Start of Balancing");
 
-	int redteamcount = GetTeamClientCount(2);
-	int blueteamcount = GetTeamClientCount(3);
+	int redteamcount = SB_CountTeams(2);
+	int blueteamcount = SB_CountTeams(3);
 
 	SB_ChatMessage(0,"Red Team Count %d / Blue Team Count %d",redteamcount,blueteamcount);
 

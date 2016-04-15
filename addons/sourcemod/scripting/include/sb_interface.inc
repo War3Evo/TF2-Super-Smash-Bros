@@ -868,3 +868,19 @@ stock void CalculateTeamScores(int &RedTeam, int &BlueTeam)
 		}
 	}
 }
+
+stock int SB_CountTeams(iTeam)
+{
+	int iTeamCount=0;
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if(SB_ValidPlayer(i,true))
+		{
+			if(GetClientTeam(i)==iTeam)
+			{
+				iTeamCount++;
+			}
+		}
+	}
+	return iTeamCount;
+}
