@@ -27,6 +27,7 @@
 #include <tf2-weapon-restrictions>
 
 Handle sb_round_time;
+float old_sb_round_time;
 
 Handle g_OnSB_EventSpawnFH;
 Handle g_OnSB_EventSpawnFH_Post;
@@ -85,6 +86,8 @@ public OnPluginStart()
 	CreateConVar("Super_Smash_Bros_version", PLUGIN_VERSION, "Smash Bros version.", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
 	sb_round_time = CreateConVar("sb_roundtime", "300.0", "Round Time in Seconds", FCVAR_PLUGIN);
+	old_sb_round_time = GetConVarFloat(sb_round_time);
+	HookConVarChange(sb_round_time, OnConVarChange);
 
 	// Events for all games
 	if(!HookEventEx("player_spawn",SB_PlayerSpawnEvent,EventHookMode_Pre)) //,EventHookMode_Pre
@@ -121,6 +124,31 @@ public OnPluginStart()
 	g_OnSB_EventSpawnFH=CreateGlobalForward("OnSB_EventSpawn",ET_Hook,Param_Cell);
 	g_OnSB_EventSpawnFH_Post=CreateGlobalForward("OnSB_EventSpawn_Post",ET_Ignore,Param_Cell);
 	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
+}
+
+public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:strNewValue[])
+{
+	if(hConvar == sb_round_time)
+	{
+		//CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
+		if(playing)
+		{
+			if(old_sb_round_time==GetConVarFloat(sb_round_time))
+			{
+				return;
+			}
+			else if(old_sb_round_time>GetConVarFloat(sb_round_time))
+			{
+				CountDownTimer -= (old_sb_round_time - GetConVarFloat(sb_round_time));
+				old_sb_round_time = GetConVarFloat(sb_round_time);
+			}
+			else
+			{
+				CountDownTimer += (GetConVarFloat(sb_round_time) - old_sb_round_time);
+				old_sb_round_time = GetConVarFloat(sb_round_time);
+			}
+		}
+	}
 }
 
 public OnMapEnd()
@@ -211,6 +239,7 @@ public Action:teamplay_round_start(Handle:event,  const String:name[], bool:dont
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast) {
 	playing=true;
+	old_sb_round_time = GetConVarFloat(sb_round_time);
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
 }
 
