@@ -26,6 +26,11 @@
 #include <sb_interface>
 #include <tf2-weapon-restrictions>
 
+#undef REQUIRE_PLUGIN
+#include <updater>
+
+#define UPDATE_URL "http://107.161.29.8:8080/job/TF2-Super-Smash-Bros%20%28DEVELOP%29/lastSuccessfulBuild/artifact/addons/sourcemod/updatefile.txt"
+
 Handle sb_round_time;
 
 Handle g_OnSB_EventSpawnFH;
@@ -122,6 +127,19 @@ public OnPluginStart()
 	g_OnSB_EventSpawnFH=CreateGlobalForward("OnSB_EventSpawn",ET_Hook,Param_Cell);
 	g_OnSB_EventSpawnFH_Post=CreateGlobalForward("OnSB_EventSpawn_Post",ET_Ignore,Param_Cell);
 	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
+
+	if (LibraryExists("updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
+}
+
+public OnLibraryAdded(const String:name[])
+{
+	if (StrEqual(name, "updater"))
+	{
+		Updater_AddPlugin(UPDATE_URL);
+	}
 }
 
 public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:strNewValue[])
