@@ -23,9 +23,9 @@
 
 #define BUILD_NUMBER "m.a.n.u.a.l." // For Jenkins Builds
 
-#define PLUGIN_VERSION "1.4.beta."...BUILD_NUMBER
+#define PLUGIN_VERSION BUILD_NUMBER
 
-#define PLUGIN_VERSION_NUMBER 12
+#define PLUGIN_VERSION_NUMBER 14
 
 #define MAXPLAYERSCUSTOM 34
 
