@@ -762,14 +762,23 @@ public OnSB_RoundEnd()
 }
 
 float SpawnLocation[MAXPLAYERS + 1][3];
+int retries[MAXPLAYERS + 1];
+bool blockjumping[MAXPLAYERS + 1];
 
 public OnSB_SpawnPlayer(int client)
 {
 	if(SB_ValidPlayer(client))
 	{
 		GetClientAbsOrigin(client, SpawnLocation[client]);
+		blockjumping[client]=true;
+		CreateTimer(0.1, StopPlayerMovement, client);
+		CreateTimer(1.0, StopJumpMovement, client);
 	}
-	CreateTimer(0.2, StopPlayerMovement, client);
+}
+
+public Action:StopJumpMovement(Handle:timer, any:client)
+{
+	blockjumping[client]=false;
 }
 
 public Action:StopPlayerMovement(Handle:timer, any:client)
@@ -786,5 +795,18 @@ public Action:StopPlayerMovement(Handle:timer, any:client)
 			SpawnLocation[client][2]!= 0.0;
 		}
 	}
+	else if(SB_ValidPlayer(client) && retries[client]<10)
+	{
+		retries[client]++;
+		CreateTimer(0.1, StopPlayerMovement, client);
+	}
 }
 
+public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
+{
+	if(blockjumping[client])
+	{
+		buttons &= ~IN_JUMP;
+	}
+	return Plugin_Continue;
+}
