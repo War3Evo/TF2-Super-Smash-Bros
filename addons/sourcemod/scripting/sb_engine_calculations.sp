@@ -251,6 +251,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 	}*/
 
 	bool DamageCustom = false;
+	int customdamage = 0;
 
 	switch (damagecustom)
 	{
@@ -259,7 +260,17 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 		TF_CUSTOM_TAUNT_UBERSLICE, TF_CUSTOM_TAUNT_ENGINEER_SMASH, TF_CUSTOM_TAUNT_ENGINEER_ARM, TF_CUSTOM_TAUNT_ARMAGEDDON:
 		{
 			DamageCustom = true;
-			SB_DamageModPercent(0.01);
+			SB_DamageModPercent(0.0);
+		}
+	}
+
+	switch (damagecustom)
+	{
+		case TF_CUSTOM_BACKSTAB, TF_CUSTOM_HEADSHOT:
+		{
+			DamageCustom = true;
+			customdamage = 100;
+			SB_DamageModPercent(0.0);
 		}
 	}
 
@@ -320,12 +331,17 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 		//{
 		if(!DamageCustom)
 		{
-			new newdamage = (SB_GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
+			int newdamage = (SB_GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
+			SB_SetPlayerProp(victim,iDamage,newdamage);
+			SB_DamageModPercent(0.01);
+		}
+		else
+		{
+			int newdamage = (SB_GetPlayerProp(victim,iDamage) + customdamage);
 			SB_SetPlayerProp(victim,iDamage,newdamage);
 		}
 		//}
 		//SB_DP("valid attacker 0.0");
-		SB_DamageModPercent(0.01);
 		//passcheck++;
 	}
 	/*
