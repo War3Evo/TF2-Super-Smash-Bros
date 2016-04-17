@@ -34,6 +34,7 @@
 #define SHORTNAMELEN 16 //item or race shotnames, 15 characters
 #define FULLNAMELEN 32 //item or race full names, 31 characters. RUSSIAN and other characters require more than 1 byte to store a displayed character
 
+
 //=============================================================================
 // Damage
 //=============================================================================
