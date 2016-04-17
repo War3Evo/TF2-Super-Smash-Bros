@@ -45,11 +45,6 @@ Handle sb_upward_force;
 float g_fsb_angles;
 float g_fsb_upward_force;
 
-float SpawnLocation[MAXPLAYERS + 1][3];
-int retries[MAXPLAYERS + 1];
-bool blockjumping[MAXPLAYERS + 1];
-
-
 public OnPluginStart()
 {
 	HookEvent("teamplay_round_start", teamplay_round_active);
@@ -79,6 +74,20 @@ public OnPluginStart()
 	AddCommandListener(Command_InterceptSuicide, "explode");
 
 	CreateTimer(0.2, Timer_Uber_Regen, _, TIMER_REPEAT);
+}
+
+bool bHopEnabled = false;
+
+public OnAllPluginsLoaded()
+{
+	//fc_version
+	if(FindConVar("fc_version"))
+	{
+		if(GetConVarInt(FindConVar("fc_bhop_enabled"))==1)
+		{
+			bHopEnabled = true;
+		}
+	}
 }
 
 public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:strNewValue[])
@@ -134,6 +143,11 @@ public bool FakeDeath(int victim, int attacker)
 			if(GetConVarBool(FindConVar("sb_chatmsg")))
 			{
 				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
+			}
+
+			if(bHopEnabled)
+			{
+				ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
 			}
 
 			SB_SpawnPlayer(victim);
@@ -500,9 +514,29 @@ public Action OnSB_EventSpawn(client)
 		SB_SetPlayerProp(client,iDamage,0);
 		//SDKHook(client,SDKHook_WeaponSwitchPost,SDK_OnWeaponSwitchPost);
 		SpawnProtect(client);
+
+		if(bHopEnabled)
+		{
+			ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
+			CreateTimer(5.0, AllowBhopAgain, client);
+		}
 	}
 	return Plugin_Continue;
 }
+
+
+public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
+{
+	if(SB_ValidPlayer(victim))
+	{
+		if(bHopEnabled)
+		{
+			ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
+		}
+	}
+}
+
+
 
 /*
 public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
@@ -770,44 +804,18 @@ public OnSB_SpawnPlayer(int client)
 {
 	if(SB_ValidPlayer(client))
 	{
-		GetClientAbsOrigin(client, SpawnLocation[client]);
-		blockjumping[client]=true;
-		CreateTimer(0.1, StopPlayerMovement, client);
-		CreateTimer(1.0, StopJumpMovement, client);
+		if(bHopEnabled)
+		{
+			ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
+			CreateTimer(5.0, AllowBhopAgain, client);
+		}
 	}
 }
 
-public Action:StopJumpMovement(Handle:timer, any:client)
-{
-	blockjumping[client]=false;
-}
-
-public Action:StopPlayerMovement(Handle:timer, any:client)
+public Action:AllowBhopAgain(Handle:timer, any:client)
 {
 	if(SB_ValidPlayer(client,true))
 	{
-		if(SpawnLocation[client][0]!= 0.0
-		&& SpawnLocation[client][1]!= 0.0
-		&& SpawnLocation[client][2]!= 0.0)
-		{
-			TeleportEntity(client, SpawnLocation[client], NULL_VECTOR, NULL_VECTOR);
-			SpawnLocation[client][0]!= 0.0;
-			SpawnLocation[client][1]!= 0.0;
-			SpawnLocation[client][2]!= 0.0;
-		}
+		ServerCommand("sm_bhop_enabled %d 1",GetClientUserId(client));
 	}
-	else if(SB_ValidPlayer(client) && retries[client]<10)
-	{
-		retries[client]++;
-		CreateTimer(0.1, StopPlayerMovement, client);
-	}
-}
-
-public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
-{
-	if(blockjumping[client])
-	{
-		buttons &= ~IN_JUMP;
-	}
-	return Plugin_Continue;
 }
