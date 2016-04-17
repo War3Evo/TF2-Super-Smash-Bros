@@ -500,11 +500,6 @@ public Action OnSB_EventSpawn(client)
 		SB_SetPlayerProp(client,iDamage,0);
 		//SDKHook(client,SDKHook_WeaponSwitchPost,SDK_OnWeaponSwitchPost);
 		SpawnProtect(client);
-
-		GetClientAbsOrigin(client, SpawnLocation[client]);
-		blockjumping[client]=true;
-		CreateTimer(0.1, StopPlayerMovement, client);
-		CreateTimer(2.0, StopJumpMovement, client);
 	}
 	return Plugin_Continue;
 }
