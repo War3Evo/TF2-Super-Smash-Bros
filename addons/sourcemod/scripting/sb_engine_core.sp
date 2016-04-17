@@ -29,7 +29,9 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-#define UPDATE_URL "http://107.161.29.8:8080/job/TF2-Super-Smash-Bros%20%28DEVELOP%29/lastSuccessfulBuild/artifact/addons/sourcemod/updatefile.txt"
+#define JENKINS_UPDATE_URL "DEVELOP"
+
+#define UPDATE_URL "http://107.161.29.8:8080/job/TF2-Super-Smash-Bros%20%28" ... JENKINS_UPDATE_URL ... "%29/lastSuccessfulBuild/artifact/addons/sourcemod/updatefile.txt"
 
 Handle sb_round_time;
 
