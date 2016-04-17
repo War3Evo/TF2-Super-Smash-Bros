@@ -791,8 +791,11 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 					int TargetOfTarget = SB_GetTargetInViewCone(target,10000.0,true, 13.0);
 					if(SB_ValidPlayer(TargetOfTarget,true))
 					{
+						char TargetOfTargetName[256];
+						GetClientName(TargetOfTarget,TargetOfTargetName,sizeof(TargetOfTargetName));
+
 						SetHudTextParams(0.67, 0.80, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "%s: %d%%\nLives: %d",PlayerName,SB_GetPlayerProp(TargetOfTarget,iDamage),SB_GetPlayerProp(TargetOfTarget,iLives));
+						ShowSyncHudText(client, TargetDamageMessage, "%s: %d%%\nLives: %d",TargetOfTargetName,SB_GetPlayerProp(TargetOfTarget,iDamage),SB_GetPlayerProp(TargetOfTarget,iLives));
 					}
 					SetHudTextParams(0.27, 0.80, 0.11, 255, 255, 255, 255);
 					ShowSyncHudText(client, YourDamageMessage, "%s: %d%%\nLives: %d",PlayerName,SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
