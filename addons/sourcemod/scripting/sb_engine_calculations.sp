@@ -177,17 +177,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 		LastValidAttacker[victim]=attacker;
 	}
 
-	if(SB_ValidPlayer(victim))
-	{
-		if(RoundToCeil(damage)>GetClientHealth(victim))
-		{
-			if(SB_GetPlayerProp(victim,iLives)>1)
-			{
-				SB_DamageModPercent(0.0);
-				FakeDeath(victim, attacker);
-			}
-		}
-	}
+	bool DamageHandled = false;
 
 	/*
 	int inflictor = SB_GetDamageInflictor();
@@ -259,6 +249,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 		TF_CUSTOM_TAUNT_ARROW_STAB, TF_CUSTOM_TAUNT_GRENADE, TF_CUSTOM_TAUNT_BARBARIAN_SWING,
 		TF_CUSTOM_TAUNT_UBERSLICE, TF_CUSTOM_TAUNT_ENGINEER_SMASH, TF_CUSTOM_TAUNT_ENGINEER_ARM, TF_CUSTOM_TAUNT_ARMAGEDDON:
 		{
+			DamageHandled = true;
 			DamageCustom = true;
 			SB_DamageModPercent(0.0);
 		}
@@ -268,6 +259,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 	{
 		case TF_CUSTOM_BACKSTAB, TF_CUSTOM_HEADSHOT:
 		{
+			DamageHandled = true;
 			DamageCustom = true;
 			customdamage = 100;
 			SB_DamageModPercent(0.0);
@@ -309,6 +301,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 			//SB_DP("victim & DMG_FALL 0.0");
 			SB_DamageModPercent(0.0);
 			//passcheck++;
+			return;
 		}
 	}
 
@@ -378,6 +371,18 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 		}
 	}
 	//SB_DP("iItemDefinitionIndex pass");
+
+	if(SB_ValidPlayer(victim))
+	{
+		if(!DamageHandled && RoundToCeil(damage)>GetClientHealth(victim))
+		{
+			if(SB_GetPlayerProp(victim,iLives)>1)
+			{
+				SB_DamageModPercent(0.0);
+				FakeDeath(victim, attacker);
+			}
+		}
+	}
 }
 
 public OnSBEventPostHurt(victim,attacker,dmgamount,const String:weapon[32])
