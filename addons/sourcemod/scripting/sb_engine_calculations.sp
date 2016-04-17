@@ -504,7 +504,7 @@ public Action OnSB_EventSpawn(client)
 		GetClientAbsOrigin(client, SpawnLocation[client]);
 		blockjumping[client]=true;
 		CreateTimer(0.1, StopPlayerMovement, client);
-		CreateTimer(1.0, StopJumpMovement, client);
+		CreateTimer(2.0, StopJumpMovement, client);
 	}
 	return Plugin_Continue;
 }
