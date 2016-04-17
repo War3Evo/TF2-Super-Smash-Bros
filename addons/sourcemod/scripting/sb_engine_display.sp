@@ -134,7 +134,7 @@ public OnMapStart()
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 {
-	//PrintToChatAll("SpreadLives");
+	//PrintToChatAllPrintToChatAll("SpreadLives");
 	if(teamToGetLives <=0 || teamToGetLives > 3)
 	{
 		//PrintToChatAll("invalid teamToGetLives");
@@ -541,7 +541,7 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
 {
-	PrintToChatAll("%s",name);
+	//PrintToChatAll("%s",name);
 	if(NewMap)
 	{
 		for(int i=1;i<=MaxClients;++i){
