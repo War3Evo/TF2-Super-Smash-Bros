@@ -760,3 +760,33 @@ public OnSB_RoundEnd()
 	AcceptEntityInput(iEnt, "SetTeam");
 	AcceptEntityInput(iEnt, "RoundWin");
 }
+
+bool StopPlayerMovement[MAXPLAYERSCUSTOM];
+
+public OnSB_SpawnPlayer(int client)
+{
+	StopPlayerMovement[client] = true;
+	CreateTimer(1.0, Remove_DontMove, client);
+}
+
+public Action:Remove_DontMove(Handle:timer, any:client)
+{
+	StopPlayerMovement[client]= false;
+}
+
+public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
+{
+	if(StopPlayerMovement[client])
+	{
+		vel[0] = 0.0;
+		vel[1] = 0.0;
+		vel[2] = 0.0;
+		return Plugin_Changed;
+	}
+	return Plugin_Continue;
+}
+
+public OnClientPutInServer(int client)
+{
+	StopPlayerMovement[client]= false;
+}
