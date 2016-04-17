@@ -775,6 +775,9 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 			}
 			else
 			{
+				SetHudTextParams(-1.0, 0.88, 0.11, 255, 255, 255, 255);
+				ShowSyncHudText(client, YourLivesMessage, "Red %d - Blue %d",RedTeam,BlueTeam);
+
 				int target = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
 				if(!SB_ValidPlayer(target))
 				{
