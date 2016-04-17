@@ -761,32 +761,30 @@ public OnSB_RoundEnd()
 	AcceptEntityInput(iEnt, "RoundWin");
 }
 
-bool StopPlayerMovement[MAXPLAYERSCUSTOM];
+float SpawnLocation[MAXPLAYERS + 1][3];
 
 public OnSB_SpawnPlayer(int client)
 {
-	StopPlayerMovement[client] = true;
-	CreateTimer(1.0, Remove_DontMove, client);
-}
-
-public Action:Remove_DontMove(Handle:timer, any:client)
-{
-	StopPlayerMovement[client]= false;
-}
-
-public Action:OnPlayerRunCmd(client, &buttons, &impulse, Float:vel[3], Float:angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
-{
-	if(StopPlayerMovement[client])
+	if(SB_ValidPlayer(client))
 	{
-		vel[0] = 0.0;
-		vel[1] = 0.0;
-		vel[2] = 0.0;
-		return Plugin_Changed;
+		GetClientAbsOrigin(client, SpawnLocation[client]);
 	}
-	return Plugin_Continue;
+	CreateTimer(0.2, StopPlayerMovement, client);
 }
 
-public OnClientPutInServer(int client)
+public Action:StopPlayerMovement(Handle:timer, any:client)
 {
-	StopPlayerMovement[client]= false;
+	if(SB_ValidPlayer(client,true))
+	{
+		if(SpawnLocation[client][0]!= 0.0
+		&& SpawnLocation[client][1]!= 0.0
+		&& SpawnLocation[client][2]!= 0.0)
+		{
+			TeleportEntity(client, SpawnLocation[client], NULL_VECTOR, NULL_VECTOR);
+			SpawnLocation[client][0]!= 0.0;
+			SpawnLocation[client][1]!= 0.0;
+			SpawnLocation[client][2]!= 0.0;
+		}
+	}
 }
+
