@@ -19,7 +19,6 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #pragma semicolon 1
 
 #include <sourcemod>
