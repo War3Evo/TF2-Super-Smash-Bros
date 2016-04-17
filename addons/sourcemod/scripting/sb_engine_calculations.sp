@@ -45,6 +45,11 @@ Handle sb_upward_force;
 float g_fsb_angles;
 float g_fsb_upward_force;
 
+float SpawnLocation[MAXPLAYERS + 1][3];
+int retries[MAXPLAYERS + 1];
+bool blockjumping[MAXPLAYERS + 1];
+
+
 public OnPluginStart()
 {
 	HookEvent("teamplay_round_start", teamplay_round_active);
@@ -495,6 +500,11 @@ public Action OnSB_EventSpawn(client)
 		SB_SetPlayerProp(client,iDamage,0);
 		//SDKHook(client,SDKHook_WeaponSwitchPost,SDK_OnWeaponSwitchPost);
 		SpawnProtect(client);
+
+		GetClientAbsOrigin(client, SpawnLocation[client]);
+		blockjumping[client]=true;
+		CreateTimer(0.1, StopPlayerMovement, client);
+		CreateTimer(1.0, StopJumpMovement, client);
 	}
 	return Plugin_Continue;
 }
@@ -760,10 +770,6 @@ public OnSB_RoundEnd()
 	AcceptEntityInput(iEnt, "SetTeam");
 	AcceptEntityInput(iEnt, "RoundWin");
 }
-
-float SpawnLocation[MAXPLAYERS + 1][3];
-int retries[MAXPLAYERS + 1];
-bool blockjumping[MAXPLAYERS + 1];
 
 public OnSB_SpawnPlayer(int client)
 {
