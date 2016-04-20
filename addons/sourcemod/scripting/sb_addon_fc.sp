@@ -50,6 +50,7 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <tf2_stocks>
+#include <sb_addon_fc>
 
 
 ////////////////////////////////////////////////////////////
@@ -763,7 +764,7 @@ Float:GetVectorAngle(Float:x, Float:y)
 ////////////////////////////////////////////////////////////
 public int Native_FC_Enabled(Handle plugin, int numParams)
 {
-	return hEnabled;
+	return GetConVarBool(hEnabled);
 }
 
 public int Native_Bhop_Enabled(Handle plugin, int numParams)
