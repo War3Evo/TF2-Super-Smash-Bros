@@ -498,6 +498,11 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 		CreateTimer(0.1, Timer_ReplaceWeapon_Cloak_And_Dagger, client);
 		return Plugin_Handled;
 	}
+	if(iItemDefinitionIndex==59) //Dead Ringer
+	{
+		CreateTimer(0.1, Timer_ReplaceWeapon_Cloak_And_Dagger, client);
+		return Plugin_Handled;
+	}
 	/*
 	if(iItemDefinitionIndex==325 || iItemDefinitionIndex==452) //The Boston Basher  / Three-Rune Blade
 	{
