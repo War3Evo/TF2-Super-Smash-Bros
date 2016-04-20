@@ -23,7 +23,6 @@
 
 #include <sourcemod>
 #include <sb_interface>
-#include <tf2-weapon-restrictions>
 
 #undef REQUIRE_PLUGIN
 #include <updater>
@@ -165,15 +164,6 @@ public OnMapEnd()
 public OnMapStart()
 {
 	playing=false;
-}
-
-public OnAllPluginsLoaded()
-{
-	// called after OnPluginStart from all plugins, even on late load
-	if(LibraryExists("tf2weaponrestrictions"))
-	{
-		TF2WeaponRestrictions_SetRestriction("smashbros");
-	}
 }
 
 public NSB_GetPlayerProp(Handle:plugin,numParams){

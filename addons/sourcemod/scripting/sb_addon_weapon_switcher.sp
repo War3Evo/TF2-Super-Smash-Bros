@@ -503,6 +503,11 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 		CreateTimer(0.1, Timer_ReplaceWeapon_Cloak_And_Dagger, client);
 		return Plugin_Handled;
 	}
+
+	if (StrEqual(classname, "tf_weapon_builder") || StrEqual(classname, "tf_weapon_sapper"))
+	{
+		return Plugin_Stop;
+	}
 	/*
 	if(iItemDefinitionIndex==325 || iItemDefinitionIndex==452) //The Boston Basher  / Three-Rune Blade
 	{
