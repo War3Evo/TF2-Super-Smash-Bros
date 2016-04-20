@@ -28,10 +28,10 @@ native void FC_SetBhop(client, bool:enabled = false, bool:lazymode = false, Floa
  **/
 native bool FC_BhopStatus(client);
 
-public SharedPlugin:__pl_fc =
+public SharedPlugin:__pl_sb_addon_fc =
 {
-	name = "fc",
-	file = "fc.smx",
+	name = "sb_addon_fc",
+	file = "sb_addon_fc.smx",
 #if defined REQUIRE_PLUGIN
 	required = 1,
 #else
@@ -44,5 +44,7 @@ public __pl_fc_SetNTVOptional()
 {
 	MarkNativeAsOptional("FC_SetBhop");
 	MarkNativeAsOptional("FC_BhopStatus");
+	MarkNativeAsOptional("FC_Enabled");
+	MarkNativeAsOptional("FC_Bhop_Enabled");
 }
 #endif
