@@ -47,6 +47,8 @@ Handle sb_upward_force;
 float g_fsb_angles;
 float g_fsb_upward_force;
 
+Handle sb_fc_bhop;
+
 public OnPluginStart()
 {
 	HookEvent("teamplay_round_start", teamplay_round_active);
@@ -54,6 +56,8 @@ public OnPluginStart()
 	HookEvent("arena_round_start", teamplay_round_active);
 
 	RegConsoleCmd("allowengineering",SB_ENGINEERING,"allowengineering");
+
+	sb_fc_bhop = CreateConVar("sb_fc_bhop", "0.5", "fc disable bhop on spawn for seconds", FCVAR_PLUGIN);
 
 	sb_angles = CreateConVar("sb_angles", "50.0", "Advanced options", FCVAR_PLUGIN);
 	g_fsb_angles = GetConVarFloat(sb_angles);
@@ -551,7 +555,7 @@ public Action OnSB_EventSpawn(client)
 		{
 			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
 			FC_SetBhop(client, false);
-			CreateTimer(3.0, AllowBhopAgain, client);
+			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowBhopAgain, client);
 		}
 #endif
 	}
@@ -844,7 +848,7 @@ public OnSB_SpawnPlayer(int client)
 		{
 			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
 			FC_SetBhop(client, false);
-			CreateTimer(3.0, AllowBhopAgain, client);
+			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowBhopAgain, client);
 		}
 	}
 }
