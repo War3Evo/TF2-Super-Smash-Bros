@@ -28,6 +28,8 @@
 #include <sb_interface>
 #include <sdkhooks>
 
+#tryinclude <sb_addon_fc>
+
 public Plugin:myinfo = {
 	name = "Smash Bros Calculations Engine",
 	author = "El Diablo",
@@ -78,17 +80,43 @@ public OnPluginStart()
 
 bool bHopEnabled = false;
 
+#if defined _sb_addon_fc_included
 public OnAllPluginsLoaded()
 {
-	//fc_version
-	if(FindConVar("fc_version"))
+	if(LibraryExists("sb_addon_fc"))
 	{
-		if(GetConVarInt(FindConVar("fc_bhop_enabled"))==1)
+		if(FC_Enabled())
 		{
-			bHopEnabled = true;
+			if(FC_Bhop_Enabled())
+			{
+				bHopEnabled = true;
+			}
 		}
 	}
 }
+
+public OnLibraryAdded(const String:name[])
+{
+	if(StrEqual(name,"sb_addon_fc"))
+	{
+		if(FC_Enabled())
+		{
+			if(FC_Bhop_Enabled())
+			{
+				bHopEnabled = true;
+			}
+		}
+	}
+}
+
+public OnLibraryRemoved(const String:name[])
+{
+	if(StrEqual(name,"sb_addon_fc"))
+	{
+		bHopEnabled = false;
+	}
+}
+#endif
 
 public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:strNewValue[])
 {
@@ -145,10 +173,13 @@ public bool FakeDeath(int victim, int attacker)
 				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
 			}
 
+#if defined _sb_addon_fc_included
 			if(bHopEnabled)
 			{
-				ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
+				//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
+				FC_SetBhop(victim, false);
 			}
+#endif
 
 			SB_SpawnPlayer(victim);
 
@@ -515,27 +546,31 @@ public Action OnSB_EventSpawn(client)
 		//SDKHook(client,SDKHook_WeaponSwitchPost,SDK_OnWeaponSwitchPost);
 		SpawnProtect(client);
 
+#if defined _sb_addon_fc_included
 		if(bHopEnabled)
 		{
-			ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
-			CreateTimer(5.0, AllowBhopAgain, client);
+			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
+			FC_SetBhop(client, false);
+			CreateTimer(3.0, AllowBhopAgain, client);
 		}
+#endif
 	}
 	return Plugin_Continue;
 }
 
-
+#if defined _sb_addon_fc_included
 public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
 {
 	if(SB_ValidPlayer(victim))
 	{
 		if(bHopEnabled)
 		{
-			ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
+			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
+			FC_SetBhop(victim, false);
 		}
 	}
 }
-
+#endif
 
 
 /*
@@ -800,14 +835,16 @@ public OnSB_RoundEnd()
 	AcceptEntityInput(iEnt, "RoundWin");
 }
 
+#if defined _sb_addon_fc_included
 public OnSB_SpawnPlayer(int client)
 {
 	if(SB_ValidPlayer(client))
 	{
 		if(bHopEnabled)
 		{
-			ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
-			CreateTimer(5.0, AllowBhopAgain, client);
+			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
+			FC_SetBhop(client, false);
+			CreateTimer(3.0, AllowBhopAgain, client);
 		}
 	}
 }
@@ -816,6 +853,8 @@ public Action:AllowBhopAgain(Handle:timer, any:client)
 {
 	if(SB_ValidPlayer(client,true))
 	{
-		ServerCommand("sm_bhop_enabled %d 1",GetClientUserId(client));
+		//ServerCommand("sm_bhop_enabled %d 1",GetClientUserId(client));
+		FC_SetBhop(client, true, true);
 	}
 }
+#endif
