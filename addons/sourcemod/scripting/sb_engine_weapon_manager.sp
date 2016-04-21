@@ -71,12 +71,104 @@ public bool SBInitNativesForwards()
 	return true;
 }
 
+Handle h_index = null;
+Handle h_Old_Weapon_String = null;
+Handle h_New_Weapon_String = null;
+Handle h_ForceWeaponActive = null;
+Handle h_WeaponIndex = null;
+Handle h_WeaponLevel = null;
+Handle h_WeaponQuality = null;
+Handle h_WeaponAttribute = null;
+Handle h_WeaponAmmo1 = null;
+Handle h_WeaponAmmo2 = null;
+Handle h_WeaponAmmo3 = null;
+Handle h_WeaponClip1 = null;
+Handle h_WeaponClip2 = null;
+Handle h_WeaponClip3 = null;
 
 public OnPluginStart()
 {
 	RegAdminCmd("reloadcfg", SB_TESTING_CONFIG, ADMFLAG_ROOT);
 
+	RegAdminCmd("reloadswitcher", SB_WEAPON_SWITCHER_CONFIG, ADMFLAG_ROOT);
+
 	sb_weapon_enabled = CreateConVar("sb_weapon_enabled", "1", "0 - disable, 1 - enable", FCVAR_PLUGIN);
+
+	h_index = CreateArray(1);
+	h_Old_Weapon_String = CreateArray(ByteCountToCells(64));
+	h_New_Weapon_String = CreateArray(ByteCountToCells(64));
+	h_ForceWeaponActive = CreateArray(1);
+	h_WeaponIndex = CreateArray(1);
+	h_WeaponLevel = CreateArray(1);
+	h_WeaponQuality = CreateArray(1);
+	h_WeaponAttribute = CreateArray(ByteCountToCells(64));
+
+	h_WeaponAmmo1 = CreateArray(1);
+	h_WeaponClip1 = CreateArray(1);
+
+	h_WeaponAmmo2 = CreateArray(1);
+	h_WeaponClip2 = CreateArray(1);
+
+	h_WeaponAmmo3 = CreateArray(1);
+	h_WeaponClip3 = CreateArray(1);
+
+}
+
+//Switcher wswitch = Switcher();
+
+methodmap Switcher
+{
+	public Switcher() //constructor
+	{
+		//return view_as<Switcher>(); //make sure you do validity check on players
+		return view_as<Switcher>(GetArraySize(h_index)+1);
+	}
+	 property Handle index
+	{
+		public get() { return view_as<Handle>(this); }
+	}
+	public bool AddWeapon(	char OldWeapon[64],
+							char NewWeapon[64],
+							int ForceWeaponActive,
+							int WeaponIndex,
+							int WeaponLevel,
+							int WeaponQuality,
+							char WeaponAttribute[64],
+							int Ammo1,
+							int Ammo2,
+							int Ammo3,
+							int Clip1,
+							int Clip2,
+							int Clip3)
+	{
+		PushArrayString(h_Old_Weapon_String, OldWeapon);
+		PushArrayString(h_New_Weapon_String, NewWeapon);
+		PushArrayCell(h_ForceWeaponActive, ForceWeaponActive);
+		PushArrayCell(h_WeaponIndex, WeaponIndex);
+		PushArrayCell(h_WeaponLevel, WeaponLevel);
+		PushArrayCell(h_WeaponQuality, WeaponQuality);
+		PushArrayString(h_WeaponAttribute, WeaponAttribute);
+		PushArrayCell(h_WeaponAmmo1, Ammo1);
+		PushArrayCell(h_WeaponAmmo2, Ammo2);
+		PushArrayCell(h_WeaponAmmo3, Ammo3);
+		PushArrayCell(h_WeaponClip1, Clip1);
+		PushArrayCell(h_WeaponClip2, Clip2);
+		PushArrayCell(h_WeaponClip3, Clip3);
+
+	}
+}
+
+public Action:SB_WEAPON_SWITCHER_CONFIG(client,args)
+{
+	PrintToChatAll("reloading weapon switcher configuration");
+
+	Handle kv = PrePareTheFile();
+
+	if(kv != null)
+	{
+		LoadWeaponSwitchingValues(kv);
+		CloseTheFile(kv);
+	}
 }
 
 public Action:SB_TESTING_CONFIG(client,args)
@@ -89,7 +181,7 @@ public Action:SB_TESTING_CONFIG(client,args)
 	{
 		LoopMaxClients(target)
 		{
-			if(SB_ValidPlayer(target))
+			if(SB_ValidPlayer(target,true))
 			{
 				int weapon_index = 0;
 				int weapon_entity = 0;
@@ -173,6 +265,150 @@ public Handle PrePareTheFile()
 public CloseTheFile(Handle kv)
 {
 	CloseHandle(kv);
+}
+
+public LoadWeaponSwitchingValues(Handle kv)
+{
+	KvRewind(kv);
+
+	char sSectionBuffer[32];
+	char sSubKeyBuffer[32];
+
+	//char sTempBuffer[64];
+
+	bool found=false;
+
+	//float newkeyvalue = 1.0;
+
+	char old_weapon[64];
+	char new_weapon[64];
+	int ForceActiveWeapon = 0;
+	int WeaponIndex = 0;
+	int WeaponLevel = 0;
+	int WeaponQuality = 0;
+	char WeaponAttribute[64];
+	int Ammo1 = -1;
+	int Ammo2 = -1;
+	int Ammo3 = -1;
+	int Clip1 = -1;
+	int Clip2 = -1;
+	int Clip3 = -1;
+
+	//GetEntityClassname(weapon_entity,weapon_name,sizeof(weapon_name));
+	//PrintToChatAll("weapon name: %s", weapon_name);
+
+	do
+	{
+		// You can read the section/key name by using KvGetSectionName here.
+		PrintToChatAll("do loop\n");
+
+		if (KvGotoFirstSubKey(kv, false))
+		{
+			do
+			{
+				if(KvGetSectionName(kv, sSectionBuffer, sizeof(sSectionBuffer)))
+				{
+					PrintToChatAll(sSectionBuffer);
+					//PushArrayCell(g_hItemNumber, GetArraySize(g_hItemNumber)+1);
+
+					if (KvGotoFirstSubKey(kv, false))
+					{
+						// Current key is a section. Browse it recursively.
+						do
+						{
+							if(KvGetSectionName(kv, sSubKeyBuffer, sizeof(sSubKeyBuffer)))
+							{
+								if(!found && StrContains(sSubKeyBuffer,"switch") == 0)
+								{
+									if(KvGetNum(kv, NULL_STRING) == 1)
+									{
+										found = true;
+										// code here
+									}
+								}
+								else if(found && StrContains(sSubKeyBuffer,"old weapon") == 0)
+								{
+									KvGetString(kv, NULL_STRING, STRING(old_weapon), "");
+									PrintToChatAll("found old weapon: %s",old_weapon);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"new weapon") == 0)
+								{
+									KvGetString(kv, NULL_STRING, STRING(new_weapon), "");
+									PrintToChatAll("found new weapon: %s",new_weapon);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"force active weapon") == 0)
+								{
+									ForceActiveWeapon = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found force active weapon: %d",ForceActiveWeapon);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"index") == 0)
+								{
+									WeaponIndex = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found new index: %d",WeaponIndex);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"level") == 0)
+								{
+									WeaponLevel = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found new level: %d",WeaponLevel);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"quality") == 0)
+								{
+									WeaponQuality = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found new level: %d",WeaponQuality);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"attribute") == 0)
+								{
+									KvGetString(kv, NULL_STRING, STRING(WeaponAttribute), "");
+									PrintToChatAll("found attribute: %s",WeaponAttribute);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"ammo1") == 0)
+								{
+									Ammo1 = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found ammo1: %d",Ammo1);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"ammo2") == 0)
+								{
+									Ammo2 = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found ammo2: %d",Ammo2);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"ammo3") == 0)
+								{
+									Ammo3 = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found ammo3: %d",Ammo3;
+								}
+								else if(found && StrContains(sSubKeyBuffer,"clip1") == 0)
+								{
+									Clip1 = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found clip1: %d",Clip1);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"clip2") == 0)
+								{
+									Clip2 = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found clip1: %d",Clip2);
+								}
+								else if(found && StrContains(sSubKeyBuffer,"clip3") == 0)
+								{
+									Clip3 = KvGetNum(kv, NULL_STRING);
+									PrintToChatAll("found clip1: %d",Clip3);
+								}
+
+							}
+						} while (KvGotoNextKey(kv, false));
+						KvGoBack(kv);
+					}
+				}
+				if(found)
+				{
+					PrintToChatAll("if(found) found = false");
+					found = false;
+				}
+			} while (KvGotoNextKey(kv, false));
+			KvGoBack(kv);
+		}
+		if(found) found = false;
+	} while (KvGotoNextKey(kv, false));
+
+	PrintToChatAll("Finished");
 }
 
 public ApplyWeaponValues(Handle kv, client, weapon_index, weapon_entity, bool removefirst)
