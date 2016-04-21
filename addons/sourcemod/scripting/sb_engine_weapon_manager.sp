@@ -354,22 +354,22 @@ public LoadWeaponSwitchingValues(Handle kv)
 								}
 								else if(found && StrContains(sSubKeyBuffer,"force active weapon") == 0)
 								{
-									ForceActiveWeapon = KvGetNum(kv, NULL_STRING);
+									ForceActiveWeapon = KvGetNum(kv, NULL_STRING, 0);
 									//PrintToChatAll("found force active weapon: %d",ForceActiveWeapon);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"index") == 0)
 								{
-									WeaponIndex = KvGetNum(kv, NULL_STRING);
+									WeaponIndex = KvGetNum(kv, NULL_STRING, 0);
 									//PrintToChatAll("found new index: %d",WeaponIndex);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"level") == 0)
 								{
-									WeaponLevel = KvGetNum(kv, NULL_STRING);
+									WeaponLevel = KvGetNum(kv, NULL_STRING, 1);
 									//PrintToChatAll("found new level: %d",WeaponLevel);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"quality") == 0)
 								{
-									WeaponQuality = KvGetNum(kv, NULL_STRING);
+									WeaponQuality = KvGetNum(kv, NULL_STRING, 0);
 									//PrintToChatAll("found new level: %d",WeaponQuality);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"attribute") == 0)
@@ -379,32 +379,32 @@ public LoadWeaponSwitchingValues(Handle kv)
 								}
 								else if(found && StrContains(sSubKeyBuffer,"ammo1") == 0)
 								{
-									Ammo1 = KvGetNum(kv, NULL_STRING);
+									Ammo1 = KvGetNum(kv, NULL_STRING, -1);
 									//PrintToChatAll("found ammo1: %d",Ammo1);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"ammo2") == 0)
 								{
-									Ammo2 = KvGetNum(kv, NULL_STRING);
+									Ammo2 = KvGetNum(kv, NULL_STRING, -1);
 									//PrintToChatAll("found ammo2: %d",Ammo2);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"ammo3") == 0)
 								{
-									Ammo3 = KvGetNum(kv, NULL_STRING);
+									Ammo3 = KvGetNum(kv, NULL_STRING, -1);
 									//PrintToChatAll("found ammo3: %d",Ammo3);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"clip1") == 0)
 								{
-									Clip1 = KvGetNum(kv, NULL_STRING);
+									Clip1 = KvGetNum(kv, NULL_STRING, -1);
 									//PrintToChatAll("found clip1: %d",Clip1);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"clip2") == 0)
 								{
-									Clip2 = KvGetNum(kv, NULL_STRING);
+									Clip2 = KvGetNum(kv, NULL_STRING, -1);
 									//PrintToChatAll("found clip1: %d",Clip2);
 								}
 								else if(found && StrContains(sSubKeyBuffer,"clip3") == 0)
 								{
-									Clip3 = KvGetNum(kv, NULL_STRING);
+									Clip3 = KvGetNum(kv, NULL_STRING, -1);
 									//PrintToChatAll("found clip1: %d",Clip3);
 								}
 
