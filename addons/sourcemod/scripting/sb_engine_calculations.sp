@@ -41,11 +41,13 @@ public Plugin:myinfo = {
 int LastValidAttacker[MAXPLAYERSCUSTOM];
 bool firstblood = false;
 
+Handle sb_medichealself;
 Handle sb_medicheal;
 Handle sb_medicmegaheal;
 Handle sb_angles;
 Handle sb_upward_force;
 
+int g_sb_medichealself;
 int g_sb_medicheal;
 int g_sb_medicmegaheal;
 float g_fsb_angles;
@@ -63,6 +65,9 @@ public OnPluginStart()
 
 	sb_fc_bhop = CreateConVar("sb_fc_bhop", "0.5", "fc disable bhop on spawn for seconds", FCVAR_PLUGIN);
 
+	sb_medichealself = CreateConVar("sb_medichealself", "2", "amount of heal applied to self", FCVAR_PLUGIN);
+	g_sb_medichealself = GetConVarInt(sb_medichealself);
+
 	sb_medicheal = CreateConVar("sb_medicheal", "1", "amount of heal applied to team when healing them", FCVAR_PLUGIN);
 	g_sb_medicheal = GetConVarInt(sb_medicheal);
 
@@ -75,6 +80,9 @@ public OnPluginStart()
 	sb_upward_force= CreateConVar("sb_upward_force", "1.5", "Advanced options", FCVAR_PLUGIN);
 	g_fsb_upward_force = GetConVarFloat(sb_upward_force);
 
+	HookConVarChange(sb_medichealself, OnConVarChange);
+	HookConVarChange(sb_medicheal, OnConVarChange);
+	HookConVarChange(sb_medicmegaheal, OnConVarChange);
 	HookConVarChange(sb_angles, OnConVarChange);
 	HookConVarChange(sb_upward_force, OnConVarChange);
 
@@ -89,7 +97,7 @@ public OnPluginStart()
 	AddCommandListener(Command_InterceptSuicide, "kill");
 	AddCommandListener(Command_InterceptSuicide, "explode");
 
-	CreateTimer(0.2, Timer_Uber_Regen, _, TIMER_REPEAT);
+	CreateTimer(1.0, Timer_Uber_Regen, _, TIMER_REPEAT);
 }
 
 bool bHopEnabled = false;
@@ -142,6 +150,8 @@ public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:s
 		g_sb_medicheal = GetConVarInt(sb_medicheal);
 	else if(hConvar == sb_medicmegaheal)
 		g_sb_medicmegaheal = GetConVarInt(sb_medicmegaheal);
+	else if(hConvar == sb_medichealself)
+		g_sb_medichealself = GetConVarInt(sb_medichealself);
 }
 
 public Action Command_InterceptSuicide(int client, char[] command, int args)
@@ -617,6 +627,18 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 		if(TF2_GetPlayerClass(i) != TFClass_Medic)
 		{
 			continue;
+		}
+
+		//g_sb_medichealself
+		if(SB_GetPlayerProp(i,iDamage)>0)
+		{
+			int NewDamage = SB_GetPlayerProp(i,iDamage)-g_sb_medichealself;
+			if(TF2_IsPlayerInCondition(i, TFCond_MegaHeal))
+			{
+				NewDamage -= g_sb_medichealself;
+			}
+			if(NewDamage<0) NewDamage = 0;
+			SB_SetPlayerProp(i,iDamage,NewDamage);
 		}
 
 		int HealVictim = TF2_GetHealingTarget(i);
