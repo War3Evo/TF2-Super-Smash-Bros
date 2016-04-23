@@ -1152,6 +1152,7 @@ stock StartingHelpMenu(int client)
 
 	AddMenuItem(hMenu,"1","Type !sbclass in chat to pick your next class on spawn.",ITEMDRAW_DEFAULT);
 	AddMenuItem(hMenu,"2","Also try !scout, !sniper, !soldier, !demo, !medic, !heavy, !pyro, !spy, !engi",ITEMDRAW_DEFAULT);
+	AddMenuItem(hMenu,"3","Your Loadout is changed for the balance of this MOD!",ITEMDRAW_DEFAULT);
 
 	DisplayMenu(hMenu, client, 30);
 }
