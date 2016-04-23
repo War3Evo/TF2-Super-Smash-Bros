@@ -87,6 +87,9 @@ Handle h_WeaponClip1 = null;
 Handle h_WeaponClip2 = null;
 Handle h_WeaponClip3 = null;
 
+
+Handle h_Block_list = null;
+
 public OnPluginStart()
 {
 	RegAdminCmd("reloadcfg", SB_TESTING_CONFIG, ADMFLAG_ROOT);
@@ -113,18 +116,43 @@ public OnPluginStart()
 	h_WeaponAmmo3 = CreateArray(1);
 	h_WeaponClip3 = CreateArray(1);
 
+	h_Block_list = CreateArray(ByteCountToCells(64));
+
+
+	Handle kv = PrePareTheFile();
+	if(kv != null)
+	{
+		ClearArray(h_index);
+		ClearArray(h_Old_Weapon_String);
+		ClearArray(h_New_Weapon_String);
+		ClearArray(h_ForceWeaponActive);
+		ClearArray(h_WeaponIndex);
+		ClearArray(h_WeaponLevel);
+		ClearArray(h_WeaponQuality);
+		ClearArray(h_WeaponAttribute);
+		ClearArray(h_WeaponAmmo1);
+		ClearArray(h_WeaponAmmo2);
+		ClearArray(h_WeaponAmmo3);
+		ClearArray(h_WeaponClip1);
+		ClearArray(h_WeaponClip2);
+		ClearArray(h_WeaponClip3);
+		ClearArray(h_index);
+		LoadWeaponSwitchingValues(kv);
+		CloseTheFile(kv);
+	}
 }
 
 //StringToInt
 
-public int Switcher_GetWeapon(char [] WeaponString, int iItemDefinitionIndex)
+//h_Old_Weapon_String
+public int Switcher_GetWeapon(Handle hString, char [] WeaponString, int iItemDefinitionIndex)
 {
-	int MainIndex = FindStringInArray(h_Old_Weapon_String, WeaponString);
+	int MainIndex = FindStringInArray(hString, WeaponString);
 	if(MainIndex == -1)
 	{
 		char tmpWeaponString[64];
 		IntToString(iItemDefinitionIndex, STRING(tmpWeaponString));
-		MainIndex = FindStringInArray(h_Old_Weapon_String, tmpWeaponString);
+		MainIndex = FindStringInArray(hString, tmpWeaponString);
 	}
 	return MainIndex;
 }
@@ -162,7 +190,7 @@ public void Switcher_AddWeapon(	char OldWeapon[64],
 public Action:SB_WEAPON_SWITCHER_CONFIG(client,args)
 {
 	PrintToChatAll("reloading weapon switcher configuration");
-	PrintToChatAll("Player must rejoin in order to activate it!");
+	//PrintToChatAll("Player must rejoin in order to activate it!");
 
 	Handle kv = PrePareTheFile();
 
@@ -185,8 +213,52 @@ public Action:SB_WEAPON_SWITCHER_CONFIG(client,args)
 		ClearArray(h_index);
 		LoadWeaponSwitchingValues(kv);
 		CloseTheFile(kv);
+
+		LoopMaxClients(target)
+		{
+			if(SB_ValidPlayer(target,true))
+			{
+				int weapon_index = 0;
+				int weapon_entity = 0;
+				LoopMaxWeapons(weapon_slot)
+				{
+					weapon_entity=GetPlayerWeaponSlot(target, weapon_slot);
+					if(weapon_entity > MaxClients)
+					{
+						weapon_index = GetEntProp(weapon_entity, Prop_Send, "m_iItemDefinitionIndex");
+
+						if(weapon_index > -1)
+						{
+							//PrintToChatAll("lookin up weapon %d", weapon_index);
+							// run check against configuration file
+							//ApplyWeaponValues(kv, target, weapon_index, weapon_entity, true);
+							//ApplySwitcherWeapons();
+							char weapon_name[64];
+							GetEntityClassname(weapon_entity,weapon_name,sizeof(weapon_name));
+							//PrintToChatAll("GetEntityClassname %s",weapon_name);
+
+							int MainIndex = Switcher_GetWeapon(h_Old_Weapon_String, weapon_name, weapon_index);
+
+							if(MainIndex>-1)
+							{
+								//PrintToChatAll("Switcher_GetWeapon MainIndex %d",MainIndex);
+
+								Handle pack;
+								if(CreateDataTimer(0.1,Timer_ReplaceWeapon,pack) != null)
+								{
+									WritePackCell(pack, client);
+									WritePackCell(pack, MainIndex);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
+	return Plugin_Continue;
 }
+
 
 public Action:SB_TESTING_CONFIG(client,args)
 {
@@ -248,7 +320,28 @@ stock void ApplyWeaponsOnClient(int client)
 					{
 						//PrintToChatAll("lookin up weapon %d", weapon_index);
 						// run check against configuration file
+
+						// WEAPON MODIFIER CFG:
 						ApplyWeaponValues(kv, client, weapon_index, weapon_entity, false);
+
+						// WEAPON SWITCHER CFG:
+						char weapon_name[64];
+						GetEntityClassname(weapon_entity,weapon_name,sizeof(weapon_name));
+
+						int MainIndex = Switcher_GetWeapon(h_Old_Weapon_String, weapon_name, weapon_index);
+
+						if(MainIndex>-1)
+						{
+							//PrintToChatAll("Switcher_GetWeapon MainIndex %d",MainIndex);
+
+							Handle pack;
+							if(CreateDataTimer(1.0,Timer_ReplaceWeapon,pack) != null)
+							{
+								WritePackCell(pack, client);
+								WritePackCell(pack, MainIndex);
+							}
+						}
+
 					}
 				}
 			}
@@ -325,7 +418,7 @@ public LoadWeaponSwitchingValues(Handle kv)
 			{
 				if(KvGetSectionName(kv, sSectionBuffer, sizeof(sSectionBuffer)))
 				{
-					//PrintToChatAll(sSectionBuffer);
+					PrintToChatAll(sSectionBuffer);
 					//PushArrayCell(g_hItemNumber, GetArraySize(g_hItemNumber)+1);
 
 					if (KvGotoFirstSubKey(kv, false))
@@ -494,7 +587,12 @@ public ApplyWeaponValues(Handle kv, client, weapon_index, weapon_entity, bool re
 						{
 							if(KvGetSectionName(kv, sSubKeyBuffer, sizeof(sSubKeyBuffer)))
 							{
-								if(!found && StrContains(sSubKeyBuffer,"all") == 0)
+								if(!found && StrContains(sSubKeyBuffer,"block") == 0)
+								{
+									KvGetString(kv, NULL_STRING, sTempBuffer, sizeof(sTempBuffer));
+									PushArrayString(h_Block_list, sTempBuffer);
+								}
+								else if(!found && StrContains(sSubKeyBuffer,"all") == 0)
 								{
 									if(KvGetNum(kv, NULL_STRING) == 1)
 									{
@@ -558,6 +656,19 @@ public Native_SB_ApplyWeapons(Handle:plugin,numParams)
 		ApplyWeaponsOnClient(client);
 	}
 }
+/*
+public TF2Items_OnGiveNamedItem_Post(client, String:classname[], itemDefinitionIndex, itemLevel, itemQuality, entityIndex)
+{
+	if (IsClientObserver(client) || !IsPlayerAlive(client))
+	{
+		return;
+	}
+
+	if(SB_ValidPlayer(client,true))
+	{
+		TF2_RegeneratePlayer(client);
+	}
+}*/
 
 
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
@@ -569,7 +680,15 @@ public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefiniti
 
 	//PrintToChatAll("classname %s iItemDefinitionIndex %d",classname,iItemDefinitionIndex);
 
-	int MainIndex = Switcher_GetWeapon(classname, iItemDefinitionIndex);
+	int MainIndex = Switcher_GetWeapon(h_Block_list, classname, iItemDefinitionIndex);
+	if(MainIndex>-1)
+	{
+		return Plugin_Stop;
+	}
+
+	MainIndex = -1;
+
+	MainIndex = Switcher_GetWeapon(h_Old_Weapon_String, classname, iItemDefinitionIndex);
 	if(MainIndex>-1)
 	{
 		//PrintToChatAll("Switcher_GetWeapon MainIndex %d",MainIndex);
