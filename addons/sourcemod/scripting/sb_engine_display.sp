@@ -118,6 +118,17 @@ public OnPluginStart()
 	//AddCommandListener(Command_InterceptJoinTeam, "jointeam");
 
 	RegConsoleCmd("sm_sbclass",Command_ChangeClass);
+	RegConsoleCmd("sm_scout",Command_ChangeClassScout);
+	RegConsoleCmd("sm_sniper",Command_ChangeClassSniper);
+	RegConsoleCmd("sm_soldier",Command_ChangeClassSoldier);
+	RegConsoleCmd("sm_demoman",Command_ChangeClassDemo);
+	RegConsoleCmd("sm_demo",Command_ChangeClassDemo);
+	RegConsoleCmd("sm_medic",Command_ChangeClassMedic);
+	RegConsoleCmd("sm_heavy",Command_ChangeClassHeavy);
+	RegConsoleCmd("sm_pyro",Command_ChangeClassPyro);
+	RegConsoleCmd("sm_spy",Command_ChangeClassSpy);
+	RegConsoleCmd("sm_engineer",Command_ChangeClassEngi);
+	RegConsoleCmd("sm_engi",Command_ChangeClassEngi);
 
 
 	RegConsoleCmd("jointeam", Command_jointeam);
@@ -885,6 +896,94 @@ public Action Command_ChangeClass(int client, int args)
 
 	return Plugin_Handled;
 }
+
+/*
+char ClassList[][] =
+{
+	"Scout", //1
+	"Sniper", //2
+	"Soldier", //3
+	"Demoman", //4
+	"Medic", //5
+	"Heavy", //6
+	"Pyro", //7
+	"Spy", //8
+	"Engineer" //9
+};*/
+
+public Action Command_ChangeClassScout(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 1;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassSniper(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 2;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassSoldier(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 3;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassDemo(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 4;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassMedic(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 5;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassHeavy(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 6;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassPyro(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 7;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassSpy(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 8;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+public Action Command_ChangeClassEngi(int client, int args)
+{
+	if(!SB_ValidPlayer(client)) return Plugin_Continue;
+	int itemnumber = 9;
+	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
+	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
+	return Plugin_Handled;
+}
+
 stock ChangeClass(int client)
 {
 //	PrintToChatAll("ChangeClass");
@@ -1052,6 +1151,7 @@ stock StartingHelpMenu(int client)
 	SetMenuTitle(hMenu,"Super Smash Bros!");
 
 	AddMenuItem(hMenu,"1","Type !sbclass in chat to pick your next class on spawn.",ITEMDRAW_DISABLED);
+	AddMenuItem(hMenu,"2","Also try !scout, !sniper, !soldier, !demo, !medic, !heavy, !pyro, !spy, !engi",ITEMDRAW_DISABLED);
 
 	DisplayMenu(hMenu, client, MENU_TIME_FOREVER);
 }
