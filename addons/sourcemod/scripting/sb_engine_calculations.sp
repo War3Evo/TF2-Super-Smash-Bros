@@ -139,9 +139,9 @@ public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:s
 	else if(hConvar == sb_upward_force)
 		g_fsb_upward_force = GetConVarFloat(sb_upward_force);
 	else if(hConvar == sb_medicheal)
-		g_sb_medicheal = GetConVarFloat(sb_medicheal);
+		g_sb_medicheal = GetConVarInt(sb_medicheal);
 	else if(hConvar == sb_medicmegaheal)
-		g_sb_medicmegaheal = GetConVarFloat(sb_medicmegaheal);
+		g_sb_medicmegaheal = GetConVarInt(sb_medicmegaheal);
 }
 
 public Action Command_InterceptSuicide(int client, char[] command, int args)
