@@ -793,7 +793,7 @@ public Action:SB_ENGINEERING(client,args)
 
 public SpawnProtect(client)
 {
-	if(SB_ValidPlayer(client,true))
+	if(SB_ValidPlayer(client,true) && !SB_IsUbered(client))
 	{
 		TF2_AddCondition(client, TFCond_Ubercharged, 5.0);
 	}
