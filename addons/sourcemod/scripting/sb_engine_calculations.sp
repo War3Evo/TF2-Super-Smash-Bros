@@ -30,6 +30,10 @@
 
 #tryinclude <sb_addon_fc>
 
+#define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && IsPlayerAlive(%1))
+
+
 public Plugin:myinfo = {
 	name = "Smash Bros Calculations Engine",
 	author = "El Diablo",
@@ -755,6 +759,11 @@ public Action:teamplay_round_active(Handle:event,  const String:name[], bool:don
 {
 	firstblood=false;
 	CreateTimer(1.0,RemoveStuff,0);
+
+	LoopAlivePlayers(target)
+	{
+		SpawnProtect(target);
+	}
 }
 
 public Action:RemoveStuff(Handle:t,any:data)
