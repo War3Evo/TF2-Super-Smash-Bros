@@ -41,9 +41,13 @@ public Plugin:myinfo = {
 int LastValidAttacker[MAXPLAYERSCUSTOM];
 bool firstblood = false;
 
+Handle sb_medicheal;
+Handle sb_medicmegaheal;
 Handle sb_angles;
 Handle sb_upward_force;
 
+int g_sb_medicheal;
+int g_sb_medicmegaheal;
 float g_fsb_angles;
 float g_fsb_upward_force;
 
@@ -58,6 +62,12 @@ public OnPluginStart()
 	RegConsoleCmd("allowengineering",SB_ENGINEERING,"allowengineering");
 
 	sb_fc_bhop = CreateConVar("sb_fc_bhop", "0.5", "fc disable bhop on spawn for seconds", FCVAR_PLUGIN);
+
+	sb_medicheal = CreateConVar("sb_medicheal", "1", "amount of heal applied to team when healing them", FCVAR_PLUGIN);
+	g_sb_medicheal = GetConVarInt(sb_medicheal);
+
+	sb_medicmegaheal = CreateConVar("sb_medicmegaheal", "1", "extra points for healing", FCVAR_PLUGIN);
+	g_sb_medicmegaheal = GetConVarInt(sb_medicmegaheal);
 
 	sb_angles = CreateConVar("sb_angles", "50.0", "Advanced options", FCVAR_PLUGIN);
 	g_fsb_angles = GetConVarFloat(sb_angles);
@@ -128,6 +138,10 @@ public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:s
 		g_fsb_angles = GetConVarFloat(sb_angles);
 	else if(hConvar == sb_upward_force)
 		g_fsb_upward_force = GetConVarFloat(sb_upward_force);
+	else if(hConvar == sb_medicheal)
+		g_sb_medicheal = GetConVarFloat(sb_medicheal);
+	else if(hConvar == sb_medicmegaheal)
+		g_sb_medicmegaheal = GetConVarFloat(sb_medicmegaheal);
 }
 
 public Action Command_InterceptSuicide(int client, char[] command, int args)
@@ -593,7 +607,7 @@ public void OnSB_EventDeath(int victim, int attacker, int assister, int distance
 
 public Action:Timer_Uber_Regen(Handle:timer, any:user)
 {
-	for (new i=1; i<=MaxClients; i++)
+	for (int i=1; i<=MaxClients; i++)
 	{
 		if (!SB_ValidPlayer(i,true,true))
 		{
@@ -605,17 +619,17 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 			continue;
 		}
 
-		new HealVictim = TF2_GetHealingTarget(i);
+		int HealVictim = TF2_GetHealingTarget(i);
 		//if (ValidPlayer(HealVictim, true) && !SB_IsUbered(healer))
 		if (SB_ValidPlayer(HealVictim, true))
 		{
 			//SB_DP("healer %d ... healer victim %d",i,HealVictim);
 			if(SB_GetPlayerProp(HealVictim,iDamage)>0)
 			{
-				new NewDamage = SB_GetPlayerProp(HealVictim,iDamage)-1;
+				int NewDamage = SB_GetPlayerProp(HealVictim,iDamage)-g_sb_medicheal;
 				if(TF2_IsPlayerInCondition(i, TFCond_MegaHeal))
 				{
-					NewDamage -= 1;
+					NewDamage -= g_sb_medicmegaheal;
 				}
 				if(NewDamage<0) NewDamage = 0;
 				SB_SetPlayerProp(HealVictim,iDamage,NewDamage);
