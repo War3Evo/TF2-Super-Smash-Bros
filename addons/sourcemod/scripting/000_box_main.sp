@@ -973,6 +973,23 @@ public OnBoxNotTrigger(boxindex, client, behaviorBitFlags, targetBitFlags, bool:
 			NoShooting[client]=false;
 		}
 	}
+
+	if(HasBitflags(behaviorBitFlags,BEHAVIOR_OUTSIDE_ZONE))
+	{
+		int pointHurt=CreateEntityByName("point_hurt");
+		if(pointHurt)
+		{
+			DispatchKeyValue(client,"targetname","sb_hurtme"); //set victim as the target for damage
+			DispatchKeyValue(pointHurt,"Damagetarget","sb_hurtme");
+			DispatchKeyValue(pointHurt,"Damage","99999");
+			DispatchKeyValue(pointHurt,"DamageType","32");
+			DispatchKeyValue(pointHurt,"classname","sb_point_hurt");
+			DispatchSpawn(pointHurt);
+			AcceptEntityInput(pointHurt,"Hurt",-1);
+			DispatchKeyValue(client,"targetname","sb_donthurtme"); //unset the victim as target for damage
+			RemoveEdict(pointHurt);
+		}
+	}
 }
 
 stock SeeDetailsDisplay(boxindex, behaviorBitFlags, targetBitFlags, xFollowMeClient, bool:isBoxEnabled)
