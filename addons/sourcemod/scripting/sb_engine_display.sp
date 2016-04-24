@@ -103,13 +103,6 @@ public OnPluginStart()
 	YourDamageMessage = CreateHudSynchronizer();
 	YourLivesMessage = CreateHudSynchronizer();
 
-	int playerresource = -1;
-	playerresource = FindEntityByClassname(playerresource, "tf_player_manager");
-	if (playerresource != INVALID_ENT_REFERENCE)
-	{
-		SDKHook(playerresource, SDKHook_ThinkPost, Hook_OnThinkPost);
-	}
-
 	sb_lives = CreateConVar("sb_lives", "3", "Amount of lives a player starts with.", FCVAR_PLUGIN);
 	sb_chatmsg = CreateConVar("sb_chatmsg", "0", "Enable chat messages of team scores in chat.", FCVAR_PLUGIN);
 	sb_chatmsg_balance = CreateConVar("sb_chatmsg_balance", "1", "Enable showing player balance information of lives during beginning of round.", FCVAR_PLUGIN);
@@ -1192,49 +1185,4 @@ public MenuHandle_Help_Menu(Handle:hMenu, MenuAction:action, param1, selection)
 			CloseHandle(hMenu);
 		}
 	}
-}
-
-public Hook_OnThinkPost(iEnt)
-{
-	static iTotalScoreOffset = -1;
-	if (iTotalScoreOffset == -1)
-	{
-		iTotalScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTotalScore");
-	}
-/*
-	static teamScoreOffset = -1;
-	if (teamScoreOffset == -1)
-	{
-		teamScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTeam");
-    }
-	static classOffset = -1;
-	if (classOffset == -1)
-	{
-		classOffset = FindSendPropInfo("CTFPlayerResource", "m_iPlayerClass");
-    }
-	static aliveOffset = -1;
-	if (aliveOffset == -1)
-	{
-		aliveOffset = FindSendPropInfo("CTFPlayerResource", "m_bAlive");
-    }*/
-	int iTotalScore[MAXPLAYERS+1];
-	LoopMaxClients(target)
-	{
-		iTotalScore[target]=SB_GetPlayerProp(target,iLives);
-	}
-	//int teamScore[MAXPLAYERS+1];
-	//int class[MAXPLAYERS+1];
-	//int alive[MAXPLAYERS+1];
-	//GetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
-	//GetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
-	//GetEntDataArray(iEnt, classOffset, class, MaxClients+1);
-	//GetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
-	//teamScore[spawnRocketIndex]=spawnRocketTeam;
-	//iTotalScore[spawnRocketIndex]=spawnRocketScore;
-	//class[spawnRocketIndex]=3;
-	//alive[spawnRocketIndex]=1;
-	SetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
-	//SetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
-	//SetEntDataArray(iEnt, classOffset, class, MaxClients+1);
-	//SetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
 }
