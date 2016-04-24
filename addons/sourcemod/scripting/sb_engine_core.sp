@@ -23,11 +23,12 @@
 
 #include <sourcemod>
 #include <sb_interface>
+#include <sdkhooks>
 
 #undef REQUIRE_PLUGIN
 #include <updater>
 
-
+#define LoopMaxClients(%1) for(int %1=1;%1<=MaxClients;++%1)
 
 
 #define JENKINS_UPDATE_URL "DEVELOP"
@@ -62,6 +63,9 @@ Handle hSpawnPlayer;
 int CountDownTimer;
 //new Float:RespawnTimer[MAXPLAYERS+1];
 
+int iTotalScore[MAXPLAYERS+1];
+
+
 public Plugin:myinfo = {
 	name = "Smash Bros Core Engine",
 	author = "El Diablo",
@@ -91,6 +95,13 @@ public bool SBInitNativesForwards()
 public OnPluginStart()
 {
 	CreateConVar("Super_Smash_Bros_version", PLUGIN_VERSION, "Smash Bros version.", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
+
+	int playerresource = -1;
+	playerresource = FindEntityByClassname(playerresource, "tf_player_manager");
+	if (playerresource != INVALID_ENT_REFERENCE)
+	{
+		SDKHook(playerresource, SDKHook_ThinkPost, Hook_OnThinkPost);
+	}
 
 	sb_round_time = CreateConVar("sb_roundtime", "300.0", "Round Time in Seconds", FCVAR_PLUGIN);
 	HookConVarChange(sb_round_time, OnConVarChange);
@@ -166,6 +177,19 @@ public OnMapStart()
 	playing=false;
 }
 
+
+stock UpdatePlayerScore(int client, int newscore = -1)
+{
+	if(newscore>-1)
+	{
+		iTotalScore[client]=newscore;
+	}
+	else
+	{
+		iTotalScore[client]=SB_GetPlayerProp(client,iLives);
+	}
+}
+
 public NSB_GetPlayerProp(Handle:plugin,numParams){
 	int client=GetNativeCell(1);
 	if (client > 0 && client <= MaxClients)
@@ -191,6 +215,7 @@ public NSB_SpawnPlayer(Handle:plugin,numParams){
 		Call_StartForward(FHOnSB_SpawnPlayer);
 		Call_PushCell(client);
 		Call_Finish();
+		UpdatePlayerScore(client);
 		return 1;
 	}
 	else
@@ -236,6 +261,11 @@ public Action:teamplay_round_start(Handle:event,  const String:name[], bool:dont
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast) {
 	playing=true;
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
+
+	LoopMaxClients(target)
+	{
+		UpdatePlayerScore(target);
+	}
 }
 
 public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast) {
@@ -243,6 +273,7 @@ public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
 	OnRoundEnd();
 	for(int i=1;i<=MaxClients;++i){
 		ResetClientVars(i);
+		UpdatePlayerScore(i,0);
 	}
 }
 
@@ -268,6 +299,8 @@ public void DoForward_OnSB_EventSpawn(client)
 		Call_PushCell(client);
 		Call_Finish(returnVal);
 
+		UpdatePlayerScore(client);
+
 		if(returnVal != Plugin_Continue)
 		{
 			return;
@@ -286,6 +319,7 @@ public void DoForward_OnSB_EventDeath(int victim,int killer,int assister,int dis
 		Call_PushCell(attacker_hpleft);
 		Call_PushCell(event);
 		Call_Finish(dummyreturn);
+		UpdatePlayerScore(victim,0);
 }
 
 
@@ -446,4 +480,45 @@ public OnGameFrame(){
 		// trigger end of round
 		TriggerEvent();
 	}
+}
+
+
+public Hook_OnThinkPost(iEnt)
+{
+	static iTotalScoreOffset = -1;
+	if (iTotalScoreOffset == -1)
+	{
+		iTotalScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTotalScore");
+	}
+/*
+	static teamScoreOffset = -1;
+	if (teamScoreOffset == -1)
+	{
+		teamScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTeam");
+    }
+	static classOffset = -1;
+	if (classOffset == -1)
+	{
+		classOffset = FindSendPropInfo("CTFPlayerResource", "m_iPlayerClass");
+    }
+	static aliveOffset = -1;
+	if (aliveOffset == -1)
+	{
+		aliveOffset = FindSendPropInfo("CTFPlayerResource", "m_bAlive");
+    }*/
+	//int teamScore[MAXPLAYERS+1];
+	//int class[MAXPLAYERS+1];
+	//int alive[MAXPLAYERS+1];
+	//GetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
+	//GetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
+	//GetEntDataArray(iEnt, classOffset, class, MaxClients+1);
+	//GetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
+	//teamScore[spawnRocketIndex]=spawnRocketTeam;
+	//iTotalScore[spawnRocketIndex]=spawnRocketScore;
+	//class[spawnRocketIndex]=3;
+	//alive[spawnRocketIndex]=1;
+	SetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
+	//SetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
+	//SetEntDataArray(iEnt, classOffset, class, MaxClients+1);
+	//SetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
 }
