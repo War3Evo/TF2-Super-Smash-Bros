@@ -259,6 +259,41 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 		LastValidAttacker[victim]=attacker;
 	}
 
+	// help prevent demos from using stickies to keep themselves launched in the air!
+	int inflictor = SB_GetDamageInflictor();
+	if(victim==attacker && inflictor>0 && IsValidEdict(inflictor))
+	{
+		char ent_name[64];
+		GetEdictClassname(inflictor,ent_name,64);
+		//SB_DP("OnSBEventPostHurt inflictor %s",ent_name);
+		if (StrEqual(ent_name, "tf_projectile_pipe_remote"))
+		{
+			//SB_DP("m_bTouched? %s",GetEntProp(inflictor, Prop_Send, "m_bTouched")?"TRUE":"FALSE");
+			if(!GetEntProp(inflictor, Prop_Send, "m_bTouched"))
+			{
+				//SB_DP("!m_bTouched");
+				SB_DamageModPercent(0.0);
+				return;
+			}
+			/*
+			if(!(GetEntityFlags(victim) & FL_ONGROUND) && !(GetEntityFlags(inflictor) & FL_ONGROUND))
+			{
+				//SB_DP("victim %d is not on ground",victim);
+				float inflictorPOS[3];
+				GetEntPropVector(inflictor, Prop_Send, "m_vecOrigin", inflictorPOS);
+
+				float victimPOS[3];
+				GetClientAbsOrigin(victim, victimPOS);
+
+				float distancetoentity = GetVectorDistance(victimPOS, inflictorPOS);
+
+				SB_DP("distancetoentity %f",distancetoentity);
+
+				return;
+			}*/
+		}
+	}
+
 	bool DamageHandled = false;
 
 	/*
@@ -285,10 +320,10 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 	//SB_DP("SB_GetDamageType %d",SB_GetDamageType());
 	//SB_DP("SB_GetDamageInflictor %d",SB_GetDamageInflictor());
 
-	if(SB_GetDamageType()==DMG_CRUSH)
-	{
-		SB_DP("DMG_CRUSH");
-	}
+	//if(SB_GetDamageType()==DMG_CRUSH)
+	//{
+		//SB_DP("DMG_CRUSH");
+	//}
 
 	//new iItemDefinitionIndex = GetEntProp(SB_GetDamageInflictor(), Prop_Send, "m_iItemDefinitionIndex");
 
@@ -434,6 +469,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 
 	//SB_DP("valid attacker pass");
 
+	/*
 	if(SB_ValidPlayer(victim))
 	{
 		new Float:vec[3];
@@ -451,7 +487,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 			//ForcePlayerSuicide(victim);
 			//SDKHooks_TakeDamage(victim, 0, 0, 999999.9, DMG_GENERIC, -1, NULL_VECTOR, NULL_VECTOR);
 		}
-	}
+	}*/
 	//SB_DP("iItemDefinitionIndex pass");
 
 	if(SB_ValidPlayer(victim))
@@ -495,10 +531,10 @@ public OnSBEventPostHurt(victim,attacker,dmgamount,const String:weapon[32])
 				//SB_DP("ent name %s",ent_name);
 				if(StrContains(ent_name,"tf_projectile_rocket",false)==0)
 				{
-					new owner = GetEntPropEnt(inflictor, Prop_Data, "m_hOwnerEntity");
+					int owner = GetEntPropEnt(inflictor, Prop_Data, "m_hOwnerEntity");
 					if(attacker==owner)
 					{
-						new MaxHealth = GetEntProp(victim, Prop_Data, "m_iMaxHealth");
+						int MaxHealth = GetEntProp(victim, Prop_Data, "m_iMaxHealth");
 						SB_SetHealth(victim, MaxHealth);
 
 						//SB_DP("projectile rocket post hurt");
@@ -574,6 +610,10 @@ public Action OnSB_EventSpawn(client)
 {
 	if(SB_ValidPlayer(client))
 	{
+		//if(TF2_GetPlayerClass(client)==TFClass_DemoMan)
+		//{
+			//SDKHook(client,SDKHook_TraceAttack,SDK_Forwarded_TraceAttack);
+		//}
 		SB_SetPlayerProp(client,iDamage,0);
 		//SDKHook(client,SDKHook_WeaponSwitchPost,SDK_OnWeaponSwitchPost);
 		SpawnProtect(client);
@@ -590,19 +630,23 @@ public Action OnSB_EventSpawn(client)
 	return Plugin_Continue;
 }
 
-#if defined _sb_addon_fc_included
 public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
 {
 	if(SB_ValidPlayer(victim))
 	{
+		//if(TF2_GetPlayerClass(victim)==TFClass_DemoMan)
+		//{
+			//SDKUnhook(victim,SDKHook_TraceAttack,SDK_Forwarded_TraceAttack);
+		//}
+#if defined _sb_addon_fc_included
 		if(bHopEnabled)
 		{
 			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
 			FC_SetBhop(victim, false);
 		}
+#endif
 	}
 }
-#endif
 
 
 /*
@@ -900,7 +944,6 @@ public OnSB_SpawnPlayer(int client)
 		}
 	}
 }
-
 public Action:AllowBhopAgain(Handle:timer, any:client)
 {
 	if(SB_ValidPlayer(client,true))
@@ -910,3 +953,35 @@ public Action:AllowBhopAgain(Handle:timer, any:client)
 	}
 }
 #endif
+
+/*
+public OnEntityCreated(entity, const String:classname[])
+{
+	if (StrEqual(classname, "tf_projectile_pipe_remote"))
+	{
+		int client = GetEntPropEnt(entity, Prop_Send, "m_hThrower");
+
+		SDKHook(client,SDKHook_TraceAttack,SDK_Forwarded_TraceAttack);
+	}
+}*/
+
+/*
+public Action:SDK_Forwarded_TraceAttack(victim, &attacker, &inflictor, &Float:damage, &damagetype, &ammotype, hitbox, hitgroup)
+{
+	PrintToChatAll("victim: %i",victim);
+	PrintToChatAll("attacker: %i",attacker);
+	PrintToChatAll("inflictor: %i",inflictor);
+	PrintToChatAll("Hitgroup: %i",hitgroup);
+	PrintToChatAll("Hitbox: %i",hitbox);
+	PrintToChatAll("Damage Type: %i",damagetype);
+	PrintToChatAll("Ammo Type: %i",ammotype);
+
+	if(inflictor>-1)
+	{
+		char eClassName[128];
+		GetEntityClassname(inflictor, STRING(eClassName));
+
+		PrintToChatAll("GetEntityClassname: %s",eClassName);
+	}
+	return Plugin_Continue;
+}*/
