@@ -265,10 +265,6 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 	{
 		char ent_name[64];
 		GetEdictClassname(inflictor,ent_name,64);
-		if(TF2_GetPlayerClass(attacker)==TFClass_Pyro)
-		{
-			SB_DP("OnSBEventPostHurt inflictor %s",ent_name);
-		}
 		if (StrEqual(ent_name, "tf_projectile_pipe_remote"))
 		{
 			//SB_DP("m_bTouched? %s",GetEntProp(inflictor, Prop_Send, "m_bTouched")?"TRUE":"FALSE");
@@ -294,6 +290,11 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 
 				return;
 			}*/
+		}
+		else if (StrEqual(ent_name, "tf_projectile_flare"))
+		{
+			SB_DamageModPercent(0.0);
+			return;
 		}
 	}
 
