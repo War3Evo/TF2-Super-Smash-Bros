@@ -35,6 +35,9 @@
 #define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
 								if(IsClientInGame(%1) && IsPlayerAlive(%1))
 
+int iTotalScore[MAXPLAYERS+1];
+
+
 public Plugin:myinfo = {
 	name = "Smash Bros Calculations Engine",
 	author = "El Diablo",
@@ -60,8 +63,20 @@ float g_fsb_upward_force;
 
 Handle sb_fc_bhop;
 
+int iTotalScoreOffset = -1;
+
 public OnPluginStart()
 {
+	int playerresource = -1;
+	iTotalScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTotalScore");
+	if (iTotalScoreOffset != -1)
+	{
+		playerresource = FindEntityByClassname(playerresource, "tf_player_manager");
+		if (playerresource != INVALID_ENT_REFERENCE)
+		{
+			SDKHook(playerresource, SDKHook_ThinkPost, Hook_OnThinkPost);
+		}
+	}
 	HookEvent("teamplay_round_start", teamplay_round_active);
 	HookEvent("teamplay_round_active", teamplay_round_active);
 	HookEvent("arena_round_start", teamplay_round_active);
@@ -177,7 +192,6 @@ public Action Command_InterceptSuicide(int client, char[] command, int args)
 	return Plugin_Continue;
 }
 
-
 //CreateTimer(1.2,instaspawn,victim);
 /*
 public Action:instaspawn(Handle:timer, any:client)
@@ -197,6 +211,8 @@ public bool FakeDeath(int victim, int attacker)
 		{
 			SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
 			//CreateTimer(3.0,instaspawn,victim);
+
+			iTotalScore[victim]=SB_GetPlayerProp(victim,iLives);
 
 			int RedTeam, BlueTeam;
 			CalculateTeamScores(RedTeam,BlueTeam);
@@ -612,6 +628,8 @@ public Action OnSB_EventSpawn(client)
 {
 	if(SB_ValidPlayer(client))
 	{
+		iTotalScore[client]=SB_GetPlayerProp(client,iLives);
+
 		//if(TF2_GetPlayerClass(client)==TFClass_DemoMan)
 		//{
 			//SDKHook(client,SDKHook_TraceAttack,SDK_Forwarded_TraceAttack);
@@ -938,6 +956,8 @@ public OnSB_SpawnPlayer(int client)
 {
 	if(SB_ValidPlayer(client))
 	{
+		iTotalScore[client]=SB_GetPlayerProp(client,iLives);
+
 		if(bHopEnabled)
 		{
 			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
@@ -987,3 +1007,39 @@ public Action:SDK_Forwarded_TraceAttack(victim, &attacker, &inflictor, &Float:da
 	}
 	return Plugin_Continue;
 }*/
+
+
+public Hook_OnThinkPost(iEnt)
+{
+/*
+	static teamScoreOffset = -1;
+	if (teamScoreOffset == -1)
+	{
+		teamScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTeam");
+    }
+	static classOffset = -1;
+	if (classOffset == -1)
+	{
+		classOffset = FindSendPropInfo("CTFPlayerResource", "m_iPlayerClass");
+    }
+	static aliveOffset = -1;
+	if (aliveOffset == -1)
+	{
+		aliveOffset = FindSendPropInfo("CTFPlayerResource", "m_bAlive");
+    }*/
+	//int teamScore[MAXPLAYERS+1];
+	//int class[MAXPLAYERS+1];
+	//int alive[MAXPLAYERS+1];
+	//GetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
+	//GetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
+	//GetEntDataArray(iEnt, classOffset, class, MaxClients+1);
+	//GetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
+	//teamScore[spawnRocketIndex]=spawnRocketTeam;
+	//iTotalScore[spawnRocketIndex]=spawnRocketScore;
+	//class[spawnRocketIndex]=3;
+	//alive[spawnRocketIndex]=1;
+	SetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
+	//SetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
+	//SetEntDataArray(iEnt, classOffset, class, MaxClients+1);
+	//SetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
+}
