@@ -30,6 +30,8 @@
 
 #tryinclude <sb_addon_fc>
 
+#define MAXHEALTHCHECK 500
+
 #define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
 								if(IsClientInGame(%1) && IsPlayerAlive(%1))
 
@@ -263,6 +265,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 	int inflictor = SB_GetDamageInflictor();
 	if(victim==attacker && inflictor>0 && IsValidEdict(inflictor))
 	{
+		//tf_projectile_flare
 		char ent_name[64];
 		GetEdictClassname(inflictor,ent_name,64);
 		if (StrEqual(ent_name, "tf_projectile_pipe_remote"))
@@ -290,11 +293,6 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 
 				return;
 			}*/
-		}
-		else if (StrEqual(ent_name, "tf_projectile_flare"))
-		{
-			SB_DamageModPercent(0.0);
-			return;
 		}
 	}
 
@@ -496,7 +494,7 @@ public OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecust
 
 	if(SB_ValidPlayer(victim))
 	{
-		if(!DamageHandled && RoundToCeil(damage)>GetClientHealth(victim))
+		if(!DamageHandled && RoundToCeil(damage)>MAXHEALTHCHECK)
 		{
 			if(SB_GetPlayerProp(victim,iLives)>1)
 			{
@@ -577,7 +575,7 @@ public OnSBEventPostHurt(victim,attacker,dmgamount,const String:weapon[32])
 		totaldamage = FloatMul(float(SB_GetPlayerProp(victim,iDamage)),3.0);
 		//}
 
-		new MaxHealth = GetEntProp(victim, Prop_Data, "m_iMaxHealth");
+		int MaxHealth = GetEntProp(victim, Prop_Data, "m_iMaxHealth");
 		SB_SetHealth(victim, MaxHealth);
 		//new Float:stren = FloatMul(float(totaldamage),0.1);
 		//new Float:stren = float(dmgamount);
