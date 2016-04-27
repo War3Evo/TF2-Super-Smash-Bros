@@ -26,15 +26,6 @@
 #include <sb_interface>
 #include <sdkhooks>
 
-#define LoopMaxClients(%1) for(int %1=1;%1<=MaxClients;++%1)
-
-#define LoopIngameClients(%1) for(int %1=1;%1<=MaxClients;++%1)\
-								if(IsClientInGame(%1))
-
-#define LoopAlivePlayers(%1) for(int %1=1;%1<=MaxClients;++%1)\
-								if(IsClientInGame(%1) && IsPlayerAlive(%1))
-
-
 #define STRING(%1) %1, sizeof(%1)
 
 /*

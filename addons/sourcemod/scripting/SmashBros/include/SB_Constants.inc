@@ -34,6 +34,20 @@
 #define SHORTNAMELEN 16 //item or race shotnames, 15 characters
 #define FULLNAMELEN 32 //item or race full names, 31 characters. RUSSIAN and other characters require more than 1 byte to store a displayed character
 
+#if !defined _diablostocks_included
+#define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && IsPlayerAlive(%1))
+
+#define LoopMaxClients(%1) for(int %1=1;%1<=MaxClients;++%1)
+
+#define LoopIngameClients(%1) for(int %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1))
+
+#define STRING(%1) %1, sizeof(%1)
+
+#define Toggle(%1) %1=%1?false:true
+#endif
+
 
 //=============================================================================
 // Damage

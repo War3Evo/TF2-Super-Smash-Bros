@@ -48,45 +48,6 @@ stock dummyreturn;
 stock String:dummystr[32]; //just a dummy string!
 
 /**********************
- * CAUTION, THIS INTERFACE NOW HANDLES AskPluginLoad2VIPCustom BECAUSE IT IS REQUIRED TO HANDLE CERTAIN TASKS
- * It acually simplifies things for you:
- * Determines game mode
- * Mark Natives optional
- * Calls your own functions (hackish way) if you have them:
- * InitNativesForwards()
- * AskPluginLoad2Custom(Handle:myself,bool:late,String:error[],err_max);
- * So if you want to do something in AskPluginLoad2, implement public AskPluginLoad2Custom(...) instead.
- */
-public APLRes:AskPluginLoad2(Handle:plugin,bool:late,String:error[],err_max)
-{
-	GlobalOptionalNatives();
-	new Function:func;
-	func=GetFunctionByName(plugin, "SBInitNativesForwards");
-	if(func!=INVALID_FUNCTION) { //non sb plugins dont have this function
-		Call_StartFunction(plugin, func);
-		Call_Finish(dummy);
-		if(!dummy) {
-			LogError("InitNativesForwards did not return true, possible failure");
-		}
-	}
-	func=GetFunctionByName(plugin, "AskPluginLoad2SBCustom");
-	if(func!=INVALID_FUNCTION) { //non sb plugins dont have this function
-		Call_StartFunction(plugin, func);
-		Call_PushCell(plugin);
-		Call_PushCell(late);
-		Call_PushString(error);
-		Call_PushCell(err_max);
-		Call_Finish(dummy);
-		if(APLRes:dummy==APLRes_SilentFailure) {
-			return APLRes_SilentFailure;
-		}
-		if(APLRes:dummy!=APLRes_Success) {
-			LogError("AskPluginLoad2Custom did not return true, possible failure");
-		}
-	}
-	return APLRes_Success;
-}
-/**********************
  * Implement this if you have natives/forwards
  */
 forward bool:SBInitNativesForwards();
@@ -94,7 +55,7 @@ forward bool:SBInitNativesForwards();
 /**********************
  * Implement this if you need AskPluginLoad2Custom
  */
-forward APLRes:AskPluginLoad2VIPCustom(Handle:plugin,bool:late,String:error[],err_max);
+forward APLRes:AskPluginLoad2SBCustom(Handle:plugin,bool:late,String:error[],err_max);
 
 
 //We mark some natives optional so different plugins can still startup
@@ -161,7 +122,7 @@ stock bool:Game_EndRound(team=0, bool:forceMapReset=false, bool:switchTeams=fals
 	return AcceptEntityInput(game_round_win, "RoundWin");
 }
 
-native bool:SB_GetGamePlaying();
+native bool SB_GetGamePlaying();
 
 native SB_GetCountDownTimer();
 
@@ -230,7 +191,7 @@ native bool:SB_IsOwnerSentry(client,bool:UseInternalInflictor=true,ExternalInfli
 
 //helper, directly uses last inflictor and damagetype
 // Acts like a DPS limiter
-native Float:SB_ChanceModifier(attacker);
+native float SB_ChanceModifier(attacker);
 
 stock bool:SBIsDamageFromMelee(const String:weapon[])
 {
@@ -379,7 +340,7 @@ stock bool:SB_SetHealth(entity, health)
 	return false;
 }
 
-new ignoreClient;
+int ignoreClient;
 public bool:AimTargetFilter(entity,contentsMask)
 {
 	return !(entity==ignoreClient);
@@ -758,6 +719,14 @@ stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflict
 	}
 	//PrintToChatAll("Event Failed");
 	return false;
+}
+
+stock void SpawnProtect(int client)
+{
+	if(SB_ValidPlayer(client,true) && !SB_IsUbered(client))
+	{
+		TF2_AddCondition(client, TFCond_Ubercharged, 5.0);
+	}
 }
 
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
