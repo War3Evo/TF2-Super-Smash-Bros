@@ -34,7 +34,10 @@ public Hook_OnThinkPost(iEnt)
 	//iTotalScore[spawnRocketIndex]=spawnRocketScore;
 	//class[spawnRocketIndex]=3;
 	//alive[spawnRocketIndex]=1;
-	SetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
+	if (iTotalScoreOffset != -1)
+	{
+		SetEntDataArray(iEnt, iTotalScoreOffset, iTotalScore, MaxClients+1);
+	}
 	//SetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
 	//SetEntDataArray(iEnt, classOffset, class, MaxClients+1);
 	//SetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);

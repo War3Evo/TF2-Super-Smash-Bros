@@ -213,11 +213,6 @@ public ResetClientVars(i)
 	//nextclass[i]=TFClass_Unknown;
 }
 
-public OnRoundEnd()
-{
-
-}
-
 /*
 public Action:teamplay_round_start(Handle:event,  const String:name[], bool:dontBroadcast) {
 	for(new i=1;i<=MaxClients;++i){

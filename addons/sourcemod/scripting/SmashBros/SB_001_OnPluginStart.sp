@@ -19,18 +19,6 @@ public OnPluginStart()
 		PrintToServer("[SmashBros] Error, could not find configuration file for game.");
 	}
 
-	int playerresource = -1;
-	iTotalScoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTotalScore");
-	if (iTotalScoreOffset != -1)
-	{
-		playerresource = FindEntityByClassname(playerresource, "tf_player_manager");
-		if (playerresource != INVALID_ENT_REFERENCE)
-		{
-			SB_001_SDKHook_OnPluginStart(playerresource);
-		}
-	}
-
-
 	SB_001_HookEvent_OnPluginStart();
 
 	SB_Engine_Updater_OnPluginStart();

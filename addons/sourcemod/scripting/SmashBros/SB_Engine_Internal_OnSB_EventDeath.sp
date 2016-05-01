@@ -26,9 +26,10 @@ public SB_Engine_Internal_OnSB_EventDeath(int victim,int killer,int assister,int
 		bStopMovement[victim] = false;
 
 		//SetPlayerProp(victim,iLives,0);
-		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		SetPlayerProp(victim,iLives,MaxLives);
+		//int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+		//SetPlayerProp(victim,iLives,MaxLives);
 		SetPlayerProp(victim,iStartingTeam,0);
+		iTotalScore[victim]=0;
 	}
 
 	if(!playing)
