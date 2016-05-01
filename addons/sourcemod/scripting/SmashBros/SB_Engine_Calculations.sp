@@ -231,6 +231,12 @@ public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, 
 		LastValidAttacker[victim]=attacker;
 	}
 
+	if(SB_IsUbered(victim))
+	{
+		DamageModPercent(0.0);
+		return false;
+	}
+
 	// help prevent demos from using stickies to keep themselves launched in the air!
 	int inflictor = g_CurInflictor;
 	if(victim==attacker && inflictor>0 && IsValidEdict(inflictor))
@@ -563,7 +569,6 @@ public void StartTheRound()
 
 	LoopAlivePlayers(target)
 	{
-		SpawnProtect(target);
 		//iTotalScore[target]=GetPlayerProp(target,iLives);
 		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
 		SetPlayerProp(target,iLives,MaxLives);
