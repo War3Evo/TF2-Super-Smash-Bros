@@ -36,6 +36,14 @@ public OnPluginStart_SB_001_CreateConVar()
 
 	SB_Engine_Weapon_Manager_SB_001_CreateConVar();
 
+	ServerCommand("tf_arena_preround_time 5");
+	ServerCommand("mp_teams_unbalance_limit 0");
+	ServerCommand("mp_enableroundwaittime 0");
+	ServerCommand("mp_restartround 0");
+	ServerCommand("mp_stalemate_timelimit 0");
+	ServerCommand("mp_stalemate_enable 0");
+	ServerCommand("tf_arena_override_team_size 1");
+	ServerCommand("tf_arena_use_queue 0");
 }
 
 
