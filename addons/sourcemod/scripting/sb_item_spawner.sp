@@ -2,9 +2,11 @@
 #include <sdktools>
 #include <tf2>
 #include <tf2_stocks>
-#include <sb_interface>
 //#tryinclude <DiabloStocks>
 #include <sdkhooks>
+
+#undef REQUIRE_PLUGIN
+#include <sb_interface>
 
 /*
 #if !defined _diablostocks_included
@@ -48,10 +50,10 @@ new g_FilteredEntity = -1;
 new Float:g_ClientPosition[MAXPLAYERS+1][3];
 
 float PlayerMulti[MAXPLAYERS+1];
-int reapplyspeed[MAXPLAYERSCUSTOM];
-//float gspeedmulti[MAXPLAYERSCUSTOM];
-float speedBefore[MAXPLAYERSCUSTOM];
-float speedWeSet[MAXPLAYERSCUSTOM];
+int reapplyspeed[MAXPLAYERS+1];
+//float gspeedmulti[MAXPLAYERS+1];
+float speedBefore[MAXPLAYERS+1];
+float speedWeSet[MAXPLAYERS+1];
 
 int m_OffsetSpeed=-1;
 
@@ -74,6 +76,8 @@ enum PowerUpType
 }
 
 PowerUpType pMenuType = pfull;
+
+bool bSmashbros = false;
 
 public Plugin:myinfo =
 {
@@ -122,6 +126,33 @@ public OnPluginStart()
 
 	CreateTimer(1.0, Timer_Caching, _, TIMER_REPEAT);
 }
+
+
+public OnAllPluginsLoaded()
+{
+	if(LibraryExists("smashbros"))
+	{
+		bSmashbros = true;
+	}
+}
+
+public OnLibraryAdded(const String:name[])
+{
+	if(StrEqual(name,"smashbros"))
+	{
+		bSmashbros = true;
+	}
+}
+
+public OnLibraryRemoved(const String:name[])
+{
+	if(StrEqual(name,"smashbros"))
+	{
+		bSmashbros = false;
+	}
+}
+
+
 
 public Action:teamplay_round_win(Handle:event,  const String:name[], bool:dontBroadcast) {
 	if(hItemTimer == null)
@@ -184,6 +215,13 @@ bool HumansExist()
 
 public Action:LoadItemsTimer(Handle:timer)
 {
+	if(!bSmashbros)
+	{
+		PrintToServer("[ITEM SPAWNER] SMASHBROS PLUGIN HAS BEEN UNLOADED, PLEASE LOAD IT!");
+		hItemTimer = CreateTimer(1.0, LoadItemsTimer, _);
+		return Plugin_Stop;
+	}
+
 	if(!ItemsLoaded && !SB_GetGamePlaying())
 	{
 		if(!HumansExist())
@@ -999,6 +1037,12 @@ public Action:StopSpeedTimer(Handle:timer,any:userid)
 
 public RandomPowerUp(client, PowerUpType:pUP)
 {
+	if(!bSmashbros)
+	{
+		PrintToServer("[ITEM SPAWNER] SMASHBROS PLUGIN HAS BEEN UNLOADED, PLEASE LOAD IT!");
+		PrintToConsole(client,"[ITEM SPAWNER] SMASHBROS PLUGIN HAS BEEN UNLOADED, PLEASE HAVE SERVER OWNER LOAD IT!");
+		return;
+	}
 	//
 	//PowerUPMessage
 	//SetHudTextParams(-1.0, -1.0, 3.0, 0, 255, 0, 200); //green

@@ -6,4 +6,5 @@ public OnMapStart()
 	NewMap=true;
 
 	SB_Engine_Sound_SB_001_OnMapStart();
+	SB_001_PrecacheModel_OnMapStart();
 }

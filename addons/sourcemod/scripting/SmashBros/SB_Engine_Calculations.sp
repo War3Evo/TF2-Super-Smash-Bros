@@ -88,13 +88,13 @@ public Event_player_healonhit(Handle:event, const String:name[], bool:dontBroadc
 
 	if(SB_ValidPlayer(client))
 	{
-		if(SB_GetPlayerProp(client,iDamage)>0)
+		if(GetPlayerProp(client,iDamage)>0)
 		{
-			int CurrentDamage = SB_GetPlayerProp(client,iDamage);
+			int CurrentDamage = GetPlayerProp(client,iDamage);
 			//int ReduceDamageBy = RoundToFloor(FloatMul(float(CurrentDamage),0.50));
 			CurrentDamage -= 10;
 			if(CurrentDamage<0) CurrentDamage = 0;
-			SB_SetPlayerProp(client,iDamage,CurrentDamage);
+			SetPlayerProp(client,iDamage,CurrentDamage);
 		}
 	}
 }
@@ -144,7 +144,7 @@ public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const 
 		//SB_DP("iItemDefinitionIndex %d",iItemDefinitionIndex);
 		//if(iItemDefinitionIndex != 325)
 		//{
-		//new newdamage = (SB_GetPlayerProp(victim,iDamage) + dmgamount);
+		//new newdamage = (GetPlayerProp(victim,iDamage) + dmgamount);
 		//SB_SetPlayerProp(victim,iDamage,newdamage);
 
 		//new Float:totaldamage = float(newdamage)*4;
@@ -162,12 +162,12 @@ public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const 
 		/*
 		if(PlayerIsOnFire)
 		{
-			totaldamage = FloatDiv(float(SB_GetPlayerProp(victim,iDamage)),0.5);
+			totaldamage = FloatDiv(float(GetPlayerProp(victim,iDamage)),0.5);
 		}
 		else
 		{*/
-		//totaldamage = FloatMul(float(SB_GetPlayerProp(victim,iDamage)),6.0);
-		totaldamage = FloatMul(float(SB_GetPlayerProp(victim,iDamage)),3.0);
+		//totaldamage = FloatMul(float(GetPlayerProp(victim,iDamage)),6.0);
+		totaldamage = FloatMul(float(GetPlayerProp(victim,iDamage)),3.0);
 		//}
 
 		int MaxHealth = GetEntProp(victim, Prop_Data, "m_iMaxHealth");
@@ -204,13 +204,25 @@ public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const 
 }
 
 
-
-public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecustom)
+// Must return so that program will wait for it
+public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecustom)
 {
-	if(!SB_GetGamePlaying())
+	if(!playing && bLateLoad)
 	{
-		Internal_SB_DamageModPercent(0.0);
-		return;
+		int RS = GameRules_GetProp("m_iRoundState");
+		if(RS == 7)
+		{
+			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre round state %d",RS);
+			playing=true;
+			bLateLoad=false;
+		}
+	}
+	//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre start");
+	if(!playing)
+	{
+		//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre !playing");
+		DamageModPercent(0.0);
+		return false;
 	}
 
 	if(damage>0.0 && (attacker > 0 && attacker < 33))
@@ -231,8 +243,8 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 			if(!GetEntProp(inflictor, Prop_Send, "m_bTouched"))
 			{
 				//SB_DP("!m_bTouched");
-				Internal_SB_DamageModPercent(0.0);
-				return;
+				DamageModPercent(0.0);
+				return true;
 			}
 			/*
 			if(!(GetEntityFlags(victim) & FL_ONGROUND) && !(GetEntityFlags(inflictor) & FL_ONGROUND))
@@ -294,7 +306,7 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 	/*
 	if(!(GetEntityFlags(victim) & FL_ONGROUND))
 	{
-		if(SB_GetPlayerProp(victim,iDamage)>10000)
+		if(GetPlayerProp(victim,iDamage)>10000)
 		{
 			//ForcePlayerSuicide(victim);
 			//SDKHooks_TakeDamage(victim, 0, 0, 999999.9, DMG_GENERIC, -1, NULL_VECTOR, NULL_VECTOR);
@@ -327,7 +339,9 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 		{
 			DamageHandled = true;
 			DamageCustom = true;
-			Internal_SB_DamageModPercent(0.0);
+			DamageModPercent(0.0);
+			bloodspray(victim);
+			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
 		}
 	}
 
@@ -338,7 +352,9 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 			DamageHandled = true;
 			DamageCustom = true;
 			customdamage = 100;
-			Internal_SB_DamageModPercent(0.0);
+			DamageModPercent(0.0);
+			bloodspray(victim);
+			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
 		}
 	}
 
@@ -349,8 +365,9 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 		if(currentwpn > MaxClients && GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex")==325)
 		{
 			//SB_DP("boston basher");
-			Internal_SB_DamageModPercent(0.0);
-			return;
+			DamageModPercent(0.0);
+			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
+			return true;
 		}
 	}
 
@@ -362,22 +379,23 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 		{
 			//SB_DP("iItemDefinitionIndex %d",iItemDefinitionIndex);
 			//SB_DP("iItemDefinitionIndex 0.0");
-			Internal_SB_DamageModPercent(0.0);
+			DamageModPercent(0.0);
 			return;
 		}
 	}*/
 
-	if(SB_ValidPlayer(victim) && SB_GetDamageType()==DMG_FALL)
+	if(SB_ValidPlayer(victim) && g_CurDamageType==DMG_FALL)
 	{
 		//SB_DP("FALL DAMAGE");
-		//new newdamage = (SB_GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
+		//new newdamage = (GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
 		//SB_SetPlayerProp(victim,iDamage,newdamage);
 		if(GetEntityFlags(victim) & FL_ONGROUND)
 		{
 			//SB_DP("victim & DMG_FALL 0.0");
-			Internal_SB_DamageModPercent(0.0);
+			DamageModPercent(0.0);
+			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
 			//passcheck++;
-			return;
+			return true;
 		}
 	}
 
@@ -387,11 +405,11 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 	//{
 		//if(iItemDefinitionIndex != 325)
 		//{
-		//new newdamage = (SB_GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
+		//new newdamage = (GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
 		//SB_SetPlayerProp(victim,iDamage,newdamage);
 		//}
 		//SB_DP("valid attacker 0.0");
-		//Internal_SB_DamageModPercent(0.0);
+		//DamageModPercent(0.0);
 		//passcheck++;
 	//}
 	else if(SB_ValidPlayer(attacker) && SB_ValidPlayer(victim) && (GetClientTeam(attacker) != GetClientTeam(victim)))
@@ -400,14 +418,16 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 		//{
 		if(!DamageCustom)
 		{
-			int newdamage = (SB_GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
-			SB_SetPlayerProp(victim,iDamage,newdamage);
-			Internal_SB_DamageModPercent(0.01);
+			int newdamage = (GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
+			SetPlayerProp(victim,iDamage,newdamage);
+			DamageModPercent(0.0);
+			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
+			bloodspray(victim);
 		}
 		else
 		{
-			int newdamage = (SB_GetPlayerProp(victim,iDamage) + customdamage);
-			SB_SetPlayerProp(victim,iDamage,newdamage);
+			int newdamage = (GetPlayerProp(victim,iDamage) + customdamage);
+			SetPlayerProp(victim,iDamage,newdamage);
 		}
 		//}
 		//SB_DP("valid attacker 0.0");
@@ -418,11 +438,11 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 	{
 		//if(iItemDefinitionIndex != 325)
 		//{
-		new newdamage = (SB_GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
-		SB_SetPlayerProp(victim,iDamage,newdamage);
+		new newdamage = (GetPlayerProp(victim,iDamage) + RoundToFloor(damage));
+		SetPlayerProp(victim,iDamage,newdamage);
 		//}
 		//SB_DP("valid attacker 0.0");
-		Internal_SB_DamageModPercent(0.01);
+		DamageModPercent(0.01);
 		//passcheck++;
 	}*/
 
@@ -453,13 +473,17 @@ public SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float
 	{
 		if(!DamageHandled && RoundToCeil(damage)>MAXHEALTHCHECK)
 		{
-			if(SB_GetPlayerProp(victim,iLives)>1)
+			if(GetPlayerProp(victim,iLives)>1)
 			{
-				Internal_SB_DamageModPercent(0.0);
+				//PrintToChatAll("RoundToCeil(damage)>MAXHEALTHCHECK");
+				DamageModPercent(0.0);
+				//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
 				FakeDeath(victim, attacker);
 			}
 		}
 	}
+	//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre end");
+	return true;
 }
 
 
@@ -468,12 +492,12 @@ public bool FakeDeath(int victim, int attacker)
 {
 	if(SB_ValidPlayer(victim))
 	{
-		if(SB_GetPlayerProp(victim,iLives)>1)
+		if(GetPlayerProp(victim,iLives)>1)
 		{
-			SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
+			SetPlayerProp(victim,iLives,GetPlayerProp(victim,iLives)-1);
 			//CreateTimer(3.0,instaspawn,victim);
 
-			iTotalScore[victim]=SB_GetPlayerProp(victim,iLives);
+			iTotalScore[victim]=GetPlayerProp(victim,iLives);
 
 			int RedTeam, BlueTeam;
 			CalculateTeamScores(RedTeam,BlueTeam);
@@ -488,11 +512,12 @@ public bool FakeDeath(int victim, int attacker)
 			{
 				//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
 				//FC_SetBhop2(victim, false);
-				PrintToChatAll("bHopEnabled FakeDeath");
-				FC_SetBhop2(victim, false, false);
+				//PrintToChatAll("bStopMovement FakeDeath");
+				bStopMovement[victim] = false;
+				//FC_SetBhop2(victim, false, false);
 			}
 
-			SB_SpawnPlayer(victim);
+			SpawnPlayer(victim);
 
 			//PrintToChatAll("fake death start");
 			//PrintToChatAll("victim = %d, attacker = %d",victim, attacker);
@@ -523,4 +548,22 @@ public bool FakeDeath(int victim, int attacker)
 		}
 	}
 	return false;
+}
+
+public void StartTheRound()
+{
+	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
+
+	// engine calculations
+	firstblood=false;
+	CreateTimer(1.0,RemoveStuff,0);
+
+	LoopAlivePlayers(target)
+	{
+		SpawnProtect(target);
+	}
+
+	SB_Engine_Display_teamplay_round_active();
+
+	playing=true;
 }

@@ -12,12 +12,14 @@ TriggerEvent()
 	Call_Finish(dummyresult2);
 }
 
-public OnGameFrame(){
+public OnGameFrame()
+{
 	//if(!started) return;
 	if(!playing) return;
 	if(GetClientCount()<2) return;
 
-	for(new i=1;i<MaxClients;i++){   // was MAXPLAYERSCUSTOM
+	for(new i=1;i<MaxClients;i++)
+	{   // was MAXPLAYERSCUSTOM
 		bHasDiedThisFrame[i]=0;
 	}
 

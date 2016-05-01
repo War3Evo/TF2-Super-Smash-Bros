@@ -799,11 +799,12 @@ public int Native_SetBhop2(Handle plugin, int numParams)
 	if (!IsValidClient(client))
 	{
 		//ThrowNativeError(SP_ERROR_INDEX, "Client is invalid.");
-		return;
+		return 0;
 	}
 
 	bIsAllowedToBhop[client] = bool:GetNativeCell(2);
 	bBhopLazyModes[client] = bool:GetNativeCell(3);
+	return 1;
 }
 
 public int Native_BhopStatus(Handle plugin, int numParams)

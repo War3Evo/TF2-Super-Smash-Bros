@@ -9,7 +9,7 @@ public OnPluginStart_SB_001_AddCommandListener()
 
 public Action Command_InterceptSuicide(int client, char[] command, int args)
 {
-	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
+	if(!SB_ValidPlayer(client,true) || !playing)
 	{
 		return Plugin_Continue;
 	}
@@ -28,19 +28,19 @@ public Action Command_InterceptSuicide(int client, char[] command, int args)
 
 public Action Command_InterceptSpectate(int client, char[] command, int args)
 {
-	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
+	if(!SB_ValidPlayer(client,true) || !playing)
 	{
 		return Plugin_Continue;
 	}
 
-	if(!SB_GetPlayerProp(client,SpawnedOnce))
+	if(!GetPlayerProp(client,SpawnedOnce))
 	{
 		return Plugin_Continue;
 	}
 
-	if(SB_GetGamePlaying())
+	if(playing)
 	{
-		int CurrentLives = SB_GetPlayerProp(client,iLives);
+		int CurrentLives = GetPlayerProp(client,iLives);
 		char sClientName[32];
 		GetClientName(client,STRING(sClientName));
 		SB_ChatMessage(0,"{yellow}%s is going spectate!",sClientName);
@@ -61,6 +61,6 @@ public Action SendToSpectate(Handle timer, any client)
 		ForcePlayerSuicide(client);
 		ChangeClientTeam(client, 1);
 		//int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		//SB_SetPlayerProp(client,iLives,MaxLives);
+		//SetPlayerProp(client,iLives,MaxLives);
 	}
 }

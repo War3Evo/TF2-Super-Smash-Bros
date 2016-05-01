@@ -150,7 +150,7 @@ public Action:Command_Lives(client, args)
 		{
 			char sClientName[32];
 			GetClientName(i,STRING(sClientName));
-			PrintToConsole(client,"%s has %d lives.",sClientName,SB_GetPlayerProp(i,iLives));
+			PrintToConsole(client,"%s has %d lives.",sClientName,GetPlayerProp(i,iLives));
 		}
 	}
 

@@ -54,19 +54,19 @@ stock String:dummystr[32]; //just a dummy string!
 /**********************
  * Implement this if you have natives/forwards
  */
-forward bool:SBInitNativesForwards();
+//forward bool:SBInitNativesForwards();
 
 /**********************
  * Implement this if you need AskPluginLoad2Custom
  */
-forward APLRes:AskPluginLoad2SBCustom(Handle:plugin,bool:late,String:error[],err_max);
+//forward APLRes:AskPluginLoad2SBCustom(Handle:plugin,bool:late,String:error[],err_max);
 
 
 //We mark some natives optional so different plugins can still startup
 /**********************
  * CALL THIS IN ASKPLUGINLOAD if you are using any of these or have native errors
  */
-
+/*
 stock GlobalOptionalNatives()
 {
 	// DAMAGE SYSTEM
@@ -81,7 +81,7 @@ stock GlobalOptionalNatives()
 	MarkNativeAsOptional("SB_GetCountDownTimer");
 
 	MarkNativeAsOptional("SB_GetGamePlaying");
-}
+}*/
 
 /*
  * Natives and misc stocks
@@ -130,7 +130,7 @@ native bool SB_GetGamePlaying();
 
 native SB_GetCountDownTimer();
 
-native SB_SpawnPlayer(int client);
+native bool SB_SpawnPlayer(int client);
 
 native SB_ApplyWeapons(int client);
 
@@ -356,7 +356,8 @@ stock bool:CanHitThis(entityhit, mask, any:data)
 	{// Check if the TraceRay hit the itself.
 		return false; // Don't allow self to be hit, skip this result
 	}
-	if(SB_ValidPlayer(entityhit)&&SB_ValidPlayer(data)&&GetClientTeam(entityhit)==GetClientTeam(data)){
+	if(SB_ValidPlayer(entityhit)&&SB_ValidPlayer(data)&&GetClientTeam(entityhit)==GetClientTeam(data))
+	{
 		return false; //skip result, prend this space is not taken cuz they on same team
 	}
 	return true; // It didn't hit itself
@@ -437,7 +438,8 @@ stock SB_GetTargetInViewCone(client,Float:max_distance=0.0,bool:include_friendly
 		if(bestTarget==0) //still no target, use direct trace
 		{
 			new Float:endpos[3];
-			if(max_distance>0.0){
+			if(max_distance>0.0)
+			{
 				ScaleVector(PlayerAimVector,max_distance);
 			}
 			else{
@@ -817,31 +819,6 @@ forward OnSB_RoundEnd();
 forward OnSB_SpawnPlayer(int client);
 
 
-
-stock void CalculateTeamScores(int &RedTeam, int &BlueTeam)
-{
-	int TheLives = 0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i,true))
-		{
-			TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					RedTeam+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					BlueTeam+=TheLives;
-				}
-			}
-		}
-	}
-}
-
 stock int SB_CountTeams(iTeam)
 {
 	int iTeamCount=0;
@@ -856,4 +833,41 @@ stock int SB_CountTeams(iTeam)
 		}
 	}
 	return iTeamCount;
+}
+
+
+
+public SharedPlugin:__pl_sb_engine_core =
+{
+	name = "sb_engine_core",
+	file = "sb_engine_core.smx",
+#if defined REQUIRE_PLUGIN
+	required = 1,
+#else
+	required = 0,
+#endif
+};
+
+#if !defined REQUIRE_PLUGIN
+public __pl_sb_engine_core_SetNTVOptional()
+{
+	// DAMAGE SYSTEM
+	MarkNativeAsOptional("SB_DamageModPercent");
+	MarkNativeAsOptional("SB_GetDamageType");
+	MarkNativeAsOptional("SB_GetDamageInflictor");
+	MarkNativeAsOptional("SB_GetSBDamageDealt");
+	MarkNativeAsOptional("SB_GetDamageStack");
+	MarkNativeAsOptional("SB_ChanceModifier");
+	MarkNativeAsOptional("SB_IsOwnerSentry");
+
+	MarkNativeAsOptional("SB_GetCountDownTimer");
+
+	MarkNativeAsOptional("SB_GetGamePlaying");
+
+	MarkNativeAsOptional("SB_SetPlayerProp");
+	MarkNativeAsOptional("SB_GetPlayerProp");
+
+	MarkNativeAsOptional("SB_SpawnPlayer");
+
+	MarkNativeAsOptional("SB_ApplyWeapons");
 }

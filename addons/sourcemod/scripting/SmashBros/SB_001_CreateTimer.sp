@@ -24,15 +24,15 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 		}
 
 		//g_sb_medichealself
-		if(SB_GetPlayerProp(i,iDamage)>0)
+		if(GetPlayerProp(i,iDamage)>0)
 		{
-			int NewDamage = SB_GetPlayerProp(i,iDamage)-g_sb_medichealself;
+			int NewDamage = GetPlayerProp(i,iDamage)-g_sb_medichealself;
 			if(TF2_IsPlayerInCondition(i, TFCond_MegaHeal))
 			{
 				NewDamage -= g_sb_medichealself;
 			}
 			if(NewDamage<0) NewDamage = 0;
-			SB_SetPlayerProp(i,iDamage,NewDamage);
+			SetPlayerProp(i,iDamage,NewDamage);
 		}
 
 		int HealVictim = TF2_GetHealingTarget(i);
@@ -40,20 +40,20 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 		if (SB_ValidPlayer(HealVictim, true))
 		{
 			//SB_DP("healer %d ... healer victim %d",i,HealVictim);
-			if(SB_GetPlayerProp(HealVictim,iDamage)>0)
+			if(GetPlayerProp(HealVictim,iDamage)>0)
 			{
-				int NewDamage = SB_GetPlayerProp(HealVictim,iDamage)-g_sb_medicheal;
+				int NewDamage = GetPlayerProp(HealVictim,iDamage)-g_sb_medicheal;
 				if(TF2_IsPlayerInCondition(i, TFCond_MegaHeal))
 				{
 					NewDamage -= g_sb_medicmegaheal;
 				}
 				if(NewDamage<0) NewDamage = 0;
-				SB_SetPlayerProp(HealVictim,iDamage,NewDamage);
+				SetPlayerProp(HealVictim,iDamage,NewDamage);
 			}
 		}
 
 		/*
-		if(SB_GetPlayerProp(i,iDamage)>10000)
+		if(GetPlayerProp(i,iDamage)>10000)
 		{
 			if(SB_ValidPlayer(i,true,true))
 			{

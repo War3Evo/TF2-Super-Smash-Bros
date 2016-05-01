@@ -35,14 +35,14 @@ public SB_PlayerSpawnEvent(Handle event,  char[] name, bool dontBroadcast)
 		if(SB_ValidPlayer(client,true))
 		{
 
-			if(!SB_GetPlayerProp(client,SpawnedOnce))
+			if(!GetPlayerProp(client,SpawnedOnce))
 			{
-				SB_SetPlayerProp(client,SpawnedOnce,true);
+				SetPlayerProp(client,SpawnedOnce,true);
 			}
 			//forward to all other plugins last
 			DoForward_OnSB_EventSpawn(client);
 
-			SB_SetPlayerProp(client,bStatefulSpawn,false); //no longer a "stateful" spawn
+			SetPlayerProp(client,bStatefulSpawn,false); //no longer a "stateful" spawn
 		}
 	}
 }
@@ -82,15 +82,18 @@ public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast
 	}
 
 
-	if(uid_attacker>0){
+	if(uid_attacker>0)
+	{
 		attackerIndex=GetClientOfUserId(uid_attacker);
 	}
 
-	if(uid_victim>0){
+	if(uid_victim>0)
+	{
 		victimIndex=GetClientOfUserId(uid_victim);
 	}
 
-	if(uid_assister>0){
+	if(uid_assister>0)
+	{
 		assisterIndex=GetClientOfUserId(uid_assister);
 	}
 
@@ -121,7 +124,8 @@ public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast
 		}
 	}
 
-	if(bHasDiedThisFrame[victimIndex]>0){
+	if(bHasDiedThisFrame[victimIndex]>0)
+	{
 		return Plugin_Handled;
 	}
 	bHasDiedThisFrame[victimIndex]++;
@@ -136,33 +140,24 @@ public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast
 
 		//DP("restore event %d",event);
 		//then we allow change race AFTER death forward
-		SB_SetPlayerProp(victimIndex,bStatefulSpawn,true);//next spawn shall be stateful
+		SetPlayerProp(victimIndex,bStatefulSpawn,true);//next spawn shall be stateful
 	}
 	return Plugin_Continue;
 }
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
 {
+	PrintToChatAll("teamplay_round_active");
 	//Action aReturn = Plugin_Continue;
-	playing=true;
-	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
-
-	// engine calculations
-	firstblood=false;
-	CreateTimer(1.0,RemoveStuff,0);
-
-	LoopAlivePlayers(target)
-	{
-		SpawnProtect(target);
-	}
-
-	SB_Engine_Display_teamplay_round_active();
+	StartTheRound();
 
 	return Plugin_Continue;
 }
 
 public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 {
+	PrintToChatAll("arena_round_start");
+	/*
 	playing=true;
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
 
@@ -173,19 +168,25 @@ public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 	LoopAlivePlayers(target)
 	{
 		SpawnProtect(target);
-	}
+	}*/
+	StartTheRound();
+
+	return Plugin_Continue;
 }
 
 public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
-	for(int i=1;i<=MaxClients;++i){
+	for(int i=1;i<=MaxClients;++i)
+	{
 		ResetClientVars(i);
 	}
 	SB_Engine_Display_teamplay_round_win();
 }
 
-public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast) {
+public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast)
+{
+	PrintToChatAll("teamplay_waiting_begins");
 	playing=false;
 	OnRoundEnd();
 }
@@ -198,7 +199,8 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 }
 
 
-public Action:Event_player_team(Handle:event, const String:name[], bool:dontBroadcast) {
+public Action:Event_player_team(Handle:event, const String:name[], bool:dontBroadcast)
+{
 	if(GetEventInt(event, "team")>1) {
 		g_spec[GetClientOfUserId(GetEventInt(event, "userid"))] = false;
 	}

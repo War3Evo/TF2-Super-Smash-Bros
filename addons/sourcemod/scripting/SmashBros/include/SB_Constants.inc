@@ -191,7 +191,7 @@ enum SBPlayerProp
 	iStartingTeam,
 }
 
-native SB_SetPlayerProp(client,SBPlayerProp:property,any:value);
-native any:SB_GetPlayerProp(client,SBPlayerProp:property);
+native void SB_SetPlayerProp(int client,SBPlayerProp property,any value);
+native any SB_GetPlayerProp(int client,SBPlayerProp property);
 
 

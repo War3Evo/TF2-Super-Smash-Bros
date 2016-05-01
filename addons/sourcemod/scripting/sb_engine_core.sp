@@ -26,9 +26,9 @@
 #include <sourcemod>
 #include <sb_interface>
 #include <sdkhooks>
-#include <sb_addon_fc>
 
 #undef REQUIRE_PLUGIN
+#include <sb_addon_fc>
 #include <updater>
 
 #define JENKINS_UPDATE_URL "DEVELOP"
@@ -51,12 +51,14 @@
 #include "SmashBros/SB_001_OnMapEnd.sp"
 #include "SmashBros/SB_001_OnMapStart.sp"
 #include "SmashBros/SB_001_OnPluginStart.sp"
+#include "SmashBros/SB_001_PrecacheModel.sp"
 #include "SmashBros/SB_001_RegConsoleCmd.sp"
 #include "SmashBros/SB_001_SDKHook.sp"
 
 #include "SmashBros/SB_Engine_Calculations.sp"
 #include "SmashBros/SB_Engine_DamageSystem.sp"
 #include "SmashBros/SB_Engine_Display.sp"
+#include "SmashBros/SB_Engine_Effects.sp"
 #include "SmashBros/SB_Engine_InitForwards.sp"
 #include "SmashBros/SB_Engine_InitNatives.sp"
 #include "SmashBros/SB_Engine_Internal_OnSB_EventDeath.sp"
@@ -96,7 +98,40 @@ public Plugin:myinfo = {
  */
 public APLRes:AskPluginLoad2(Handle:plugin,bool:late,String:error[],err_max)
 {
-	GlobalOptionalNatives();
+	if(late==true)
+	{
+		bLateLoad = true;
+		/*
+		//bLateLoad = true;
+
+		// To help reloading plugin
+		MarkNativeAsOptional("SB_DamageModPercent");
+		MarkNativeAsOptional("SB_GetDamageType");
+		MarkNativeAsOptional("SB_GetDamageInflictor");
+		MarkNativeAsOptional("SB_GetSBDamageDealt");
+		MarkNativeAsOptional("SB_GetDamageStack");
+		MarkNativeAsOptional("SB_ChanceModifier");
+		MarkNativeAsOptional("SB_IsOwnerSentry");
+
+		MarkNativeAsOptional("SB_GetCountDownTimer");
+
+		MarkNativeAsOptional("SB_GetGamePlaying");
+
+		MarkNativeAsOptional("SB_SetPlayerProp");
+		MarkNativeAsOptional("SB_GetPlayerProp");
+
+		MarkNativeAsOptional("SB_SpawnPlayer");
+
+		MarkNativeAsOptional("SB_ApplyWeapons");
+		*/
+	}
+	else
+	{
+		bLateLoad = false;
+	}
+
+	//GlobalOptionalNatives();
+	/*
 	new Function:func;
 	func=GetFunctionByName(plugin, "SBInitNativesForwards");
 	if(func!=INVALID_FUNCTION) { //non sb plugins dont have this function
@@ -120,14 +155,17 @@ public APLRes:AskPluginLoad2(Handle:plugin,bool:late,String:error[],err_max)
 		if(APLRes:dummy!=APLRes_Success) {
 			LogError("AskPluginLoad2SBCustom did not return true, possible failure");
 		}
-	}
+	}*/
+	APLRes CheckSuccess = APLRes_Success;
+	CheckSuccess = Load2SBCustom();
+
 	RegPluginLibrary("smashbros");
-	return APLRes_Success;
+	return CheckSuccess;
 }
 //=============================================================================
 // AskPluginLoad2SBCustom
 //=============================================================================
-public APLRes:AskPluginLoad2SBCustom(Handle:myself,bool:late,String:error[],err_max)
+public APLRes Load2SBCustom()
 {
 
 	//PrintToServer("<< Smashbros is Loading >>");
@@ -162,11 +200,12 @@ public APLRes:AskPluginLoad2SBCustom(Handle:myself,bool:late,String:error[],err_
 	return APLRes_Success;
 }
 
-public ResetClientVars(i){
+public ResetClientVars(i)
+{
 	respawn[i]=0.0;
 	// don't set lives here (doing it where sb_engine_display)
 	//SB_SetPlayerProp(i,iLives,0);
-	SB_SetPlayerProp(i,iDamage,0);
+	SetPlayerProp(i,iDamage,0);
 	//killPlayer[i]=false;
 	//allowSpawn[i]=false;
 	//fragcount[i]=0;
@@ -196,11 +235,37 @@ public Action:instaspawn(Handle:timer, any:client)
 	}
 }*/
 
-public Float:calcDistance(Float:x1,Float:x2,Float:y1,Float:y2,Float:z1,Float:z2){
+public Float:calcDistance(Float:x1,Float:x2,Float:y1,Float:y2,Float:z1,Float:z2)
+{
 	//Distance between two 3d points
 	float dx = x1-x2;
 	float dy = y1-y2;
 	float dz = z1-z2;
 
 	return(SquareRoot(dx*dx + dy*dy + dz*dz));
+}
+
+
+public void CalculateTeamScores(int &RedTeam, int &BlueTeam)
+{
+	int TheLives = 0;
+
+	for(int i=1;i<MaxClients;i++)
+	{
+		if(SB_ValidPlayer(i,true))
+		{
+			TheLives = GetPlayerProp(i,iLives);
+			if(TheLives>0)
+			{
+				if(GetClientTeam(i)==TEAM_RED)
+				{
+					RedTeam+=TheLives;
+				}
+				else if(GetClientTeam(i)==TEAM_BLUE)
+				{
+					BlueTeam+=TheLives;
+				}
+			}
+		}
+	}
 }

@@ -45,6 +45,7 @@ public SharedPlugin:__pl_sb_addon_fc =
 public __pl_fc_SetNTVOptional()
 {
 	MarkNativeAsOptional("FC_SetBhop");
+	MarkNativeAsOptional("FC_SetBhop2");
 	MarkNativeAsOptional("FC_BhopStatus");
 	MarkNativeAsOptional("FC_Enabled");
 	MarkNativeAsOptional("FC_Bhop_Enabled");

@@ -5,6 +5,7 @@ public SB_Engine_Internal_OnSB_EventDeath(int victim,int killer,int assister,int
 	if(GetEventBool(event, "sourcemod"))
 		return;
 
+	/*
 	if(SB_ValidPlayer(victim))
 	{
 		//if(TF2_GetPlayerClass(victim)==TFClass_DemoMan)
@@ -17,18 +18,20 @@ public SB_Engine_Internal_OnSB_EventDeath(int victim,int killer,int assister,int
 			FC_SetBhop2(victim, false, false);
 			PrintToChatAll("FC_SetBhop2 SB_Engine_Internal_OnSB_EventDeath");
 		}
-	}
+	}*/
 
 	// orignally from sb_engine_display
 	if(victim)
 	{
-		//SB_SetPlayerProp(victim,iLives,0);
+		bStopMovement[victim] = false;
+
+		//SetPlayerProp(victim,iLives,0);
 		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		SB_SetPlayerProp(victim,iLives,MaxLives);
-		SB_SetPlayerProp(victim,iStartingTeam,0);
+		SetPlayerProp(victim,iLives,MaxLives);
+		SetPlayerProp(victim,iStartingTeam,0);
 	}
 
-	if(!SB_GetGamePlaying())
+	if(!playing)
 		return;
 
 	if(!GetConVarBool(sb_chatmsg))

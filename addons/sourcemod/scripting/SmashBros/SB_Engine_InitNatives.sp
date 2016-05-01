@@ -33,7 +33,7 @@ public Native_SB_GetCountDownTimer(Handle:plugin,numParams)
 	return CountDownTimer;
 }
 
-public any Internal_SB_GetPlayerProp(int client, SBPlayerProp Property)
+public any GetPlayerProp(int client, SBPlayerProp Property)
 {
 	if (client > 0 && client <= MaxClients)
 	{
@@ -42,27 +42,37 @@ public any Internal_SB_GetPlayerProp(int client, SBPlayerProp Property)
 	else
 		return 0;
 }
+public void SetPlayerProp(int client, SBPlayerProp Property, any value)
+{
+	if (client > 0 && client <= MaxClients)
+	{
+		p_properties[client][Property]=value;
+	}
+}
 
-public NSB_GetPlayerProp(Handle:plugin,numParams){
+public NSB_GetPlayerProp(Handle:plugin,numParams)
+{
 	int client=GetNativeCell(1);
 	if (client > 0 && client <= MaxClients)
 	{
 		//return p_properties[client][SBPlayerProp:GetNativeCell(2)];
-		return Internal_SB_GetPlayerProp(client,view_as<SBPlayerProp>(GetNativeCell(2)));
+		return GetPlayerProp(client,view_as<SBPlayerProp>(GetNativeCell(2)));
 	}
 	else
 		return 0;
 }
-public NSB_SetPlayerProp(Handle:plugin,numParams){
+public NSB_SetPlayerProp(Handle:plugin,numParams)
+{
 	int client=GetNativeCell(1);
 	if (client > 0 && client <= MaxClients)
 	{
-		p_properties[client][SBPlayerProp:GetNativeCell(2)]=GetNativeCell(3);
+		//p_properties[client][SBPlayerProp:GetNativeCell(2)]=GetNativeCell(3);
+		SetPlayerProp(client,GetNativeCell(2),GetNativeCell(3));
 	}
 }
 
-public NSB_SpawnPlayer(Handle:plugin,numParams){
-	int client=GetNativeCell(1);
+public bool SpawnPlayer(int client)
+{
 	if (SB_ValidPlayer(client))
 	{
 		SDKCall(hSpawnPlayer,client);
@@ -72,8 +82,14 @@ public NSB_SpawnPlayer(Handle:plugin,numParams){
 		Call_StartForward(FHOnSB_SpawnPlayer);
 		Call_PushCell(client);
 		Call_Finish();
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
+}
+
+public NSB_SpawnPlayer(Handle:plugin,numParams)
+{
+	int client=GetNativeCell(1);
+	return SpawnPlayer(client);
 }

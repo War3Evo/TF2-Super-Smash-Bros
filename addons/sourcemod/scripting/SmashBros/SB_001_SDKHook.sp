@@ -38,4 +38,19 @@ public Hook_OnThinkPost(iEnt)
 	//SetEntDataArray(iEnt, teamScoreOffset, teamScore, MaxClients+1);
 	//SetEntDataArray(iEnt, classOffset, class, MaxClients+1);
 	//SetEntDataArray(iEnt, aliveOffset, alive, MaxClients+1);
+
+	if(SB_ValidPlayer(iEnt,true))
+	{
+		if(bStopMovement[iEnt])
+		{
+			StopMovement(iEnt);
+		}
+	}
+}
+
+public void StopMovement(int client)
+{
+	// Stop Velocity!
+	float fNewVel[3];
+	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fNewVel);
 }

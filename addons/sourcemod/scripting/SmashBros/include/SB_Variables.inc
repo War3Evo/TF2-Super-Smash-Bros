@@ -118,3 +118,16 @@ int LastPersonAttacked[MAXPLAYERSCUSTOM];
 
 //new bool:started=false;
 //new bool:playing=false;
+
+
+
+
+
+// NEW
+bool bStopMovement[MAXPLAYERSCUSTOM];
+
+
+bool bLateLoad = false;
+
+int mBloodSpray;
+int mBloodDrop;

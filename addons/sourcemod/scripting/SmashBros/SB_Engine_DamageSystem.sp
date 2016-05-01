@@ -45,9 +45,19 @@ public bool SB_Engine_DamageSystem_SB_Engine_InitForwards()
 	return true;
 }
 
-public void Internal_SB_DamageModPercent(float num)
+public DamageSystemLateLoad()
 {
-	if(!g_CanSetDamageMod){
+	LoopIngameClients(client)
+	{
+		SDKHook(client,SDKHook_OnTakeDamage, SDK_Forwarded_OnTakeDamage);
+		SDKHook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
+	}
+}
+
+public void DamageModPercent(float num)
+{
+	if(!g_CanSetDamageMod)
+	{
 		LogError("	");
 		ThrowError("You may not set damage mod percent here, use ....Pre forward");
 		//SB_LogError("You may not set damage mod percent here, use ....Pre forward");
@@ -63,16 +73,19 @@ public void Internal_SB_DamageModPercent(float num)
 public Native_SB_DamageModPercent(Handle:plugin,numParams)
 {
 	float num=GetNativeCell(1);
-	Internal_SB_DamageModPercent(num);
+	DamageModPercent(num);
 }
 
-public NSB_GetDamageType(Handle:plugin,numParams){
+public NSB_GetDamageType(Handle:plugin,numParams)
+{
 	return g_CurDamageType;
 }
-public NSB_GetDamageInflictor(Handle:plugin,numParams){
+public NSB_GetDamageInflictor(Handle:plugin,numParams)
+{
 	return g_CurInflictor;
 }
-public NSB_GetDamageStack(Handle:plugin,numParams){
+public NSB_GetDamageStack(Handle:plugin,numParams)
+{
 	return damagestack;
 }
 
@@ -90,7 +103,7 @@ public OnEntityCreated(entity, const String:classname[])
 
 public void SB_Engine_DamageSystem_OnClientPutInServer(int client)
 {
-	SDKHook(client,SDKHook_OnTakeDamage,SDK_Forwarded_OnTakeDamage);
+	SDKHook(client,SDKHook_OnTakeDamage, SDK_Forwarded_OnTakeDamage);
 	SDKHook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
 }
 public void SB_Engine_DamageSystem_OnClientDisconnect(int client)
@@ -130,7 +143,8 @@ public Native_SB_ChanceModifier(Handle:plugin,numParams)
 {
 
 	new attacker=GetNativeCell(1);
-	if(attacker<=0 || attacker>MaxClients || !IsValidEdict(attacker)){
+	if(attacker<=0 || attacker>MaxClients || !IsValidEdict(attacker))
+	{
 		return _:1.0;
 	}
 
@@ -181,7 +195,9 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		return Plugin_Continue;
 	}
 
-	if(SB_ValidPlayer(victim,true)){
+	if(SB_ValidPlayer(victim,true))
+	{
+		//PrintToChatAll("SDK_Forwarded_OnTakeDamage");
 		//store old variables on local stack!
 
 		new old_DamageType= g_CurDamageType;
@@ -218,15 +234,12 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		}
 		//	DP("%f",ChanceModifier[attacker]);
 		//else it is true damage
-		//PrintToChatAll("takedmg %f BULLET %d   lastiswarcraft %d",damage,isBulletDamage,g_CurDamageIsWarcraft);
+		//PrintToChatAll("takedmg %f",damage);
 
 		new bool:old_CanSetDamageMod=g_CanSetDamageMod;
 		new bool:old_CanDealDamage=g_CanDealDamage;
 		g_CanSetDamageMod=true;
 		g_CanDealDamage=false;
-
-		SB_Engine_Calculations_OnSB_TakeDmgAllPre(victim, attacker, damage, damagecustom);
-		SB_Engine_Display_OnSB_TakeDmgAllPre(victim, attacker, damage);
 
 		Call_StartForward(FHOnSB_TakeDmgAllPre);
 		Call_PushCell(victim);
@@ -235,10 +248,18 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		Call_PushCell(damagecustom);
 		Call_Finish(dummyresult); //this will be returned to
 
+		if(SB_Engine_Calculations_OnSB_TakeDmgAllPre(victim, attacker, damage, damagecustom))
+		{
+		}
+		if(SB_Engine_Display_OnSB_TakeDmgAllPre(victim, attacker, damage))
+		{
+		}
+
 		g_CanSetDamageMod=false;
 		g_CanDealDamage=true;
 
-		if(g_CurDMGModifierPercent>0.001){ //so if damage is already canceled, no point in forwarding the second part , do we dont get: evaded but still recieve warcraft damage proc)
+		if(g_CurDMGModifierPercent>0.001)
+		{ //so if damage is already canceled, no point in forwarding the second part , do we dont get: evaded but still recieve warcraft damage proc)
 
 			Call_StartForward(FHOnSB_TakeDmgAll);
 			Call_PushCell(victim);
@@ -251,8 +272,9 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		g_CanDealDamage=old_CanDealDamage;
 
 		//modify final damage
-		//DP("Damage before modifier %f %d to %d",damage,attacker,victim);
+		//PrintToChatAll("Damage before modifier %f %d to %d",damage,attacker,victim);
 		damage=damage*g_CurDMGModifierPercent; ////so we calculate the percent
+		//PrintToChatAll("Damage after modifier %f %d to %d",damage,attacker,victim);
 
 		//nobobdy retrieves our global variables outside of the forward call, restore old stack vars
 		g_CurDamageType= old_DamageType;
@@ -316,14 +338,14 @@ public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetyp
 
 		//SB_LogInfo("OnTakeDamagePostHook called with weapon \"%s\"", weaponName);
 
-		SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,RoundToFloor(damage),weaponName);
-
 		Call_StartForward(g_OnSBEventPostHurtFH);
 		Call_PushCell(victim);
 		Call_PushCell(attacker);
 		Call_PushCell(RoundToFloor(damage));
 		Call_PushString(weaponName);
 		Call_Finish(dummyreturn);
+
+		SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,RoundToFloor(damage),weaponName);
 
 		g_CanDealDamage=old_CanDealDamage;
 
@@ -332,6 +354,7 @@ public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetyp
 		g_CurLastActualDamageDealt = RoundToFloor(damage);
 }
 
-public Native_SB_GetSBDamageDealt(Handle:plugin,numParams) {
+public Native_SB_GetSBDamageDealt(Handle:plugin,numParams)
+{
 	return g_CurLastActualDamageDealt;
 }
