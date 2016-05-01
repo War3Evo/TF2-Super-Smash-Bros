@@ -111,7 +111,7 @@ public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const 
 		if(StrEqual(weapon,"tf_weapon_bat"))
 		{
 			int currentwpn = GetEntPropEnt(attacker, Prop_Send, "m_hActiveWeapon");
-			// boston basher
+			// boston basher && runeblade
 			int itemIndex = GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex");
 			if(currentwpn > MaxClients && (itemIndex==325 || itemIndex==452))
 			{
@@ -362,7 +362,7 @@ public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, 
 	if(SB_ValidPlayer(attacker) && attacker == victim)
 	{
 		int currentwpn = GetEntPropEnt(attacker, Prop_Send, "m_hActiveWeapon");
-		// boston basher
+		// boston basher && runeblade
 		int itemIndex = GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex");
 		if(currentwpn > MaxClients && (itemIndex==325 || itemIndex==452))
 		{
