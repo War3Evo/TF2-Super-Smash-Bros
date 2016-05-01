@@ -112,7 +112,8 @@ public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const 
 		{
 			int currentwpn = GetEntPropEnt(attacker, Prop_Send, "m_hActiveWeapon");
 			// boston basher
-			if(currentwpn > MaxClients && GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex")==325)
+			int itemIndex = GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex");
+			if(currentwpn > MaxClients && (itemIndex==325 || itemIndex==452))
 			{
 				//SB_DP("boston basher");
 				return;
