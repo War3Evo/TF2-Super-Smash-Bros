@@ -153,9 +153,12 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 
 	if(bHopEnabled)
 	{
-		FC_SetBhop2(client, false, false);
-		bStopMovement[client] = true;
-		CreateTimer(GetConVarFloat(sb_fc_bhop), AllowMovementAgain, client);
+		LoopAlivePlayers(target)
+		{
+			FC_SetBhop2(target, false, false);
+			bStopMovement[target] = true;
+			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowMovementAgain, target);
+		}
 	}
 
 	return Plugin_Continue;
