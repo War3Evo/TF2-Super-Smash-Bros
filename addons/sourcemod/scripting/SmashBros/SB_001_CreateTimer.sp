@@ -4,6 +4,8 @@
 
 public OnPluginStart_SB_001_CreateTimer()
 {
+	SB_Engine_Sound_SB_001_CreateTimer();
+
 	CreateTimer(1.0, Timer_Uber_Regen, _, TIMER_REPEAT);
 }
 

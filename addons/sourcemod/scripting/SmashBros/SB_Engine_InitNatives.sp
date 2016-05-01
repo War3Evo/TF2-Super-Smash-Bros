@@ -17,6 +17,8 @@ public bool SB_Engine_InitNatives()
 
 	SB_Engine_DamageSystem_SB_Engine_InitNatives();
 
+	SB_Engine_Weapon_Manager_SB_Engine_InitNatives();
+
 	return true;
 }
 

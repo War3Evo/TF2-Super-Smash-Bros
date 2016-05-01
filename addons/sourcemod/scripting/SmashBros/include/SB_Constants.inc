@@ -38,6 +38,9 @@
 #define FULLNAMELEN 32 //item or race full names, 31 characters. RUSSIAN and other characters require more than 1 byte to store a displayed character
 
 #if !defined _diablostocks_included
+#define LoopIngamePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && !IsFakeClient(%1))
+
 #define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
 								if(IsClientInGame(%1) && IsPlayerAlive(%1))
 
@@ -49,9 +52,36 @@
 #define STRING(%1) %1, sizeof(%1)
 
 #define Toggle(%1) %1=%1?false:true
+
+stock bool IsEntLimitReached()
+{
+	if (GetEntityCount() >= (GetMaxEntities()-16))
+	{
+		PrintToServer("Warning: Entity limit is nearly reached! Please switch or reload the map!");
+		LogError("Entity limit is nearly reached: %d/%d", GetEntityCount(), GetMaxEntities());
+		return true;
+	}
+	else
+		return false;
+}
+stock bool ValidPlayer(int client, bool check_alive=false, bool alivecheckbyhealth=false) {
+	if(client>0 && client<=MaxClients && IsClientConnected(client) && IsClientInGame(client))
+	{
+		if(check_alive && !IsPlayerAlive(client))
+		{
+			return false;
+		}
+		if(alivecheckbyhealth&&GetClientHealth(client)<1) {
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+
 #endif
 
-char ClassList[][] =
+stock char ClassList[][] =
 {
 	"Scout", //1
 	"Sniper", //2

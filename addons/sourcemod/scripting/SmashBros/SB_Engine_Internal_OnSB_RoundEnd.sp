@@ -50,4 +50,6 @@ public SB_Engine_Internal_OnSB_RoundEnd()
 	SetVariantInt(iWinningTeam);
 	AcceptEntityInput(iEnt, "SetTeam");
 	AcceptEntityInput(iEnt, "RoundWin");
+
+	SB_Engine_Sound_SB_Engine_Internal_OnSB_RoundEnd();
 }

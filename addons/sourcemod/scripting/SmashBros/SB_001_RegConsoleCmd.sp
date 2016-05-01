@@ -20,6 +20,8 @@ public SB_001_RegConsoleCmd_OnPluginStart()
 	RegConsoleCmd("jointeam", Command_jointeam);
 
 	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
+
+	SB_Engine_Weapon_Manager_SB_001_RegConsoleCmd();
 }
 
 public Action:SB_ENGINEERING(client,args)

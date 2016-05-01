@@ -34,6 +34,8 @@ public OnPluginStart_SB_001_CreateConVar()
 	sb_chatmsg = CreateConVar("sb_chatmsg", "0", "Enable chat messages of team scores in chat.", FCVAR_PLUGIN);
 	sb_chatmsg_balance = CreateConVar("sb_chatmsg_balance", "1", "Enable showing player balance information of lives during beginning of round.", FCVAR_PLUGIN);
 
+	SB_Engine_Weapon_Manager_SB_001_CreateConVar();
+
 }
 
 

@@ -38,4 +38,6 @@ public OnPluginStart()
 	SB_Engine_DamageSystem_OnPluginStart();
 
 	SB_Engine_Display_OnPluginStart();
+
+	SB_Engine_Weapon_Manager_OnPluginStart();
 }

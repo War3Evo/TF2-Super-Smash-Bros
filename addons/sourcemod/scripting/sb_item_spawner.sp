@@ -3,10 +3,10 @@
 #include <tf2>
 #include <tf2_stocks>
 #include <sb_interface>
-#tryinclude <DiabloStocks>
+//#tryinclude <DiabloStocks>
 #include <sdkhooks>
 
-
+/*
 #if !defined _diablostocks_included
 #define STRING(%1) %1, sizeof(%1)
 
@@ -42,7 +42,7 @@ stock bool IsEntLimitReached()
 	else
 		return false;
 }
-#endif
+#endif*/
 
 new g_FilteredEntity = -1;
 new Float:g_ClientPosition[MAXPLAYERS+1][3];
