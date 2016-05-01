@@ -351,26 +351,26 @@ public void SB_Engine_Display_teamplay_round_start()
 	}
 }
 
-public void SB_Engine_Display_teamplay_round_active()
+public bool SB_Engine_Display_teamplay_round_active()
 {
 	//PrintToChatAll("%s",name);
 	if(NewMap)
 	{
+		NewMap = false;
 		for(int i=1;i<=MaxClients;++i)
 		{
 			LastPersonAttacked[i]=-1;
 			SetPlayerProp(i,iLives,1);
 		}
 
-		NewMap = false;
 		SB_ChatMessage(0,"First Round of the Map {yellow}[{red}SUDDEN DEATH{yellow}]");
-		return;
+		return true;
 	}
-	TeamBalanceTimer();
+	return TeamBalanceTimer();
 }
 
 
-public void TeamBalanceTimer()
+public bool TeamBalanceTimer()
 {
 	//PrintToChatAll("Debug: Start of Balancing");
 
@@ -405,7 +405,7 @@ public void TeamBalanceTimer()
 		CalculateTeamScores(RedTeam,BlueTeam);
 
 		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
-		return;
+		return true;
 	}
 
 	// Randomly spread the love
@@ -460,7 +460,7 @@ public void TeamBalanceTimer()
 	}
 	//PrintToChatAll("Debug: End of Balancing");*/
 
-	return;
+	return true;
 }
 
 

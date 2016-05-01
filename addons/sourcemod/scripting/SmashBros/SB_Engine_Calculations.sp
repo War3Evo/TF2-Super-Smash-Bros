@@ -422,7 +422,7 @@ public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, 
 			SetPlayerProp(victim,iDamage,newdamage);
 			DamageModPercent(0.0);
 			//PrintToChatAll("SB_Engine_Calculations_OnSB_TakeDmgAllPre NO DAMAGE");
-			bloodspray(victim);
+			//bloodspray(victim);
 		}
 		else
 		{
@@ -432,6 +432,7 @@ public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, 
 		//}
 		//SB_DP("valid attacker 0.0");
 		//passcheck++;
+		Gore(victim);
 	}
 	/*
 	else if(SB_ValidPlayer(attacker) && attacker==victim)
@@ -516,6 +517,7 @@ public bool FakeDeath(int victim, int attacker)
 				bStopMovement[victim] = false;
 				//FC_SetBhop2(victim, false, false);
 			}
+			CreateRagDoll(victim);
 
 			SpawnPlayer(victim);
 
@@ -552,7 +554,7 @@ public bool FakeDeath(int victim, int attacker)
 
 public void StartTheRound()
 {
-	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
+	playing=false;
 
 	// engine calculations
 	firstblood=false;
@@ -563,7 +565,11 @@ public void StartTheRound()
 		SpawnProtect(target);
 	}
 
-	SB_Engine_Display_teamplay_round_active();
+	if(SB_Engine_Display_teamplay_round_active())
+	{
+	}
+
+	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
 
 	playing=true;
 }
