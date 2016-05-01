@@ -151,16 +151,6 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 	//Action aReturn = Plugin_Continue;
 	StartTheRound();
 
-	if(bHopEnabled)
-	{
-		LoopAlivePlayers(target)
-		{
-			FC_SetBhop2(target, false, false);
-			bStopMovement[target] = true;
-			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowMovementAgain, target);
-		}
-	}
-
 	return Plugin_Continue;
 }
 
@@ -180,6 +170,16 @@ public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 		SpawnProtect(target);
 	}*/
 	StartTheRound();
+
+	if(bHopEnabled)
+	{
+		LoopAlivePlayers(target)
+		{
+			FC_SetBhop2(target, false, false);
+			bStopMovement[target] = true;
+			CreateTimer(5.0, AllowMovementAgain, target);
+		}
+	}
 
 	return Plugin_Continue;
 }
