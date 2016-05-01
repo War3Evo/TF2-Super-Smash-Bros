@@ -19,6 +19,10 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined _sb_interface_included
+	#endinput
+#endif
+#define _sb_interface_included
 
 /**
  * File: sb_interface.inc
@@ -39,7 +43,7 @@
 #include <sourcemod>
 //#include <clients>
 #include <morecolors>
-#include <sb_constants>
+#include "SmashBros/include/SB_Constants.inc"
 #include <tf2_stocks>
 #include <sdktools_trace>
 
@@ -48,60 +52,21 @@ stock dummyreturn;
 stock String:dummystr[32]; //just a dummy string!
 
 /**********************
- * CAUTION, THIS INTERFACE NOW HANDLES AskPluginLoad2VIPCustom BECAUSE IT IS REQUIRED TO HANDLE CERTAIN TASKS
- * It acually simplifies things for you:
- * Determines game mode
- * Mark Natives optional
- * Calls your own functions (hackish way) if you have them:
- * InitNativesForwards()
- * AskPluginLoad2Custom(Handle:myself,bool:late,String:error[],err_max);
- * So if you want to do something in AskPluginLoad2, implement public AskPluginLoad2Custom(...) instead.
- */
-public APLRes:AskPluginLoad2(Handle:plugin,bool:late,String:error[],err_max)
-{
-	GlobalOptionalNatives();
-	new Function:func;
-	func=GetFunctionByName(plugin, "SBInitNativesForwards");
-	if(func!=INVALID_FUNCTION) { //non sb plugins dont have this function
-		Call_StartFunction(plugin, func);
-		Call_Finish(dummy);
-		if(!dummy) {
-			LogError("InitNativesForwards did not return true, possible failure");
-		}
-	}
-	func=GetFunctionByName(plugin, "AskPluginLoad2SBCustom");
-	if(func!=INVALID_FUNCTION) { //non sb plugins dont have this function
-		Call_StartFunction(plugin, func);
-		Call_PushCell(plugin);
-		Call_PushCell(late);
-		Call_PushString(error);
-		Call_PushCell(err_max);
-		Call_Finish(dummy);
-		if(APLRes:dummy==APLRes_SilentFailure) {
-			return APLRes_SilentFailure;
-		}
-		if(APLRes:dummy!=APLRes_Success) {
-			LogError("AskPluginLoad2Custom did not return true, possible failure");
-		}
-	}
-	return APLRes_Success;
-}
-/**********************
  * Implement this if you have natives/forwards
  */
-forward bool:SBInitNativesForwards();
+//forward bool:SBInitNativesForwards();
 
 /**********************
  * Implement this if you need AskPluginLoad2Custom
  */
-forward APLRes:AskPluginLoad2VIPCustom(Handle:plugin,bool:late,String:error[],err_max);
+//forward APLRes:AskPluginLoad2SBCustom(Handle:plugin,bool:late,String:error[],err_max);
 
 
 //We mark some natives optional so different plugins can still startup
 /**********************
  * CALL THIS IN ASKPLUGINLOAD if you are using any of these or have native errors
  */
-
+/*
 stock GlobalOptionalNatives()
 {
 	// DAMAGE SYSTEM
@@ -116,7 +81,7 @@ stock GlobalOptionalNatives()
 	MarkNativeAsOptional("SB_GetCountDownTimer");
 
 	MarkNativeAsOptional("SB_GetGamePlaying");
-}
+}*/
 
 /*
  * Natives and misc stocks
@@ -161,11 +126,11 @@ stock bool:Game_EndRound(team=0, bool:forceMapReset=false, bool:switchTeams=fals
 	return AcceptEntityInput(game_round_win, "RoundWin");
 }
 
-native bool:SB_GetGamePlaying();
+native bool SB_GetGamePlaying();
 
 native SB_GetCountDownTimer();
 
-native SB_SpawnPlayer(int client);
+native bool SB_SpawnPlayer(int client);
 
 native SB_ApplyWeapons(int client);
 
@@ -230,7 +195,7 @@ native bool:SB_IsOwnerSentry(client,bool:UseInternalInflictor=true,ExternalInfli
 
 //helper, directly uses last inflictor and damagetype
 // Acts like a DPS limiter
-native Float:SB_ChanceModifier(attacker);
+native float SB_ChanceModifier(attacker);
 
 stock bool:SBIsDamageFromMelee(const String:weapon[])
 {
@@ -379,7 +344,7 @@ stock bool:SB_SetHealth(entity, health)
 	return false;
 }
 
-new ignoreClient;
+int ignoreClient;
 public bool:AimTargetFilter(entity,contentsMask)
 {
 	return !(entity==ignoreClient);
@@ -391,7 +356,8 @@ stock bool:CanHitThis(entityhit, mask, any:data)
 	{// Check if the TraceRay hit the itself.
 		return false; // Don't allow self to be hit, skip this result
 	}
-	if(SB_ValidPlayer(entityhit)&&SB_ValidPlayer(data)&&GetClientTeam(entityhit)==GetClientTeam(data)){
+	if(SB_ValidPlayer(entityhit)&&SB_ValidPlayer(data)&&GetClientTeam(entityhit)==GetClientTeam(data))
+	{
 		return false; //skip result, prend this space is not taken cuz they on same team
 	}
 	return true; // It didn't hit itself
@@ -472,7 +438,8 @@ stock SB_GetTargetInViewCone(client,Float:max_distance=0.0,bool:include_friendly
 		if(bestTarget==0) //still no target, use direct trace
 		{
 			new Float:endpos[3];
-			if(max_distance>0.0){
+			if(max_distance>0.0)
+			{
 				ScaleVector(PlayerAimVector,max_distance);
 			}
 			else{
@@ -760,6 +727,14 @@ stock bool SB_FakeKillFeed(int victim, int attacker, int assister=0, int inflict
 	return false;
 }
 
+stock void SpawnProtect(int client)
+{
+	if(SB_ValidPlayer(client,true) && !SB_IsUbered(client))
+	{
+		TF2_AddCondition(client, TFCond_Ubercharged, 5.0);
+	}
+}
+
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
 // FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS FORWARDS
@@ -844,31 +819,6 @@ forward OnSB_RoundEnd();
 forward OnSB_SpawnPlayer(int client);
 
 
-
-stock void CalculateTeamScores(int &RedTeam, int &BlueTeam)
-{
-	int TheLives = 0;
-
-	for(int i=1;i<MaxClients;i++)
-	{
-		if(SB_ValidPlayer(i,true))
-		{
-			TheLives = SB_GetPlayerProp(i,iLives);
-			if(TheLives>0)
-			{
-				if(GetClientTeam(i)==TEAM_RED)
-				{
-					RedTeam+=TheLives;
-				}
-				else if(GetClientTeam(i)==TEAM_BLUE)
-				{
-					BlueTeam+=TheLives;
-				}
-			}
-		}
-	}
-}
-
 stock int SB_CountTeams(iTeam)
 {
 	int iTeamCount=0;
@@ -883,4 +833,41 @@ stock int SB_CountTeams(iTeam)
 		}
 	}
 	return iTeamCount;
+}
+
+
+
+public SharedPlugin:__pl_sb_engine_core =
+{
+	name = "sb_engine_core",
+	file = "sb_engine_core.smx",
+#if defined REQUIRE_PLUGIN
+	required = 1,
+#else
+	required = 0,
+#endif
+};
+
+#if !defined REQUIRE_PLUGIN
+public __pl_sb_engine_core_SetNTVOptional()
+{
+	// DAMAGE SYSTEM
+	MarkNativeAsOptional("SB_DamageModPercent");
+	MarkNativeAsOptional("SB_GetDamageType");
+	MarkNativeAsOptional("SB_GetDamageInflictor");
+	MarkNativeAsOptional("SB_GetSBDamageDealt");
+	MarkNativeAsOptional("SB_GetDamageStack");
+	MarkNativeAsOptional("SB_ChanceModifier");
+	MarkNativeAsOptional("SB_IsOwnerSentry");
+
+	MarkNativeAsOptional("SB_GetCountDownTimer");
+
+	MarkNativeAsOptional("SB_GetGamePlaying");
+
+	MarkNativeAsOptional("SB_SetPlayerProp");
+	MarkNativeAsOptional("SB_GetPlayerProp");
+
+	MarkNativeAsOptional("SB_SpawnPlayer");
+
+	MarkNativeAsOptional("SB_ApplyWeapons");
 }

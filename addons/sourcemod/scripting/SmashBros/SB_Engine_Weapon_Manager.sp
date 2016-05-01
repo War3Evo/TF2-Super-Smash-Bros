@@ -1,43 +1,11 @@
-/*
- * =============================================================================
- * Smash Bros Interface Includes File
- * Includes, stocks, natives, and other resources required by Smash Bros Plugins
- *
- * (C)2014 El Diablo of www.war3evo.info                       All rights reserved.
- * =============================================================================
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License , version 3.0, as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+//SB_Engine_Weapon_Manager.sp
 
-#pragma semicolon 1
-
-#include <sourcemod>
-#include <sb_interface>
 #include <tf2attributes>
 #include <tf2items>
 
 #define LoopMaxWeapons(%1) for(new %1=0;%1<=7;++%1)
 
-#define LoopMaxClients(%1) for(new %1=1;%1<=MaxClients;++%1)
-
-
-public Plugin:myinfo = {
-	name = "Smash Bros Weapons Engine",
-	author = "El Diablo",
-	description = "SB Core Plugins",
-	version = PLUGIN_VERSION,
-	url = "www.war3evo.info"
-}
+//#define LoopMaxClients(%1) for(new %1=1;%1<=MaxClients;++%1)
 
 
 // TF2 Weapon Loadout Slots
@@ -65,11 +33,9 @@ enum
 
 Handle sb_weapon_enabled;
 
-public bool SBInitNativesForwards()
+public void SB_Engine_Weapon_Manager_SB_Engine_InitNatives()
 {
 	CreateNative("SB_ApplyWeapons",Native_SB_ApplyWeapons);
-
-	return true;
 }
 
 Handle h_index = null;
@@ -90,14 +56,19 @@ Handle h_WeaponClip3 = null;
 
 Handle h_Block_list = null;
 
-public OnPluginStart()
+public void SB_Engine_Weapon_Manager_SB_001_CreateConVar()
+{
+	sb_weapon_enabled = CreateConVar("sb_weapon_enabled", "1", "0 - disable, 1 - enable", FCVAR_PLUGIN);
+}
+
+public void SB_Engine_Weapon_Manager_SB_001_RegConsoleCmd()
 {
 	RegAdminCmd("reloadcfg", SB_TESTING_CONFIG, ADMFLAG_ROOT);
-
 	RegAdminCmd("reloadswitcher", SB_WEAPON_SWITCHER_CONFIG, ADMFLAG_ROOT);
+}
 
-	sb_weapon_enabled = CreateConVar("sb_weapon_enabled", "1", "0 - disable, 1 - enable", FCVAR_PLUGIN);
-
+public SB_Engine_Weapon_Manager_OnPluginStart()
+{
 	h_index = CreateArray(1);
 	h_Old_Weapon_String = CreateArray(ByteCountToCells(64));
 	h_New_Weapon_String = CreateArray(ByteCountToCells(64));
@@ -648,13 +619,17 @@ public ApplyWeaponValues(Handle kv, client, weapon_index, weapon_entity, bool re
 	//PrintToChatAll("Finished");
 }
 
-public Native_SB_ApplyWeapons(Handle:plugin,numParams)
+public ApplyWeapons(int client)
 {
-	int client=GetNativeCell(1);
 	if(SB_ValidPlayer(client,true))
 	{
 		ApplyWeaponsOnClient(client);
 	}
+}
+public Native_SB_ApplyWeapons(Handle:plugin,numParams)
+{
+	int client=GetNativeCell(1);
+	ApplyWeapons(client);
 }
 /*
 public TF2Items_OnGiveNamedItem_Post(client, String:classname[], itemDefinitionIndex, itemLevel, itemQuality, entityIndex)

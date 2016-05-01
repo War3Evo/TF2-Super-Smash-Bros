@@ -548,17 +548,17 @@ stock SetBehaviorMenu(client,pagenum=0)
 		Format(STRING(Buffer), "[%s] No Buildings", HasBitflags(BehaviorBitFlags,BEHAVIOR_NO_BUILDINGS)?"+":"-");
 		AddMenuItem(hMenu,"2",Buffer,ITEMDRAW_DEFAULT);
 
-		Format(STRING(Buffer), "[%s] Kill Zone", HasBitflags(BehaviorBitFlags,BEHAVIOR_KILL_ZONE)?"+":"-");
+		Format(STRING(Buffer), "[%s] Kill Zone (Inside Box)", HasBitflags(BehaviorBitFlags,BEHAVIOR_KILL_ZONE)?"+":"-");
 		AddMenuItem(hMenu,"16",Buffer,ITEMDRAW_DEFAULT);
+
+		Format(STRING(Buffer), "[%s] Kill Zone (Outside Box)", HasBitflags(BehaviorBitFlags,BEHAVIOR_OUTSIDE_ZONE)?"+":"-");
+		AddMenuItem(hMenu,"17",Buffer,ITEMDRAW_DEFAULT);
 
 		Format(STRING(Buffer), "[%s] Target Red Team", HasBitflags(TargetBitFlags,BOX_TARGET_REDTEAM)?"+":"-");
 		AddMenuItem(hMenu,"3",Buffer,ITEMDRAW_DEFAULT);
 
 		Format(STRING(Buffer), "[%s] Target Blue Team", HasBitflags(TargetBitFlags,BOX_TARGET_BLUETEAM)?"+":"-");
 		AddMenuItem(hMenu,"4",Buffer,ITEMDRAW_DEFAULT);
-
-		Format(STRING(Buffer), "[%s] Target Scouts", HasBitflags(TargetBitFlags,BOX_TARGET_SCOUT)?"+":"-");
-		AddMenuItem(hMenu,"5",Buffer,ITEMDRAW_DEFAULT);
 
 		//AddMenuItem(hMenu,"777","",ITEMDRAW_SPACER);
 		AddMenuItem(hMenu,"777","",ITEMDRAW_SPACER);
@@ -567,6 +567,9 @@ stock SetBehaviorMenu(client,pagenum=0)
 	}
 	else if(pagenum==1)
 	{
+		Format(STRING(Buffer), "[%s] Target Scouts", HasBitflags(TargetBitFlags,BOX_TARGET_SCOUT)?"+":"-");
+		AddMenuItem(hMenu,"5",Buffer,ITEMDRAW_DEFAULT);
+
 		Format(STRING(Buffer), "[%s] Target Soldiers", HasBitflags(TargetBitFlags,BOX_TARGET_SOLDIER)?"+":"-");
 		AddMenuItem(hMenu,"6",Buffer,ITEMDRAW_DEFAULT);
 
@@ -582,7 +585,7 @@ stock SetBehaviorMenu(client,pagenum=0)
 		Format(STRING(Buffer), "[%s] Target Pyro", HasBitflags(TargetBitFlags,BOX_TARGET_PYRO)?"+":"-");
 		AddMenuItem(hMenu,"12",Buffer,ITEMDRAW_DEFAULT);
 
-		AddMenuItem(hMenu,"777","",ITEMDRAW_SPACER);
+		//AddMenuItem(hMenu,"777","",ITEMDRAW_SPACER);
 		AddMenuItem(hMenu,"777","",ITEMDRAW_SPACER);
 		AddMenuItem(hMenu,"8","Previous Page",ITEMDRAW_DEFAULT);
 		AddMenuItem(hMenu,"20","Next Page",ITEMDRAW_DEFAULT);
@@ -724,6 +727,11 @@ public MenuHandle_Behavior_Menu(Handle:hMenu, MenuAction:action, param1, selecti
 				case 16:
 				{
 					BehaviorBitFlags = ToggleBitflag(BehaviorBitFlags,BEHAVIOR_KILL_ZONE);
+					SetBehaviorMenu(client,0);
+				}
+				case 17:
+				{
+					BehaviorBitFlags = ToggleBitflag(BehaviorBitFlags,BEHAVIOR_OUTSIDE_ZONE);
 					SetBehaviorMenu(client,0);
 				}
 				case 50:
@@ -960,6 +968,24 @@ public OnBoxNotTrigger(boxindex, client, behaviorBitFlags, targetBitFlags, bool:
 	}
 
 	if(!isBoxEnabled) return;
+
+	if(HasBitflags(behaviorBitFlags,BEHAVIOR_OUTSIDE_ZONE))
+	{
+		int pointHurt=CreateEntityByName("point_hurt");
+		if(pointHurt)
+		{
+			DispatchKeyValue(client,"targetname","sb_hurtme"); //set victim as the target for damage
+			DispatchKeyValue(pointHurt,"Damagetarget","sb_hurtme");
+			DispatchKeyValue(pointHurt,"Damage","99999");
+			DispatchKeyValue(pointHurt,"DamageType","32");
+			DispatchKeyValue(pointHurt,"classname","sb_point_hurt");
+			DispatchSpawn(pointHurt);
+			AcceptEntityInput(pointHurt,"Hurt",-1);
+			DispatchKeyValue(client,"targetname","sb_donthurtme"); //unset the victim as target for damage
+			RemoveEdict(pointHurt);
+		}
+		return;
+	}
 
 	if(CurrentClientInBox[client]==boxindex)
 	{

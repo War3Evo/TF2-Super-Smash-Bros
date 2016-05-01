@@ -33,6 +33,7 @@
 #define BEHAVIOR_NO_SHOOTING		(1 << 1)
 #define BEHAVIOR_NO_BUILDINGS		(1 << 2)
 #define BEHAVIOR_KILL_ZONE			(1 << 3)
+#define BEHAVIOR_OUTSIDE_ZONE		(1 << 4)
 
 
 #if !defined _diablostocks_included
