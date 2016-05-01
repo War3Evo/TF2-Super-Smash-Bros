@@ -151,6 +151,13 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 	//Action aReturn = Plugin_Continue;
 	StartTheRound();
 
+	if(bHopEnabled)
+	{
+		FC_SetBhop2(client, false, false);
+		bStopMovement[client] = true;
+		CreateTimer(GetConVarFloat(sb_fc_bhop), AllowMovementAgain, client);
+	}
+
 	return Plugin_Continue;
 }
 
@@ -186,7 +193,7 @@ public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
 
 public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast)
 {
-	PrintToChatAll("teamplay_waiting_begins");
+	//PrintToChatAll("teamplay_waiting_begins");
 	playing=false;
 	OnRoundEnd();
 }
