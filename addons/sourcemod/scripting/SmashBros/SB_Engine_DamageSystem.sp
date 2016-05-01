@@ -15,7 +15,7 @@ public SB_Engine_DamageSystem_OnPluginStart()
 	ownerOffset = FindSendPropInfo("CBaseObject", "m_hBuilder");
 }
 
-public bool SB_Engine_DamageSystem_SB_Engine_InitNatives()
+public void SB_Engine_DamageSystem_SB_Engine_InitNatives()
 {
 	CreateNative("SB_DamageModPercent",Native_SB_DamageModPercent);
 
@@ -29,7 +29,7 @@ public bool SB_Engine_DamageSystem_SB_Engine_InitNatives()
 	CreateNative("SB_ChanceModifier",Native_SB_ChanceModifier);
 	CreateNative("SB_IsOwnerSentry",Native_SB_IsOwnerSentry);
 
-	return true;
+	//return true;
 }
 
 public bool SB_Engine_DamageSystem_SB_Engine_InitForwards()

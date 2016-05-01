@@ -18,6 +18,8 @@ native bool FC_Bhop_Enabled();
  **/
 native void FC_SetBhop(client, bool:enabled = false, bool:lazymode = false, Float:multi = 1.0, Float:zmulti = 1.0);
 
+native void FC_SetBhop2(int client, bool enabled = false, bool lazymode = false);
+
 /**
  * Set Bunny Hopping for client(s).
  *

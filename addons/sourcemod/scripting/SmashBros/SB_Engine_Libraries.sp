@@ -4,13 +4,7 @@ public SB_Engine_Libraries_OnAllPluginsLoaded()
 {
 	if(LibraryExists("sb_addon_fc"))
 	{
-		if(FC_Enabled())
-		{
-			if(FC_Bhop_Enabled())
-			{
-				bHopEnabled = true;
-			}
-		}
+		bHopEnabled = true;
 	}
 }
 
@@ -18,13 +12,7 @@ public OnLibraryAdded(const String:name[])
 {
 	if(StrEqual(name,"sb_addon_fc"))
 	{
-		if(FC_Enabled())
-		{
-			if(FC_Bhop_Enabled())
-			{
-				bHopEnabled = true;
-			}
-		}
+		bHopEnabled = true;
 	}
 	SB_Engine_Updater_OnLibraryAdded(name);
 }

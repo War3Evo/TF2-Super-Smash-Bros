@@ -521,7 +521,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 			SetHudTextParams(-1.0, 0.85, 0.11, 255, 255, 255, 255);
 			if(SB_GetGamePlaying())
 			{
-				new iTimer = SB_GetCountDownTimer() - GetTime();
+				new iTimer = CountDownTimer - GetTime();
 				new Minutes = sb_minutes(iTimer);
 				if(Minutes<0) Minutes = 0;
 				new Seconds = sb_seconds(iTimer);

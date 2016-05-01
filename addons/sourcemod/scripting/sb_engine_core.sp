@@ -26,11 +26,10 @@
 #include <sourcemod>
 #include <sb_interface>
 #include <sdkhooks>
+#include <sb_addon_fc>
 
 #undef REQUIRE_PLUGIN
 #include <updater>
-
-#tryinclude <sb_addon_fc>
 
 #define JENKINS_UPDATE_URL "DEVELOP"
 

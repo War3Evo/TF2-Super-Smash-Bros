@@ -16,6 +16,8 @@ public bool SB_Engine_InitForwards()
 	g_OnSB_EventSpawnFH_Post=CreateGlobalForward("OnSB_EventSpawn_Post",ET_Ignore,Param_Cell);
 	g_OnSB_EventDeathFH=CreateGlobalForward("OnSB_EventDeath",ET_Ignore,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
 
+	SB_Engine_DamageSystem_SB_Engine_InitForwards();
+
 	return true;
 }
 

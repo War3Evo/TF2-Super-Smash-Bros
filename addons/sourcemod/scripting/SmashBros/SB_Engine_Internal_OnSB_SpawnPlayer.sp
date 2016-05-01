@@ -9,7 +9,9 @@ public void SB_Engine_Internal_OnSB_SpawnPlayer(int client)
 		if(bHopEnabled)
 		{
 			//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(client));
-			FC_SetBhop(client, false);
+			//FC_SetBhop2(client, false);
+			FC_SetBhop2(client, false, false);
+			PrintToChatAll("FC_SetBhop2 SB_Engine_Internal_OnSB_SpawnPlayer");
 			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowBhopAgain, client);
 		}
 		SB_Engine_Display_SB_Engine_Internal_OnSB_SpawnPlayer(client);
@@ -20,7 +22,8 @@ public Action:AllowBhopAgain(Handle:timer, any:client)
 	if(SB_ValidPlayer(client,true))
 	{
 		//ServerCommand("sm_bhop_enabled %d 1",GetClientUserId(client));
-		FC_SetBhop(client, true, true);
+		PrintToChatAll("AllowBhopAgain");
+		FC_SetBhop2(client, true, true);
 	}
 }
 

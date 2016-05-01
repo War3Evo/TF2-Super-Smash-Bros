@@ -17,7 +17,9 @@ public Action SB_Engine_Internal_OnSB_EventSpawn(int client)
 
 		if(bHopEnabled)
 		{
-			FC_SetBhop(client, false);
+			//FC_SetBhop2(client, false);
+			FC_SetBhop2(client, false, false);
+			PrintToChatAll("FC_SetBhop2 SB_Engine_Internal_OnSB_EventSpawn");
 			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowBhopAgain, client);
 		}
 	}

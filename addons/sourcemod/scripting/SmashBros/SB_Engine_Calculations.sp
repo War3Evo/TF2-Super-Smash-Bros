@@ -484,13 +484,13 @@ public bool FakeDeath(int victim, int attacker)
 				SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
 			}
 
-#if defined _sb_addon_fc_included
 			if(bHopEnabled)
 			{
 				//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
-				FC_SetBhop(victim, false);
+				//FC_SetBhop2(victim, false);
+				PrintToChatAll("bHopEnabled FakeDeath");
+				FC_SetBhop2(victim, false, false);
 			}
-#endif
 
 			SB_SpawnPlayer(victim);
 

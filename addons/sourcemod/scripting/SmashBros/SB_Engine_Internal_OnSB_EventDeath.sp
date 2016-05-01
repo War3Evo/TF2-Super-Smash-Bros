@@ -13,7 +13,9 @@ public SB_Engine_Internal_OnSB_EventDeath(int victim,int killer,int assister,int
 		//}
 		if(bHopEnabled)
 		{
-			FC_SetBhop(victim, false);
+			//FC_SetBhop2(victim, false);
+			FC_SetBhop2(victim, false, false);
+			PrintToChatAll("FC_SetBhop2 SB_Engine_Internal_OnSB_EventDeath");
 		}
 	}
 
