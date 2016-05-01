@@ -163,12 +163,8 @@ public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 
 	// engine calculations
 	firstblood=false;
-	CreateTimer(1.0,RemoveStuff,0);
+	CreateTimer(1.0,RemoveStuff,0);*/
 
-	LoopAlivePlayers(target)
-	{
-		SpawnProtect(target);
-	}*/
 	StartTheRound();
 
 	if(bHopEnabled)
