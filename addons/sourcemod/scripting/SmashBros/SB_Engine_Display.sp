@@ -324,12 +324,12 @@ public void SB_Engine_Display_teamplay_round_start()
 			int cred = GetTeamClientCount(2);
 			int cblue = GetTeamClientCount(3);
 			if(cred>cblue) {
-				if(GetClientTeam(i)!=3)
+				if(GetClientTeam(i)==2)
 				{
 					ChangeClientTeam(i, 3);
 				}
 			} else if(cblue>cred) {
-				if(GetClientTeam(i)!=2)
+				if(GetClientTeam(i)==3)
 				{
 					ChangeClientTeam(i, 2);
 				}
