@@ -143,8 +143,11 @@ public Action:Command_jointeam(client, args) {
 		{
 			SB_ChatMessage(client,"{yellow}You can not join while the round is active!");
 			ForcePlayerSuicide(client);
+			ChangeClientTeam(client, 1);
+			return Plugin_Handled;
 		}
 	}
+	return Plugin_Continue;
 }
 
 public Action:Command_Lives(client, args)
