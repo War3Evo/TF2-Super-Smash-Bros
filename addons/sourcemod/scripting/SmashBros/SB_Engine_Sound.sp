@@ -1,29 +1,4 @@
-/*
- * =============================================================================
- * Smash Bros Interface Includes File
- * Includes, stocks, natives, and other resources required by Smash Bros Plugins
- *
- * (C)2014 El Diablo of www.war3evo.info                       All rights reserved.
- * =============================================================================
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License , version 3.0, as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-
-#pragma semicolon 1
-
-#include <sourcemod>
-#include <sb_interface>
+//SB_Engine_Sound.sp
 
 //#define MIN5 "vo/announcer_ends_5min.mp3"
 //#define MIN2 "vo/announcer_ends_2min.mp3"
@@ -41,20 +16,12 @@
 #define SEC2 "vo/announcer_ends_2sec.mp3"
 #define SEC1 "vo/announcer_ends_1sec.mp3"
 
-public Plugin:myinfo = {
-	name = "Smash Bros Sound Engine",
-	author = "El Diablo",
-	description = "SB Core Plugins",
-	version = PLUGIN_VERSION,
-	url = "www.war3evo.info"
-}
-
-public OnPluginStart()
+public SB_Engine_Sound_SB_001_CreateTimer()
 {
 	CreateTimer(0.5,SoundTimer,_,TIMER_REPEAT);
 }
 
-public OnMapStart()
+public SB_Engine_Sound_SB_001_OnMapStart()
 {
 	//PrecacheSound(MIN5);
 	//PrecacheSound(MIN2);
@@ -89,7 +56,7 @@ bool PlayOnce_3_sec = false;
 bool PlayOnce_2_sec = false;
 bool PlayOnce_1_sec = false;
 
-public OnSB_RoundEnd()
+public SB_Engine_Sound_SB_Engine_Internal_OnSB_RoundEnd()
 {
 	//PlayOnce_5_Min = false;
 	//PlayOnce_2_Min = false;
@@ -111,7 +78,7 @@ public OnSB_RoundEnd()
 public Action:SoundTimer(Handle:timer,any:userid)
 {
 	// Timer
-	int iTimer = SB_GetCountDownTimer() - GetTime();
+	int iTimer = CountDownTimer - GetTime();
 	switch (iTimer)
 	{
 		case 300:
@@ -245,3 +212,4 @@ public Action:SoundTimer(Handle:timer,any:userid)
 		}
 	}
 }
+

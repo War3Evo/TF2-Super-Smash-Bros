@@ -18,7 +18,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#if defined _sb_constants_included
+	#endinput
+#endif
+#define _sb_constants_included
 
 
 #define GAME_TITLE "SmashBros"
@@ -33,6 +36,63 @@
 
 #define SHORTNAMELEN 16 //item or race shotnames, 15 characters
 #define FULLNAMELEN 32 //item or race full names, 31 characters. RUSSIAN and other characters require more than 1 byte to store a displayed character
+
+#if !defined _diablostocks_included
+#define LoopIngamePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && !IsFakeClient(%1))
+
+#define LoopAlivePlayers(%1) for(new %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1) && IsPlayerAlive(%1))
+
+#define LoopMaxClients(%1) for(int %1=1;%1<=MaxClients;++%1)
+
+#define LoopIngameClients(%1) for(int %1=1;%1<=MaxClients;++%1)\
+								if(IsClientInGame(%1))
+
+#define STRING(%1) %1, sizeof(%1)
+
+#define Toggle(%1) %1=%1?false:true
+
+stock bool IsEntLimitReached()
+{
+	if (GetEntityCount() >= (GetMaxEntities()-16))
+	{
+		PrintToServer("Warning: Entity limit is nearly reached! Please switch or reload the map!");
+		LogError("Entity limit is nearly reached: %d/%d", GetEntityCount(), GetMaxEntities());
+		return true;
+	}
+	else
+		return false;
+}
+stock bool ValidPlayer(int client, bool check_alive=false, bool alivecheckbyhealth=false) {
+	if(client>0 && client<=MaxClients && IsClientConnected(client) && IsClientInGame(client))
+	{
+		if(check_alive && !IsPlayerAlive(client))
+		{
+			return false;
+		}
+		if(alivecheckbyhealth&&GetClientHealth(client)<1) {
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+
+#endif
+
+stock char ClassList[][] =
+{
+	"Scout", //1
+	"Sniper", //2
+	"Soldier", //3
+	"Demoman", //4
+	"Medic", //5
+	"Heavy", //6
+	"Pyro", //7
+	"Spy", //8
+	"Engineer" //9
+};
 
 
 //=============================================================================
@@ -131,7 +191,7 @@ enum SBPlayerProp
 	iStartingTeam,
 }
 
-native SB_SetPlayerProp(client,SBPlayerProp:property,any:value);
-native any:SB_GetPlayerProp(client,SBPlayerProp:property);
+native void SB_SetPlayerProp(int client,SBPlayerProp property,any value);
+native any SB_GetPlayerProp(int client,SBPlayerProp property);
 
 

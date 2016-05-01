@@ -129,6 +129,7 @@ public Plugin:myinfo =
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	CreateNative("FC_SetBhop", Native_SetBhop);
+	CreateNative("FC_SetBhop2", Native_SetBhop2);
 	CreateNative("FC_BhopStatus", Native_BhopStatus);
 	CreateNative("FC_Enabled", Native_FC_Enabled);
 	CreateNative("FC_Bhop_Enabled", Native_Bhop_Enabled);
@@ -787,6 +788,23 @@ public int Native_SetBhop(Handle plugin, int numParams)
 	bBhopLazyModes[client] = bool:GetNativeCell(3);
 	fBhopMults[client] = Float:GetNativeCell(4);
 	fBhopZMults[client] = Float:GetNativeCell(5);
+}
+
+public int Native_SetBhop2(Handle plugin, int numParams)
+{
+	if (!hEnabled || !hBhopEnabled) return 0; //ThrowNativeError(SP_ERROR_INDEX, "Native is currently disabled.");
+
+	int client = GetNativeCell(1);
+
+	if (!IsValidClient(client))
+	{
+		//ThrowNativeError(SP_ERROR_INDEX, "Client is invalid.");
+		return 0;
+	}
+
+	bIsAllowedToBhop[client] = bool:GetNativeCell(2);
+	bBhopLazyModes[client] = bool:GetNativeCell(3);
+	return 1;
 }
 
 public int Native_BhopStatus(Handle plugin, int numParams)

@@ -1,148 +1,14 @@
-/*
- * =============================================================================
- * Smash Bros Interface Includes File
- * Includes, stocks, natives, and other resources required by Smash Bros Plugins
- *
- * (C)2014 El Diablo of www.war3evo.info                       All rights reserved.
- * =============================================================================
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License , version 3.0, as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// SB_Engine_Display.sp
 
-
-#pragma semicolon 1
-
-#include <sourcemod>
-#include <sb_interface>
-#include <sdkhooks>
-
-#define LoopMaxClients(%1) for(int %1=1;%1<=MaxClients;++%1)
-
-#define LoopIngameClients(%1) for(int %1=1;%1<=MaxClients;++%1)\
-								if(IsClientInGame(%1))
-
-#define LoopAlivePlayers(%1) for(int %1=1;%1<=MaxClients;++%1)\
-								if(IsClientInGame(%1) && IsPlayerAlive(%1))
-
-
-#define STRING(%1) %1, sizeof(%1)
-
-/*
-enum TFClassType
-{
-	TFClass_Unknown = 0,
-	TFClass_Scout,
-	TFClass_Sniper,
-	TFClass_Soldier,
-	TFClass_DemoMan,
-	TFClass_Medic,
-	TFClass_Heavy,
-	TFClass_Pyro,
-	TFClass_Spy,
-	TFClass_Engineer
-};*/
-
-char ClassList[][] =
-{
-	"Scout", //1
-	"Sniper", //2
-	"Soldier", //3
-	"Demoman", //4
-	"Medic", //5
-	"Heavy", //6
-	"Pyro", //7
-	"Spy", //8
-	"Engineer" //9
-};
-
-TFClassType PlayerNextClass[MAXPLAYERSCUSTOM];
-
-Handle sb_lives;
-Handle sb_chatmsg;
-Handle sb_chatmsg_balance;
-
-Handle CountDownTimerMessage;
-Handle TargetDamageMessage;
-Handle YourDamageMessage;
-Handle YourLivesMessage;
-
-bool g_spec[MAXPLAYERS+1] = {true, ...};
-
-bool displayedHelp[MAXPLAYERSCUSTOM];
-
-bool NewMap = true;
-
-//new Float:respawn[MAXPLAYERS+1];
-int LastPersonAttacked[MAXPLAYERSCUSTOM];
-
-//new bool:started=false;
-//new bool:playing=false;
-
-public Plugin:myinfo = {
-	name = "Smash Bros Display Engine",
-	author = "El Diablo",
-	description = "SB Core Plugins",
-	version = PLUGIN_VERSION,
-	url = "www.war3evo.info"
-}
-
-public OnPluginStart()
+public SB_Engine_Display_OnPluginStart()
 {
 	CountDownTimerMessage = CreateHudSynchronizer();
 	TargetDamageMessage = CreateHudSynchronizer();
 	YourDamageMessage = CreateHudSynchronizer();
 	YourLivesMessage = CreateHudSynchronizer();
 
-	sb_lives = CreateConVar("sb_lives", "3", "Amount of lives a player starts with.", FCVAR_PLUGIN);
-	sb_chatmsg = CreateConVar("sb_chatmsg", "0", "Enable chat messages of team scores in chat.", FCVAR_PLUGIN);
-	sb_chatmsg_balance = CreateConVar("sb_chatmsg_balance", "1", "Enable showing player balance information of lives during beginning of round.", FCVAR_PLUGIN);
-
-	HookEvent("teamplay_round_start", teamplay_round_start);
-	HookEvent("teamplay_round_win", teamplay_round_win);
-	//HookEvent("teamplay_waiting_begins", teamplay_round_start);
-
-	HookEvent("teamplay_round_active", teamplay_round_active);
-	HookEvent("arena_round_start", teamplay_round_active);
-
-	RegAdminCmd("sm_lives", Command_Lives, ADMFLAG_BAN, "sm_lives");
-
-	AddCommandListener(Command_InterceptSpectate, "spectate");
-	//AddCommandListener(Command_InterceptJoinTeam, "jointeam");
-
-	RegConsoleCmd("sm_sbclass",Command_ChangeClass);
-	RegConsoleCmd("sm_scout",Command_ChangeClassScout);
-	RegConsoleCmd("sm_sniper",Command_ChangeClassSniper);
-	RegConsoleCmd("sm_soldier",Command_ChangeClassSoldier);
-	RegConsoleCmd("sm_demoman",Command_ChangeClassDemo);
-	RegConsoleCmd("sm_demo",Command_ChangeClassDemo);
-	RegConsoleCmd("sm_medic",Command_ChangeClassMedic);
-	RegConsoleCmd("sm_heavy",Command_ChangeClassHeavy);
-	RegConsoleCmd("sm_pyro",Command_ChangeClassPyro);
-	RegConsoleCmd("sm_spy",Command_ChangeClassSpy);
-	RegConsoleCmd("sm_engineer",Command_ChangeClassEngi);
-	RegConsoleCmd("sm_engi",Command_ChangeClassEngi);
-
-
-	RegConsoleCmd("jointeam", Command_jointeam);
-	HookEvent("player_team", Event_player_team);
-
 	CreateTimer(0.1,DisplayInformation,_,TIMER_REPEAT);
 	//CreateTimer(1.0,DisplayInformation2,_,TIMER_REPEAT);
-}
-
-public OnMapStart()
-{
-	NewMap=true;
 }
 
 stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
@@ -184,13 +50,13 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 	//PrintToChatAll("LoopAlivePlayers before");
 	LoopAlivePlayers(target)
 	{
-		if(SB_GetPlayerProp(target,iStartingTeam)<=1)
+		if(GetPlayerProp(target,iStartingTeam)<=1)
 		{
-			//PrintToChatAll("SB_GetPlayerProp(target,iStartingTeam) %d",SB_GetPlayerProp(target,iStartingTeam));
+			//PrintToChatAll("GetPlayerProp(target,iStartingTeam) %d",GetPlayerProp(target,iStartingTeam));
 			continue;
 		}
 		LivePlayers[LivePlayerCount]=target;
-		LivePlayersTeam[LivePlayerCount]=SB_GetPlayerProp(target,iStartingTeam);
+		LivePlayersTeam[LivePlayerCount]=GetPlayerProp(target,iStartingTeam);
 		LivePlayerCount++;
 		//PrintToChatAll("LivePlayerCount %d",LivePlayerCount);
 	}
@@ -245,11 +111,11 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 				if(teamToGetLives==2)
 				{
 					//PrintToChatAll("teamToGetLives==2");
-					SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
+					SetPlayerProp(target,iLives,(GetPlayerProp(target,iLives)+1));
 					if(B_sb_chatmsg_balance)
 					{
 						GetClientName(target,STRING(sClientName));
-						SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+						SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,GetPlayerProp(target,iLives));
 					}
 					SpreadSuccess++;
 					GiveLives--;
@@ -258,11 +124,11 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 				else if(teamToGetLives==3)
 				{
 					//PrintToChatAll("teamToGetLives==3");
-					SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
+					SetPlayerProp(target,iLives,(GetPlayerProp(target,iLives)+1));
 					if(B_sb_chatmsg_balance)
 					{
 						GetClientName(target,STRING(sClientName));
-						SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+						SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,GetPlayerProp(target,iLives));
 					}
 					SpreadSuccess++;
 					GiveLives--;
@@ -293,14 +159,14 @@ stock bool SpreadLives(int teamToGetLives, int GiveLives, int iClient=0)
 /*
 public Action Command_InterceptJoinTeam(int client, char[] command, int args)
 {
-	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
+	if(!SB_ValidPlayer(client,true) || !playing)
 	{
 		return Plugin_Continue;
 	}
 
-	if(SB_GetGamePlaying())
+	if(playing)
 	{
-		int CurrentLives = SB_GetPlayerProp(client,iLives);
+		int CurrentLives = GetPlayerProp(client,iLives);
 		char sClientName[32];
 		GetClientName(client,STRING(sClientName));
 		SB_ChatMessage(0,"{yellow}%s is switching teams!",sClientName);
@@ -326,57 +192,20 @@ public Action:Force_Jointeam(Handle:timer, any:client)
 	}
 }*/
 
-public Action Command_InterceptSpectate(int client, char[] command, int args)
-{
-	if(!SB_ValidPlayer(client,true) || !SB_GetGamePlaying())
-	{
-		return Plugin_Continue;
-	}
-
-	if(!SB_GetPlayerProp(client,SpawnedOnce))
-	{
-		return Plugin_Continue;
-	}
-
-	if(SB_GetGamePlaying())
-	{
-		int CurrentLives = SB_GetPlayerProp(client,iLives);
-		char sClientName[32];
-		GetClientName(client,STRING(sClientName));
-		SB_ChatMessage(0,"{yellow}%s is going spectate!",sClientName);
-		if(SpreadLives(GetClientTeam(client), CurrentLives, client))
-		{
-			SB_ChatMessage(client,"{yellow}Gave away your lives, please wait while prepare you for spectate!");
-		}
-		CreateTimer(1.5,SendToSpectate,client);
-		return Plugin_Handled;
-	}
-
-	return Plugin_Continue;
-}
-public Action SendToSpectate(Handle timer, any client)
-{
-	if(SB_ValidPlayer(client) && GetClientTeam(client)>1)
-	{
-		ForcePlayerSuicide(client);
-		ChangeClientTeam(client, 1);
-		//int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		//SB_SetPlayerProp(client,iLives,MaxLives);
-	}
-}
-
-public OnAllPluginsLoaded()
+/*
+public SB_Engine_Display_OnAllPluginsLoaded()
 {
 	for(int i=1;i<MaxClients;i++)
 	{
 		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		SB_SetPlayerProp(i,iLives,MaxLives);
+		SetPlayerProp(i,iLives,MaxLives);
 	}
-}
+}*/
 
-public OnClientConnected(client){
+public SB_Engine_Display_OnClientConnected(client)
+{
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-	SB_SetPlayerProp(client,iLives,MaxLives);
+	SetPlayerProp(client,iLives,MaxLives);
 	PlayerNextClass[client]=TFClass_Unknown;
 }
 
@@ -390,16 +219,16 @@ public void OnClientDisconnect(int client)
 	g_spec[client] = true;
 
 	ClientDisconnectDisconnected[client]=true;
-	ClientDisconnectLives[client] = SB_GetPlayerProp(client,iLives);
-	ClientDisconnectTeam[client] = SB_GetPlayerProp(client,iStartingTeam);
+	ClientDisconnectLives[client] = GetPlayerProp(client,iLives);
+	ClientDisconnectTeam[client] = GetPlayerProp(client,iStartingTeam);
 
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-	SB_SetPlayerProp(client,iLives,MaxLives);
+	SetPlayerProp(client,iLives,MaxLives);
 }
 public void OnClientDisconnect_Post(int client)
 {
 	//PrintToChatAll("OnClientDisconnect_Post");
-	if(SB_GetGamePlaying())
+	if(playing)
 	{
 		if(ClientDisconnectDisconnected[client])
 		{
@@ -412,53 +241,24 @@ public void OnClientDisconnect_Post(int client)
 	ClientDisconnectLives[client] = 0;
 
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-	SB_SetPlayerProp(client,iLives,MaxLives);
+	SetPlayerProp(client,iLives,MaxLives);
 }
 
-public OnClientPutInServer(client){
+public SB_Engine_Display_OnClientPutInServer(client)
+{
 	int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-	SB_SetPlayerProp(client,iLives,MaxLives);
+	SetPlayerProp(client,iLives,MaxLives);
 	PlayerNextClass[client]=TFClass_Unknown;
-	SB_SetPlayerProp(client,iStartingTeam,0);
+	SetPlayerProp(client,iStartingTeam,0);
 	displayedHelp[client]=false;
 }
 
-
-public Action:Command_Lives(client, args)
+public void SB_Engine_Display_teamplay_round_win()
 {
-	for(int i=1;i<MaxClients;i++)
+	for(int i=1;i<=MaxClients;++i)
 	{
-		if(SB_ValidPlayer(i))
-		{
-			char sClientName[32];
-			GetClientName(i,STRING(sClientName));
-			PrintToConsole(client,"%s has %d lives.",sClientName,SB_GetPlayerProp(i,iLives));
-		}
-	}
-
-}
-
-
-public Action:Event_player_team(Handle:event, const String:name[], bool:dontBroadcast) {
-	if(GetEventInt(event, "team")>1) {
-		g_spec[GetClientOfUserId(GetEventInt(event, "userid"))] = false;
-	}
-}
-
-public Action:Command_jointeam(client, args) {
-	decl String:argstr[16];
-	GetCmdArgString(argstr, sizeof(argstr));
-	if(StrEqual(argstr, "spectatearena")) {
-		g_spec[client] = true;
-	} else {
-		g_spec[client] = false;
-	}
-}
-
-public Action teamplay_round_win(Handle event,  const char[] name, bool dontBroadcast) {
-	for(int i=1;i<=MaxClients;++i){
 		LastPersonAttacked[i]=-1;
-		SB_SetPlayerProp(i,iStartingTeam,0);
+		SetPlayerProp(i,iStartingTeam,0);
 	}
 	/*
 	int rand = GetRandomInt(2, 3);
@@ -503,15 +303,16 @@ remove_entity_all(String:classname[])
 	}
 }*/
 
-public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast)
+public void SB_Engine_Display_teamplay_round_start()
 {
 	//PrintToChatAll("TEAMPLAY_ROUND_START");
 	//remove_entity_all("trigger_hurt");
 	int MaxLives = GetConVarInt(sb_lives);
 	//PrintToChatAll("Max lives = %d",MaxLives);
-	for(int i=1;i<=MaxClients;++i){
+	for(int i=1;i<=MaxClients;++i)
+	{
 		LastPersonAttacked[i]=-1;
-		SB_SetPlayerProp(i,iLives,MaxLives);
+		SetPlayerProp(i,iLives,MaxLives);
 	}
 	//int rand = GetRandomInt(2, 3);
 	for(int i=1;i<=MaxClients;i++)
@@ -544,34 +345,32 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 				ChangeClientTeam(i, rand);
 			}*/
 
-			SB_SetPlayerProp(i,iStartingTeam,GetClientTeam(i));
+			SetPlayerProp(i,iStartingTeam,GetClientTeam(i));
 		}
 		//TF2_RespawnPlayer(i);
 	}
-
-	return Plugin_Continue;
 }
 
-public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
+public bool SB_Engine_Display_teamplay_round_active()
 {
 	//PrintToChatAll("%s",name);
 	if(NewMap)
 	{
-		for(int i=1;i<=MaxClients;++i){
+		NewMap = false;
+		for(int i=1;i<=MaxClients;++i)
+		{
 			LastPersonAttacked[i]=-1;
-			SB_SetPlayerProp(i,iLives,1);
+			SetPlayerProp(i,iLives,1);
 		}
 
-		NewMap = false;
 		SB_ChatMessage(0,"First Round of the Map {yellow}[{red}SUDDEN DEATH{yellow}]");
-		return Plugin_Continue;
+		return true;
 	}
-	TeamBalanceTimer();
-	return Plugin_Continue;
+	return TeamBalanceTimer();
 }
 
 
-public void TeamBalanceTimer()
+public bool TeamBalanceTimer()
 {
 	//PrintToChatAll("Debug: Start of Balancing");
 
@@ -606,7 +405,7 @@ public void TeamBalanceTimer()
 		CalculateTeamScores(RedTeam,BlueTeam);
 
 		SB_ChatMessage(0,"{default}[{yellow}[ROUND START]{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",RedTeam,BlueTeam);
-		return;
+		return true;
 	}
 
 	// Randomly spread the love
@@ -645,15 +444,15 @@ public void TeamBalanceTimer()
 			if(GetRandomFloat(0.0,1.0)>=0.50)
 			{
 				TargetGotExtraLiveAlready[target]=true;
-				SB_SetPlayerProp(target,iLives,(SB_GetPlayerProp(target,iLives)+1));
+				SetPlayerProp(target,iLives,(GetPlayerProp(target,iLives)+1));
 				GetClientName(target,STRING(sClientName));
 				if(teamToBalance==2)
 				{
-					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					SB_ChatMessage(0,"{yellow}To help balance the game, {red}%s on red team {yellow}now has {green}%d {yellow}lives!",sClientName,GetPlayerProp(target,iLives));
 				}
 				else
 				{
-					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,SB_GetPlayerProp(target,iLives));
+					SB_ChatMessage(0,"{yellow}To help balance the game, {blue}%s on blue team {yellow}now has {green}%d {yellow}lives!",sClientName,GetPlayerProp(target,iLives));
 				}
 				teambalance--;
 			}
@@ -661,7 +460,7 @@ public void TeamBalanceTimer()
 	}
 	//PrintToChatAll("Debug: End of Balancing");*/
 
-	return;
+	return true;
 }
 
 
@@ -678,14 +477,18 @@ sb_minutes(time) {
 	//return RoundToFloor(time/86400.0);
 //}
 
-public OnSB_TakeDmgAllPre(victim,attacker,Float:damage)
+// Must return so that program will wait for it
+public bool SB_Engine_Display_OnSB_TakeDmgAllPre(victim,attacker,Float:damage)
 {
+	//PrintToChatAll("SB_Engine_Display_OnSB_TakeDmgAllPre start");
 	if(SB_ValidPlayer(attacker))
 	{
 		LastPersonAttacked[attacker]=victim;
+		return true;
 	}
+	//PrintToChatAll("SB_Engine_Display_OnSB_TakeDmgAllPre end");
+	return false;
 }
-
 
 stock void SendDialogToOne(client, String:text[], any:...)
 {
@@ -727,9 +530,9 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 		{
 			// COUNT DOWN TIMER
 			SetHudTextParams(-1.0, 0.85, 0.11, 255, 255, 255, 255);
-			if(SB_GetGamePlaying())
+			if(playing)
 			{
-				new iTimer = SB_GetCountDownTimer() - GetTime();
+				new iTimer = CountDownTimer - GetTime();
 				new Minutes = sb_minutes(iTimer);
 				if(Minutes<0) Minutes = 0;
 				new Seconds = sb_seconds(iTimer);
@@ -751,10 +554,10 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 			if(IsPlayerAlive(client))
 			{
 				SetHudTextParams(0.27, 0.60, 0.11, 255, 255, 255, 255);
-				ShowSyncHudText(client, YourDamageMessage, "You: %d%%",SB_GetPlayerProp(client,iDamage));
+				ShowSyncHudText(client, YourDamageMessage, "You: %d%%",GetPlayerProp(client,iDamage));
 
 				SetHudTextParams(-1.0, 0.88, 0.11, 255, 255, 255, 255);
-				ShowSyncHudText(client, YourLivesMessage, "Lives %d\nRed %d - Blue %d",SB_GetPlayerProp(client,iLives),RedTeam,BlueTeam);
+				ShowSyncHudText(client, YourLivesMessage, "Lives %d\nRed %d - Blue %d",GetPlayerProp(client,iLives),RedTeam,BlueTeam);
 
 				//new target=SB_GetTargetInViewCone(client,10000.0,true, 13.0);
 				if(TF2_GetPlayerClass(client) != TFClass_Medic)
@@ -763,7 +566,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 					if(SB_ValidPlayer(target))
 					{
 						SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
+						ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",GetPlayerProp(target,iDamage),GetPlayerProp(target,iLives));
 					}
 				}
 				else
@@ -772,7 +575,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 					if(SB_ValidPlayer(target))
 					{
 						SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "Healing: %d%%\nLives: %d",SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
+						ShowSyncHudText(client, TargetDamageMessage, "Healing: %d%%\nLives: %d",GetPlayerProp(target,iDamage),GetPlayerProp(target,iLives));
 					}
 					else
 					{
@@ -780,7 +583,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 						if(SB_ValidPlayer(target))
 						{
 							SetHudTextParams(0.67, 0.60, 0.11, 255, 255, 255, 255);
-							ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
+							ShowSyncHudText(client, TargetDamageMessage, "Enemy: %d%%\nLives: %d",GetPlayerProp(target,iDamage),GetPlayerProp(target,iLives));
 						}
 					}
 
@@ -808,10 +611,10 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 						GetClientName(TargetOfTarget,TargetOfTargetName,sizeof(TargetOfTargetName));
 
 						SetHudTextParams(0.67, 0.80, 0.11, 255, 255, 255, 255);
-						ShowSyncHudText(client, TargetDamageMessage, "%s: %d%%\nLives: %d",TargetOfTargetName,SB_GetPlayerProp(TargetOfTarget,iDamage),SB_GetPlayerProp(TargetOfTarget,iLives));
+						ShowSyncHudText(client, TargetDamageMessage, "%s: %d%%\nLives: %d",TargetOfTargetName,GetPlayerProp(TargetOfTarget,iDamage),GetPlayerProp(TargetOfTarget,iLives));
 					}
 					SetHudTextParams(0.27, 0.80, 0.11, 255, 255, 255, 255);
-					ShowSyncHudText(client, YourDamageMessage, "%s: %d%%\nLives: %d",PlayerName,SB_GetPlayerProp(target,iDamage),SB_GetPlayerProp(target,iLives));
+					ShowSyncHudText(client, YourDamageMessage, "%s: %d%%\nLives: %d",PlayerName,GetPlayerProp(target,iDamage),GetPlayerProp(target,iLives));
 				}
 			}
 
@@ -822,7 +625,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 			//{
 				//SetHudTextParams(0.20, 0.80, 0.11, 255, 255, 255, 255);
 
-				//ShowSyncHudText(client, TargetDamageMessage, "Target: %d%%",SB_GetPlayerProp(target,iDamage));
+				//ShowSyncHudText(client, TargetDamageMessage, "Target: %d%%",GetPlayerProp(target,iDamage));
 			//}
 
 /*
@@ -843,61 +646,6 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 
 }
 
-public void OnSB_EventDeath(int victim, int attacker, int assister, int distance, int attacker_hpleft, Handle event)
-{
-	/*
-	if(SB_ValidPlayer(victim))
-	{
-		if(SB_GetPlayerProp(victim,iLives)>0)
-		{
-			SB_SetPlayerProp(victim,iLives,SB_GetPlayerProp(victim,iLives)-1);
-			SDKCall(hSpawnPlayer,victim);
-		}
-	}
-	*/
-	if(GetEventBool(event, "sourcemod"))
-		return;
-
-	if(victim)
-	{
-		//SB_SetPlayerProp(victim,iLives,0);
-		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
-		SB_SetPlayerProp(victim,iLives,MaxLives);
-		SB_SetPlayerProp(victim,iStartingTeam,0);
-	}
-
-	if(!SB_GetGamePlaying())
-		return;
-
-	if(!GetConVarBool(sb_chatmsg))
-		return;
-
-	int teamred, teamblue;
-	CalculateTeamScores(teamred,teamblue);
-
-	SB_ChatMessage(0,"{default}[{yellow}Total Lives{default}]{red}Red Team{default} %d {blue}Blue Team{default} %d",teamred,teamblue);
-/*
-	new iWinningTeam = 0;
-
-	if(teamred>teamblue)
-	{
-		iWinningTeam=TEAM_RED;
-	}
-	else if(teamred<teamblue)
-	{
-		iWinningTeam=TEAM_BLUE;
-	}*/
-}
-
-
-public Action Command_ChangeClass(int client, int args)
-{
-	//PrintToChatAll("Command_ChangeClass");
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	ChangeClass(client);
-
-	return Plugin_Handled;
-}
 
 /*
 char ClassList[][] =
@@ -913,80 +661,7 @@ char ClassList[][] =
 	"Engineer" //9
 };*/
 
-public Action Command_ChangeClassScout(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 1;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassSniper(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 2;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassSoldier(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 3;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassDemo(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 4;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassMedic(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 5;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassHeavy(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 6;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassPyro(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 7;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassSpy(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 8;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-public Action Command_ChangeClassEngi(int client, int args)
-{
-	if(!SB_ValidPlayer(client)) return Plugin_Continue;
-	int itemnumber = 9;
-	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
-	SB_ChatMessage(client,"You will be %s next spawn.",ClassList[itemnumber-1]);
-	return Plugin_Handled;
-}
-
-stock ChangeClass(int client)
+public void ChangeClass_Menu(int client)
 {
 //	PrintToChatAll("ChangeClass");
 
@@ -1050,7 +725,7 @@ public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, select
 	}
 }
 
-public void OnSB_EventSpawn_Post(client)
+public SB_Engine_Display_OnSB_EventSpawn_Post(int client)
 {
 	if(!displayedHelp[client])
 	{
@@ -1059,9 +734,10 @@ public void OnSB_EventSpawn_Post(client)
 	}
 }
 
-public OnSB_SpawnPlayer(int client)
+public SB_Engine_Display_SB_Engine_Internal_OnSB_SpawnPlayer(int client)
 {
-	if(SB_ValidPlayer(client) && PlayerNextClass[client]!=TFClass_Unknown)
+	//if(SB_ValidPlayer(client) && PlayerNextClass[client]!=TFClass_Unknown)
+	if(PlayerNextClass[client]!=TFClass_Unknown)
 	{
 		TF2_RemoveCondition(client, TFCond:44);
 
@@ -1129,7 +805,7 @@ public OnSB_SpawnPlayer(int client)
 		CreateTimer(1.0, Remove_Cond_44, GetClientUserId(client));
 		PlayerNextClass[client]=TFClass_Unknown;
 
-		SB_ApplyWeapons(client);
+		ApplyWeapons(client);
 	}
 }
 
@@ -1144,7 +820,7 @@ public Action:Remove_Cond_44(Handle:timer, any:userid)
 	}
 }
 
-stock StartingHelpMenu(int client)
+public void StartingHelpMenu(int client)
 {
 	Handle hMenu = CreateMenu(MenuHandle_Help_Menu);
 	SetMenuExitBackButton(hMenu, false);

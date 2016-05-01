@@ -1,73 +1,12 @@
-/*
- * =============================================================================
- * Smash Bros Interface Includes File
- * Includes, stocks, natives, and other resources required by Smash Bros Plugins
- *
- * (C)2014 El Diablo of www.war3evo.info                       All rights reserved.
- * =============================================================================
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License , version 3.0, as published by
- * the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+//SB_Engine_DamageSystem.sp
 
+//#pragma semicolon 1
+//#include <sourcemod>
+//#include <sdkhooks>
+//#include <sb_interface>
 
-#pragma semicolon 1
-
-#include <sourcemod>
-#include <sdkhooks>
-#include <sb_interface>
-
-///would you like to see the damage stack print out?
-//#define DEBUG
-new Handle:FHOnSB_TakeDmgAllPre;
-new Handle:FHOnSB_TakeDmgAll;
-
-new Handle:g_OnSBEventPostHurtFH;
-new Handle:PyroSB_ChanceModifierCvar;
-new Handle:HeavySB_ChanceModifierCvar;
-
-new g_CurDamageType=-99;
-new g_CurInflictor=-99; //variables from sdkhooks, natives retrieve them if needed
-
-new Float:g_CurDMGModifierPercent=-99.9;
-
-new g_CurLastActualDamageDealt=-99;
-
-new bool:g_CanSetDamageMod=false; //default false, you may not change damage percent when there is none to change
-new bool:g_CanDealDamage=true; //default true, you can initiate damage out of nowhere
-//for deal damage only
-
-new dummyresult;
-
-//global
-new ownerOffset;
-
-new damagestack=0;
-
-new Float:ChanceModifier[MAXPLAYERSCUSTOM];
-
-public Plugin:myinfo=
+public SB_Engine_DamageSystem_OnPluginStart()
 {
-	name="Smash Bros Damage Engine",
-	author="El Diablo",
-	description="SB Core Plugins",
-	version=PLUGIN_VERSION,
-	url="http://war3evo.info/"
-};
-
-
-public OnPluginStart()
-{
-	CreateConVar("sb_damagesystem",PLUGIN_VERSION,"SB Damage System",FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 	PyroSB_ChanceModifierCvar=CreateConVar("sb_pyro_chancemod","0.500","Float 0.0 - 1.0");
 	HeavySB_ChanceModifierCvar=CreateConVar("sb_heavy_chancemod","0.666","Float 0.0 - 1.0");
 
@@ -76,11 +15,7 @@ public OnPluginStart()
 	ownerOffset = FindSendPropInfo("CBaseObject", "m_hBuilder");
 }
 
-//cvar handle
-new Handle:ChanceModifierSentry;
-new Handle:ChanceModifierSentryRocket;
-
-public bool:SBInitNativesForwards()
+public void SB_Engine_DamageSystem_SB_Engine_InitNatives()
 {
 	CreateNative("SB_DamageModPercent",Native_SB_DamageModPercent);
 
@@ -94,6 +29,11 @@ public bool:SBInitNativesForwards()
 	CreateNative("SB_ChanceModifier",Native_SB_ChanceModifier);
 	CreateNative("SB_IsOwnerSentry",Native_SB_IsOwnerSentry);
 
+	//return true;
+}
+
+public bool SB_Engine_DamageSystem_SB_Engine_InitForwards()
+{
 	FHOnSB_TakeDmgAllPre=CreateGlobalForward("OnSB_TakeDmgAllPre",ET_Hook,Param_Cell,Param_Cell,Param_Cell,Param_Cell);
 	FHOnSB_TakeDmgAll=CreateGlobalForward("OnSB_TakeDmgAll",ET_Hook,Param_Cell,Param_Cell,Param_Cell);
 
@@ -105,30 +45,47 @@ public bool:SBInitNativesForwards()
 	return true;
 }
 
-public Native_SB_DamageModPercent(Handle:plugin,numParams)
+public DamageSystemLateLoad()
 {
-	if(!g_CanSetDamageMod){
+	LoopIngameClients(client)
+	{
+		SDKHook(client,SDKHook_OnTakeDamage, SDK_Forwarded_OnTakeDamage);
+		SDKHook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
+	}
+}
+
+public void DamageModPercent(float num)
+{
+	if(!g_CanSetDamageMod)
+	{
 		LogError("	");
 		ThrowError("You may not set damage mod percent here, use ....Pre forward");
 		//SB_LogError("You may not set damage mod percent here, use ....Pre forward");
 		//PrintPluginError(plugin);
 	}
 
-	new Float:num=GetNativeCell(1);
 	#if defined DEBUG
 	PrintToServer("percent change %f",num);
 	#endif
 	g_CurDMGModifierPercent*=num;
-
 }
 
-public NSB_GetDamageType(Handle:plugin,numParams){
+public Native_SB_DamageModPercent(Handle:plugin,numParams)
+{
+	float num=GetNativeCell(1);
+	DamageModPercent(num);
+}
+
+public NSB_GetDamageType(Handle:plugin,numParams)
+{
 	return g_CurDamageType;
 }
-public NSB_GetDamageInflictor(Handle:plugin,numParams){
+public NSB_GetDamageInflictor(Handle:plugin,numParams)
+{
 	return g_CurInflictor;
 }
-public NSB_GetDamageStack(Handle:plugin,numParams){
+public NSB_GetDamageStack(Handle:plugin,numParams)
+{
 	return damagestack;
 }
 
@@ -144,11 +101,13 @@ public OnEntityCreated(entity, const String:classname[])
 	}
 }
 
-public OnClientPutInServer(client){
-	SDKHook(client,SDKHook_OnTakeDamage,SDK_Forwarded_OnTakeDamage);
+public void SB_Engine_DamageSystem_OnClientPutInServer(int client)
+{
+	SDKHook(client,SDKHook_OnTakeDamage, SDK_Forwarded_OnTakeDamage);
 	SDKHook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
 }
-public OnClientDisconnect(client){
+public void SB_Engine_DamageSystem_OnClientDisconnect(int client)
+{
 	SDKUnhook(client,SDKHook_OnTakeDamage,SDK_Forwarded_OnTakeDamage);
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
 }
@@ -184,7 +143,8 @@ public Native_SB_ChanceModifier(Handle:plugin,numParams)
 {
 
 	new attacker=GetNativeCell(1);
-	if(attacker<=0 || attacker>MaxClients || !IsValidEdict(attacker)){
+	if(attacker<=0 || attacker>MaxClients || !IsValidEdict(attacker))
+	{
 		return _:1.0;
 	}
 
@@ -235,7 +195,9 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		return Plugin_Continue;
 	}
 
-	if(SB_ValidPlayer(victim,true)){
+	if(SB_ValidPlayer(victim,true))
+	{
+		//PrintToChatAll("SDK_Forwarded_OnTakeDamage");
 		//store old variables on local stack!
 
 		new old_DamageType= g_CurDamageType;
@@ -272,12 +234,13 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		}
 		//	DP("%f",ChanceModifier[attacker]);
 		//else it is true damage
-		//PrintToChatAll("takedmg %f BULLET %d   lastiswarcraft %d",damage,isBulletDamage,g_CurDamageIsWarcraft);
+		//PrintToChatAll("takedmg %f",damage);
 
 		new bool:old_CanSetDamageMod=g_CanSetDamageMod;
 		new bool:old_CanDealDamage=g_CanDealDamage;
 		g_CanSetDamageMod=true;
 		g_CanDealDamage=false;
+
 		Call_StartForward(FHOnSB_TakeDmgAllPre);
 		Call_PushCell(victim);
 		Call_PushCell(attacker);
@@ -285,10 +248,18 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		Call_PushCell(damagecustom);
 		Call_Finish(dummyresult); //this will be returned to
 
+		if(SB_Engine_Calculations_OnSB_TakeDmgAllPre(victim, attacker, damage, damagecustom))
+		{
+		}
+		if(SB_Engine_Display_OnSB_TakeDmgAllPre(victim, attacker, damage))
+		{
+		}
+
 		g_CanSetDamageMod=false;
 		g_CanDealDamage=true;
 
-		if(g_CurDMGModifierPercent>0.001){ //so if damage is already canceled, no point in forwarding the second part , do we dont get: evaded but still recieve warcraft damage proc)
+		if(g_CurDMGModifierPercent>0.001)
+		{ //so if damage is already canceled, no point in forwarding the second part , do we dont get: evaded but still recieve warcraft damage proc)
 
 			Call_StartForward(FHOnSB_TakeDmgAll);
 			Call_PushCell(victim);
@@ -301,8 +272,9 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		g_CanDealDamage=old_CanDealDamage;
 
 		//modify final damage
-		//DP("Damage before modifier %f %d to %d",damage,attacker,victim);
+		//PrintToChatAll("Damage before modifier %f %d to %d",damage,attacker,victim);
 		damage=damage*g_CurDMGModifierPercent; ////so we calculate the percent
+		//PrintToChatAll("Damage after modifier %f %d to %d",damage,attacker,victim);
 
 		//nobobdy retrieves our global variables outside of the forward call, restore old stack vars
 		g_CurDamageType= old_DamageType;
@@ -373,6 +345,8 @@ public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetyp
 		Call_PushString(weaponName);
 		Call_Finish(dummyreturn);
 
+		SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,RoundToFloor(damage),weaponName);
+
 		g_CanDealDamage=old_CanDealDamage;
 
 		damagestack--;
@@ -380,6 +354,7 @@ public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetyp
 		g_CurLastActualDamageDealt = RoundToFloor(damage);
 }
 
-public Native_SB_GetSBDamageDealt(Handle:plugin,numParams) {
+public Native_SB_GetSBDamageDealt(Handle:plugin,numParams)
+{
 	return g_CurLastActualDamageDealt;
 }
