@@ -139,6 +139,11 @@ public Action:Command_jointeam(client, args) {
 		g_spec[client] = true;
 	} else {
 		g_spec[client] = false;
+		if(playing)
+		{
+			SB_ChatMessage(client,"{yellow}You can not join while the round is active!");
+			ForcePlayerSuicide(client);
+		}
 	}
 }
 
