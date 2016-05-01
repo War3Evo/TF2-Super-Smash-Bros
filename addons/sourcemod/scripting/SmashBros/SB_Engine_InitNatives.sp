@@ -47,6 +47,17 @@ public void SetPlayerProp(int client, SBPlayerProp Property, any value)
 	if (client > 0 && client <= MaxClients)
 	{
 		p_properties[client][Property]=value;
+		if(Property==iLives)
+		{
+			if(SB_ValidPlayer(client,true))
+			{
+				iTotalScore[client]=value;
+			}
+			else
+			{
+				iTotalScore[client]=0;
+			}
+		}
 	}
 }
 

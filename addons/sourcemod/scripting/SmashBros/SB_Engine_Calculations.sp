@@ -497,8 +497,7 @@ public bool FakeDeath(int victim, int attacker)
 		{
 			SetPlayerProp(victim,iLives,GetPlayerProp(victim,iLives)-1);
 			//CreateTimer(3.0,instaspawn,victim);
-
-			iTotalScore[victim]=GetPlayerProp(victim,iLives);
+			//iTotalScore[victim]=GetPlayerProp(victim,iLives);
 
 			int RedTeam, BlueTeam;
 			CalculateTeamScores(RedTeam,BlueTeam);
@@ -514,7 +513,7 @@ public bool FakeDeath(int victim, int attacker)
 				//ServerCommand("sm_bhop_enabled %d 0",GetClientUserId(victim));
 				//FC_SetBhop2(victim, false);
 				//PrintToChatAll("bStopMovement FakeDeath");
-				bStopMovement[victim] = false;
+				bStopMovement[victim] = true;
 				//FC_SetBhop2(victim, false, false);
 			}
 			CreateRagDoll(victim);
@@ -563,7 +562,14 @@ public void StartTheRound()
 	LoopAlivePlayers(target)
 	{
 		SpawnProtect(target);
+		//iTotalScore[target]=GetPlayerProp(target,iLives);
+		int MaxLives = GetConVarInt(sb_lives)>0?GetConVarInt(sb_lives):1;
+		SetPlayerProp(target,iLives,MaxLives);
 	}
+	//else
+	//{
+		//iTotalScore[target]=0;
+	//}
 
 	if(SB_Engine_Display_teamplay_round_active())
 	{
