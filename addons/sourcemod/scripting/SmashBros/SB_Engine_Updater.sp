@@ -8,7 +8,7 @@ public SB_Engine_Updater_OnPluginStart()
 	}
 }
 
-public OnLibraryAdded(const String:name[])
+public SB_Engine_Updater_OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "updater"))
 	{

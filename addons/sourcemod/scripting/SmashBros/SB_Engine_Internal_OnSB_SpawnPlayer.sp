@@ -1,6 +1,6 @@
 //SB_Engine_Internal_OnSB_SpawnPlayer.sp
 
-public SB_Engine_Internal_OnSB_SpawnPlayer()
+public void SB_Engine_Internal_OnSB_SpawnPlayer(int client)
 {
 	if(SB_ValidPlayer(client))
 	{
@@ -12,6 +12,7 @@ public SB_Engine_Internal_OnSB_SpawnPlayer()
 			FC_SetBhop(client, false);
 			CreateTimer(GetConVarFloat(sb_fc_bhop), AllowBhopAgain, client);
 		}
+		SB_Engine_Display_SB_Engine_Internal_OnSB_SpawnPlayer(client);
 	}
 }
 public Action:AllowBhopAgain(Handle:timer, any:client)

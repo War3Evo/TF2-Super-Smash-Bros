@@ -19,6 +19,10 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined _sb_interface_included
+	#endinput
+#endif
+#define _sb_interface_included
 
 /**
  * File: sb_interface.inc
@@ -39,7 +43,7 @@
 #include <sourcemod>
 //#include <clients>
 #include <morecolors>
-#include <sb_constants>
+#include "SmashBros/include/SB_Constants.inc"
 #include <tf2_stocks>
 #include <sdktools_trace>
 

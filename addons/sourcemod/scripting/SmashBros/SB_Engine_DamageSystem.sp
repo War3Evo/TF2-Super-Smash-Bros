@@ -5,8 +5,7 @@
 //#include <sdkhooks>
 //#include <sb_interface>
 
-
-public OnPluginStart_SB_Engine_DamageSystem()
+public SB_Engine_DamageSystem_OnPluginStart()
 {
 	PyroSB_ChanceModifierCvar=CreateConVar("sb_pyro_chancemod","0.500","Float 0.0 - 1.0");
 	HeavySB_ChanceModifierCvar=CreateConVar("sb_heavy_chancemod","0.666","Float 0.0 - 1.0");
@@ -46,7 +45,7 @@ public bool SB_Engine_DamageSystem_SB_Engine_InitForwards()
 	return true;
 }
 
-public Native_SB_DamageModPercent(Handle:plugin,numParams)
+public void Internal_SB_DamageModPercent(float num)
 {
 	if(!g_CanSetDamageMod){
 		LogError("	");
@@ -55,12 +54,16 @@ public Native_SB_DamageModPercent(Handle:plugin,numParams)
 		//PrintPluginError(plugin);
 	}
 
-	new Float:num=GetNativeCell(1);
 	#if defined DEBUG
 	PrintToServer("percent change %f",num);
 	#endif
 	g_CurDMGModifierPercent*=num;
+}
 
+public Native_SB_DamageModPercent(Handle:plugin,numParams)
+{
+	float num=GetNativeCell(1);
+	Internal_SB_DamageModPercent(num);
 }
 
 public NSB_GetDamageType(Handle:plugin,numParams){
@@ -85,12 +88,12 @@ public OnEntityCreated(entity, const String:classname[])
 	}
 }
 
-public OnClientPutInServer(client)
+public void SB_Engine_DamageSystem_OnClientPutInServer(int client)
 {
 	SDKHook(client,SDKHook_OnTakeDamage,SDK_Forwarded_OnTakeDamage);
 	SDKHook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
 }
-public OnClientDisconnect(client)
+public void SB_Engine_DamageSystem_OnClientDisconnect(int client)
 {
 	SDKUnhook(client,SDKHook_OnTakeDamage,SDK_Forwarded_OnTakeDamage);
 	SDKUnhook(client, SDKHook_OnTakeDamagePost, OnTakeDamagePostHook);
@@ -221,6 +224,10 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 		new bool:old_CanDealDamage=g_CanDealDamage;
 		g_CanSetDamageMod=true;
 		g_CanDealDamage=false;
+
+		SB_Engine_Calculations_OnSB_TakeDmgAllPre(victim, attacker, damage, damagecustom);
+		SB_Engine_Display_OnSB_TakeDmgAllPre(victim, attacker, damage);
+
 		Call_StartForward(FHOnSB_TakeDmgAllPre);
 		Call_PushCell(victim);
 		Call_PushCell(attacker);
@@ -308,6 +315,8 @@ public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetyp
 		GetEntityClassname(realWeapon, weaponName, sizeof(weaponName));
 
 		//SB_LogInfo("OnTakeDamagePostHook called with weapon \"%s\"", weaponName);
+
+		SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,RoundToFloor(damage),weaponName);
 
 		Call_StartForward(g_OnSBEventPostHurtFH);
 		Call_PushCell(victim);

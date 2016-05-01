@@ -31,11 +31,22 @@ public Native_SB_GetCountDownTimer(Handle:plugin,numParams)
 	return CountDownTimer;
 }
 
+public any Internal_SB_GetPlayerProp(int client, SBPlayerProp Property)
+{
+	if (client > 0 && client <= MaxClients)
+	{
+		return p_properties[client][Property];
+	}
+	else
+		return 0;
+}
+
 public NSB_GetPlayerProp(Handle:plugin,numParams){
 	int client=GetNativeCell(1);
 	if (client > 0 && client <= MaxClients)
 	{
-		return p_properties[client][SBPlayerProp:GetNativeCell(2)];
+		//return p_properties[client][SBPlayerProp:GetNativeCell(2)];
+		return Internal_SB_GetPlayerProp(client,view_as<SBPlayerProp>(GetNativeCell(2)));
 	}
 	else
 		return 0;
@@ -54,7 +65,7 @@ public NSB_SpawnPlayer(Handle:plugin,numParams){
 	{
 		SDKCall(hSpawnPlayer,client);
 
-		SB_Engine_Internal_OnSB_SpawnPlayer();
+		SB_Engine_Internal_OnSB_SpawnPlayer(client);
 
 		Call_StartForward(FHOnSB_SpawnPlayer);
 		Call_PushCell(client);

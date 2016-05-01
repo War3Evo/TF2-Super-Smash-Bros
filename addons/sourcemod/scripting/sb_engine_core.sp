@@ -30,20 +30,41 @@
 #undef REQUIRE_PLUGIN
 #include <updater>
 
+#tryinclude <sb_addon_fc>
+
 #define JENKINS_UPDATE_URL "DEVELOP"
 
 #define UPDATE_URL "http://107.161.29.8:8080/job/TF2-Super-Smash-Bros%20%28" ... JENKINS_UPDATE_URL ... "%29/lastSuccessfulBuild/artifact/addons/sourcemod/updatefile.txt"
 
-#include "SmashBros/SB_Constants.inc"
-#include "SmashBros/SB_Variables.inc"
+#include "SmashBros/include/SB_Constants.inc"
+#include "SmashBros/include/SB_Variables.inc"
 
-#include "SmashBros/SB_001_Engine_InitForwards.sp"
-#include "SmashBros/SB_001_Engine_InitNatives.sp"
-
-#include "SmashBros/SB_001_OnPluginStart.sp"
+#include "SmashBros/SB_001_AddCommandListener.sp"
+#include "SmashBros/SB_001_CreateConVar.sp"
+#include "SmashBros/SB_001_CreateTimer.sp"
 #include "SmashBros/SB_001_HookEvent.sp"
+#include "SmashBros/SB_001_OnAllPluginsLoaded.sp"
+#include "SmashBros/SB_001_OnClientConnected.sp"
+#include "SmashBros/SB_001_OnClientDisconnected.sp"
+#include "SmashBros/SB_001_OnClientPutInServer.sp"
+#include "SmashBros/SB_001_OnConditionAdded.sp"
 #include "SmashBros/SB_001_OnGameFrame.sp"
+#include "SmashBros/SB_001_OnMapEnd.sp"
+#include "SmashBros/SB_001_OnMapStart.sp"
+#include "SmashBros/SB_001_OnPluginStart.sp"
+#include "SmashBros/SB_001_RegConsoleCmd.sp"
+#include "SmashBros/SB_001_SDKHook.sp"
 
+#include "SmashBros/SB_Engine_Calculations.sp"
+#include "SmashBros/SB_Engine_DamageSystem.sp"
+#include "SmashBros/SB_Engine_Display.sp"
+#include "SmashBros/SB_Engine_InitForwards.sp"
+#include "SmashBros/SB_Engine_InitNatives.sp"
+#include "SmashBros/SB_Engine_Internal_OnSB_EventDeath.sp"
+#include "SmashBros/SB_Engine_Internal_OnSB_EventSpawn.sp"
+#include "SmashBros/SB_Engine_Internal_OnSB_RoundEnd.sp"
+#include "SmashBros/SB_Engine_Internal_OnSB_SpawnPlayer.sp"
+#include "SmashBros/SB_Engine_Libraries.sp"
 #include "SmashBros/SB_Engine_Updater.sp"
 //#include "SmashBros/"
 //#include "SmashBros/"

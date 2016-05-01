@@ -34,4 +34,8 @@ public OnPluginStart()
 	SB_001_HookEvent_OnPluginStart();
 
 	SB_Engine_Updater_OnPluginStart();
+
+	SB_Engine_DamageSystem_OnPluginStart();
+
+	SB_Engine_Display_OnPluginStart();
 }

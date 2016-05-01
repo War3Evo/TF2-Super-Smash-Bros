@@ -26,6 +26,7 @@ public OnLibraryAdded(const String:name[])
 			}
 		}
 	}
+	SB_Engine_Updater_OnLibraryAdded(name);
 }
 
 public OnLibraryRemoved(const String:name[])

@@ -4,12 +4,12 @@ TriggerEvent()
 {
 	playing = false;
 
-	int dummyresult = 0;
+	int dummyresult2 = 0;
 
 	SB_Engine_Internal_OnSB_RoundEnd();
 
 	Call_StartForward(FHOnSB_RoundEnd);
-	Call_Finish(dummyresult);
+	Call_Finish(dummyresult2);
 }
 
 public OnGameFrame(){

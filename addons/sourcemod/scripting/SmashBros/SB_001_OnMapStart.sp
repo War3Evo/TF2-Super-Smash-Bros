@@ -3,4 +3,5 @@
 public OnMapStart()
 {
 	playing=false;
+	NewMap=true;
 }

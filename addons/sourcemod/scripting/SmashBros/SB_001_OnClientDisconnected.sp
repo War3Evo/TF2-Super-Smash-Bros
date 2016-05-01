@@ -3,4 +3,5 @@
 public OnClientDisconnected(client)
 {
 	ResetClientVars(client);
+	SB_Engine_DamageSystem_OnClientDisconnect(client);
 }

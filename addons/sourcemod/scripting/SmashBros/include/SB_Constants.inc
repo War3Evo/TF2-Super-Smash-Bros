@@ -18,7 +18,10 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#if defined _sb_constants_included
+	#endinput
+#endif
+#define _sb_constants_included
 
 
 #define GAME_TITLE "SmashBros"
@@ -47,6 +50,19 @@
 
 #define Toggle(%1) %1=%1?false:true
 #endif
+
+char ClassList[][] =
+{
+	"Scout", //1
+	"Sniper", //2
+	"Soldier", //3
+	"Demoman", //4
+	"Medic", //5
+	"Heavy", //6
+	"Pyro", //7
+	"Spy", //8
+	"Engineer" //9
+};
 
 
 //=============================================================================

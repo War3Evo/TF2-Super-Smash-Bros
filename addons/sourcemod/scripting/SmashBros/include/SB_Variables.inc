@@ -51,38 +51,70 @@ int iTotalScore[MAXPLAYERS+1];
 
 bool bHopEnabled = false;
 
-//DAMAGE SYSTEM
+// SB_Engine_DamageSystem
+// SB_Engine_DamageSystem
+// SB_Engine_DamageSystem
+// SB_Engine_DamageSystem
+// SB_Engine_DamageSystem
+// SB_Engine_DamageSystem
+
 //would you like to see the damage stack print out?
 //#define DEBUG
-new Handle:FHOnSB_TakeDmgAllPre;
-new Handle:FHOnSB_TakeDmgAll;
+Handle FHOnSB_TakeDmgAllPre;
+Handle FHOnSB_TakeDmgAll;
 
-new Handle:g_OnSBEventPostHurtFH;
-new Handle:PyroSB_ChanceModifierCvar;
-new Handle:HeavySB_ChanceModifierCvar;
+Handle g_OnSBEventPostHurtFH;
+Handle PyroSB_ChanceModifierCvar;
+Handle HeavySB_ChanceModifierCvar;
 
-new g_CurDamageType=-99;
-new g_CurInflictor=-99; //variables from sdkhooks, natives retrieve them if needed
+int g_CurDamageType=-99;
+int g_CurInflictor=-99; //variables from sdkhooks, natives retrieve them if needed
 
-new Float:g_CurDMGModifierPercent=-99.9;
+float g_CurDMGModifierPercent=-99.9;
 
-new g_CurLastActualDamageDealt=-99;
-
-new bool:g_CanSetDamageMod=false; //default false, you may not change damage percent when there is none to change
-new bool:g_CanDealDamage=true; //default true, you can initiate damage out of nowhere
+int g_CurLastActualDamageDealt=-99;
+bool g_CanSetDamageMod=false; //default false, you may not change damage percent when there is none to change
+bool g_CanDealDamage=true; //default true, you can initiate damage out of nowhere
 //for deal damage only
-
-new dummyresult;
+int dummyresult;
 
 //global
-new ownerOffset;
-
-new damagestack=0;
-
-new Float:ChanceModifier[MAXPLAYERSCUSTOM];
+int ownerOffset;
+int damagestack=0;
+float ChanceModifier[MAXPLAYERSCUSTOM];
 
 //cvar handle
-new Handle:ChanceModifierSentry;
-new Handle:ChanceModifierSentryRocket;
+Handle ChanceModifierSentry;
+Handle ChanceModifierSentryRocket;
 
 
+// SB_Engine_Display
+// SB_Engine_Display
+// SB_Engine_Display
+// SB_Engine_Display
+// SB_Engine_Display
+// SB_Engine_Display
+// SB_Engine_Display
+
+TFClassType PlayerNextClass[MAXPLAYERSCUSTOM];
+
+Handle sb_lives;
+Handle sb_chatmsg;
+Handle sb_chatmsg_balance;
+
+Handle CountDownTimerMessage;
+Handle TargetDamageMessage;
+Handle YourDamageMessage;
+Handle YourLivesMessage;
+
+bool g_spec[MAXPLAYERS+1] = {true, ...};
+
+bool displayedHelp[MAXPLAYERSCUSTOM];
+
+bool NewMap = true;
+
+//new Float:respawn[MAXPLAYERS+1];
+int LastPersonAttacked[MAXPLAYERSCUSTOM];
+
+//new bool:started=false;
+//new bool:playing=false;

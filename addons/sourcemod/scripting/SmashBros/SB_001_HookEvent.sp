@@ -13,13 +13,14 @@ public SB_001_HookEvent_OnPluginStart()
 		PrintToServer("[SmashBros] Could not hook the player_death event.");
 	}
 
-	//HookEvent("teamplay_round_start", teamplay_round_start);
-
+	HookEvent("teamplay_round_start", teamplay_round_start);
 	HookEvent("teamplay_round_active", teamplay_round_active);
 	HookEvent("arena_round_start", arena_round_start);
 
 	HookEvent("teamplay_round_win", teamplay_round_win);
 	HookEvent("teamplay_waiting_begins", teamplay_waiting_begins);
+
+	HookEvent("player_team", Event_player_team);
 
 	SB_Engine_Calculations_SB_001_HookEvent();
 }
@@ -140,7 +141,9 @@ public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast
 	return Plugin_Continue;
 }
 
-public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast) {
+public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
+{
+	//Action aReturn = Plugin_Continue;
 	playing=true;
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
 
@@ -152,9 +155,14 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 	{
 		SpawnProtect(target);
 	}
+
+	SB_Engine_Display_teamplay_round_active();
+
+	return Plugin_Continue;
 }
 
-public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast) {
+public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
+{
 	playing=true;
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
 
@@ -174,9 +182,24 @@ public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
 	for(int i=1;i<=MaxClients;++i){
 		ResetClientVars(i);
 	}
+	SB_Engine_Display_teamplay_round_win();
 }
 
 public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast) {
 	playing=false;
 	OnRoundEnd();
+}
+
+
+public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast)
+{
+	SB_Engine_Display_teamplay_round_start();
+	return Plugin_Continue;
+}
+
+
+public Action:Event_player_team(Handle:event, const String:name[], bool:dontBroadcast) {
+	if(GetEventInt(event, "team")>1) {
+		g_spec[GetClientOfUserId(GetEventInt(event, "userid"))] = false;
+	}
 }

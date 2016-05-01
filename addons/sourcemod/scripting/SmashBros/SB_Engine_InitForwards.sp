@@ -20,9 +20,9 @@ public bool SB_Engine_InitForwards()
 }
 
 
-public void DoForward_OnSB_EventSpawn(client)
+public void DoForward_OnSB_EventSpawn(int client)
 {
-		Action returnVal = SB_Engine_Internal_OnSB_EventSpawn();
+		Action returnVal = SB_Engine_Internal_OnSB_EventSpawn(client);
 
 		if(returnVal != Plugin_Continue)
 		{
@@ -37,6 +37,8 @@ public void DoForward_OnSB_EventSpawn(client)
 		{
 			return;
 		}
+
+		SB_Engine_Display_OnSB_EventSpawn_Post(client);
 
 		Call_StartForward(g_OnSB_EventSpawnFH_Post);
 		Call_PushCell(client);
