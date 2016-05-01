@@ -5,7 +5,7 @@ public Action SB_Engine_Internal_OnSB_EventSpawn(int client)
 	Action returnVal = Plugin_Continue;
 	if(SB_ValidPlayer(client))
 	{
-		iTotalScore[client]=p_properties[client][iLives];
+		//iTotalScore[client]=GetPlayerProp(client,iLives);
 
 		//if(TF2_GetPlayerClass(client)==TFClass_DemoMan)
 		//{
