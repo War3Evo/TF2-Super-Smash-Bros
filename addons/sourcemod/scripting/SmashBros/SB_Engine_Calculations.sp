@@ -363,7 +363,8 @@ public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, 
 	{
 		int currentwpn = GetEntPropEnt(attacker, Prop_Send, "m_hActiveWeapon");
 		// boston basher
-		if(currentwpn > MaxClients && GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex")==325)
+		int itemIndex = GetEntProp(currentwpn, Prop_Send, "m_iItemDefinitionIndex");
+		if(currentwpn > MaxClients && (itemIndex==325 || itemIndex==452))
 		{
 			//SB_DP("boston basher");
 			DamageModPercent(0.0);
