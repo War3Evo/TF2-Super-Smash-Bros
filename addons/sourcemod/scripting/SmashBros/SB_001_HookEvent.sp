@@ -147,7 +147,7 @@ public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
 {
-	//PrintToChatAll("teamplay_round_active");
+	PrintToChatAll("teamplay_round_active");
 	//Action aReturn = Plugin_Continue;
 	StartTheRound();
 
@@ -156,7 +156,7 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 
 public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 {
-	//PrintToChatAll("arena_round_start");
+	PrintToChatAll("arena_round_start");
 	/*
 	playing=true;
 	CountDownTimer = GetTime() + RoundToFloor(GetConVarFloat(sb_round_time));
@@ -171,22 +171,13 @@ public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 	}*/
 	StartTheRound();
 
-	if(bHopEnabled)
-	{
-		LoopAlivePlayers(target)
-		{
-			FC_SetBhop2(target, false, false);
-			bStopMovement[target] = true;
-			CreateTimer(5.0, AllowMovementAgain, target);
-		}
-	}
-
 	return Plugin_Continue;
 }
 
-public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast) {
+public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
+{
+	PrintToChatAll("teamplay_round_win");
 	playing=false;
-	OnRoundEnd();
 	for(int i=1;i<=MaxClients;++i)
 	{
 		ResetClientVars(i);
@@ -196,9 +187,18 @@ public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
 
 public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast)
 {
-	//PrintToChatAll("teamplay_waiting_begins");
+	PrintToChatAll("teamplay_waiting_begins");
 	playing=false;
-	OnRoundEnd();
+
+	if(bHopEnabled)
+	{
+		LoopAlivePlayers(target)
+		{
+			FC_SetBhop2(target, false, false);
+			bStopMovement[target] = true;
+			CreateTimer(5.0, AllowMovementAgain, target);
+		}
+	}
 }
 
 
