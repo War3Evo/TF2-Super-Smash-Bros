@@ -5,7 +5,7 @@ Current is playable.
 
 If you have any issues, pleaes do post them on this GitHub.
 
-You can grab a pre-compiled copy from here: http://war3evo.info:8080/job/TF2-Super-Smash-Bros/
+You can grab a pre-compiled copy from here: http://107.161.29.8:8080/
 
 Link to Sourcemod Forums:
 
@@ -41,8 +41,6 @@ mp_enableroundwaittime 0
 mp_restartround 0
 mp_stalemate_timelimit 0
 mp_stalemate_enable 0
-mp_waitingforplayers_restart 1
-mp_waitingforplayers_cancel 1
 tf_arena_override_team_size 1
 tf_arena_use_queue 0
 
