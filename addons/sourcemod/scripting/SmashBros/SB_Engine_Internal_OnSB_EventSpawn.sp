@@ -2,6 +2,8 @@
 
 public Action SB_Engine_Internal_OnSB_EventSpawn(int client)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	Action returnVal = Plugin_Continue;
 	if(SB_ValidPlayer(client))
 	{

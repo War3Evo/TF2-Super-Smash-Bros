@@ -9,6 +9,7 @@ public bool SB_Engine_InitNatives()
 	CreateNative("SB_GetCountDownTimer",Native_SB_GetCountDownTimer);
 
 	CreateNative("SB_GetGamePlaying",Native_SB_GetGamePlaying);
+	CreateNative("SB_Enabled",Native_SB_Enabled);
 
 	CreateNative("SB_SetPlayerProp",NSB_SetPlayerProp);
 	CreateNative("SB_GetPlayerProp",NSB_GetPlayerProp);
@@ -22,14 +23,21 @@ public bool SB_Engine_InitNatives()
 	return true;
 }
 
+public Native_SB_Enabled(Handle:plugin,numParams)
+{
+	return g_sb_enabled;
+}
+
 
 public Native_SB_GetGamePlaying(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return false;
 	return playing;
 }
 
 public Native_SB_GetCountDownTimer(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return 0;
 	return CountDownTimer;
 }
 
@@ -101,6 +109,8 @@ public bool SpawnPlayer(int client)
 
 public NSB_SpawnPlayer(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return false;
+
 	int client=GetNativeCell(1);
 	return SpawnPlayer(client);
 }

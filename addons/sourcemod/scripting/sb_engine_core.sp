@@ -98,12 +98,9 @@ public Plugin:myinfo = {
  */
 public APLRes:AskPluginLoad2(Handle:plugin,bool:late,String:error[],err_max)
 {
-	if(late==true)
+	bLateLoad = late;
+	/*if(bLateLoad==true)
 	{
-		bLateLoad = true;
-		/*
-		//bLateLoad = true;
-
 		// To help reloading plugin
 		MarkNativeAsOptional("SB_DamageModPercent");
 		MarkNativeAsOptional("SB_GetDamageType");
@@ -123,12 +120,8 @@ public APLRes:AskPluginLoad2(Handle:plugin,bool:late,String:error[],err_max)
 		MarkNativeAsOptional("SB_SpawnPlayer");
 
 		MarkNativeAsOptional("SB_ApplyWeapons");
-		*/
-	}
-	else
-	{
-		bLateLoad = false;
-	}
+
+	}*/
 
 	//GlobalOptionalNatives();
 	/*

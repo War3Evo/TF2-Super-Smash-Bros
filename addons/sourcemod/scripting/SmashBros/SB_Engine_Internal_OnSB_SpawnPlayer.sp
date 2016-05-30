@@ -2,6 +2,8 @@
 
 public void SB_Engine_Internal_OnSB_SpawnPlayer(int client)
 {
+	if(!g_sb_enabled) return;
+
 	if(SB_ValidPlayer(client))
 	{
 		//iTotalScore[client]=GetPlayerProp(client,iLives);

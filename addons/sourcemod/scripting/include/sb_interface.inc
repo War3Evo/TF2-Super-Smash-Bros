@@ -127,6 +127,7 @@ stock bool:Game_EndRound(team=0, bool:forceMapReset=false, bool:switchTeams=fals
 }
 
 native bool SB_GetGamePlaying();
+native bool SB_Enabled();
 
 native SB_GetCountDownTimer();
 
@@ -863,6 +864,7 @@ public __pl_sb_engine_core_SetNTVOptional()
 	MarkNativeAsOptional("SB_GetCountDownTimer");
 
 	MarkNativeAsOptional("SB_GetGamePlaying");
+	MarkNativeAsOptional("SB_Enabled");
 
 	MarkNativeAsOptional("SB_SetPlayerProp");
 	MarkNativeAsOptional("SB_GetPlayerProp");

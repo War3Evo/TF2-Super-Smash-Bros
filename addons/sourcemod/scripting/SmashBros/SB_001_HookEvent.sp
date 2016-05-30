@@ -28,6 +28,8 @@ public SB_001_HookEvent_OnPluginStart()
 
 public SB_PlayerSpawnEvent(Handle event,  char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return 0;
+
 	int userid=GetEventInt(event,"userid");
 	if(userid>0)
 	{
@@ -45,10 +47,13 @@ public SB_PlayerSpawnEvent(Handle event,  char[] name, bool dontBroadcast)
 			SetPlayerProp(client,bStatefulSpawn,false); //no longer a "stateful" spawn
 		}
 	}
+	return 1;
 }
 
 public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	int uid_victim = GetEventInt(event, "userid");
 	int uid_attacker = GetEventInt(event, "attacker");
 	int uid_assister = GetEventInt(event, "assister");
@@ -147,6 +152,8 @@ public Action SB_PlayerDeathEvent(Handle event,  char[] name, bool dontBroadcast
 
 public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	//PrintToChatAll("teamplay_round_active");
 	//Action aReturn = Plugin_Continue;
 	StartTheRound();
@@ -156,6 +163,7 @@ public Action teamplay_round_active(Handle event,  char[] name, bool dontBroadca
 
 public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
 	//PrintToChatAll("arena_round_start");
 	/*
 	playing=true;
@@ -180,6 +188,7 @@ public Action arena_round_start(Handle event,  char[] name, bool dontBroadcast)
 
 public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
 	//PrintToChatAll("teamplay_round_win");
 	playing=false;
 	for(int i=1;i<=MaxClients;++i)
@@ -194,6 +203,7 @@ public Action teamplay_round_win(Handle event,  char[] name, bool dontBroadcast)
 			CreateTimer(10.0, TurnOffMovement, target);
 		}
 	}
+	return Plugin_Continue;
 }
 public Action:TurnOffMovement(Handle:timer, any:client)
 {
@@ -210,13 +220,18 @@ public Action:TurnOffMovement(Handle:timer, any:client)
 
 public Action:teamplay_waiting_begins(Handle event,  char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	//PrintToChatAll("teamplay_waiting_begins");
 	playing=false;
+	return Plugin_Continue;
 }
 
 
 public Action teamplay_round_start(Handle event,  const char[] name, bool dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	SB_Engine_Display_teamplay_round_start();
 	return Plugin_Continue;
 }
@@ -224,7 +239,10 @@ public Action teamplay_round_start(Handle event,  const char[] name, bool dontBr
 
 public Action:Event_player_team(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(GetEventInt(event, "team")>1) {
 		g_spec[GetClientOfUserId(GetEventInt(event, "userid"))] = false;
 	}
+	return Plugin_Continue;
 }

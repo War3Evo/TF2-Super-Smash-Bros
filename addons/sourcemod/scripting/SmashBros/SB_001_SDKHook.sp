@@ -7,6 +7,7 @@ public SB_001_SDKHook_OnPluginStart(int playerresource)
 
 public Hook_OnThinkPost(iEnt)
 {
+	if(!g_sb_enabled) return 0;
 /*
 	static teamScoreOffset = -1;
 	if (teamScoreOffset == -1)
@@ -49,6 +50,7 @@ public Hook_OnThinkPost(iEnt)
 			StopMovement(iEnt);
 		}
 	}
+	return 1;
 }
 
 public void StopMovement(int client)

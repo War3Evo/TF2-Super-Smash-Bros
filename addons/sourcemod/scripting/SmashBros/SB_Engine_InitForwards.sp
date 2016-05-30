@@ -24,6 +24,8 @@ public bool SB_Engine_InitForwards()
 
 public void DoForward_OnSB_EventSpawn(int client)
 {
+		if(!g_sb_enabled) return;
+
 		Action returnVal = SB_Engine_Internal_OnSB_EventSpawn(client);
 
 		if(returnVal != Plugin_Continue)
@@ -49,6 +51,8 @@ public void DoForward_OnSB_EventSpawn(int client)
 
 public void DoForward_OnSB_EventDeath(int victim,int killer,int assister,int distance,int attacker_hpleft,Handle event)
 {
+		if(!g_sb_enabled) return;
+
 		SB_Engine_Internal_OnSB_EventDeath(victim,killer,assister,distance,attacker_hpleft,event);
 
 		Call_StartForward(g_OnSB_EventDeathFH);

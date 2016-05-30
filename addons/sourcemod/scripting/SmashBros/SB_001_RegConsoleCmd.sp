@@ -31,6 +31,8 @@ public Action:SB_ENGINEERING(client,args)
 
 public Action:RemoveStuff(Handle:t,any:data)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	int i = -1;
 	while((i = FindEntityByClassname(i,"func_nobuild")) != -1)
 	{
@@ -47,11 +49,14 @@ public Action:RemoveStuff(Handle:t,any:data)
 			AcceptEntityInput( i,"Kill");
 		}
 	}
+	return Plugin_Continue;
 }
 
 
 public Action Command_ChangeClass(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	//PrintToChatAll("Command_ChangeClass");
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	ChangeClass_Menu(client);
@@ -61,6 +66,8 @@ public Action Command_ChangeClass(int client, int args)
 
 public Action Command_ChangeClassScout(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 1;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -69,6 +76,8 @@ public Action Command_ChangeClassScout(int client, int args)
 }
 public Action Command_ChangeClassSniper(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 2;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -77,6 +86,8 @@ public Action Command_ChangeClassSniper(int client, int args)
 }
 public Action Command_ChangeClassSoldier(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 3;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -85,6 +96,8 @@ public Action Command_ChangeClassSoldier(int client, int args)
 }
 public Action Command_ChangeClassDemo(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 4;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -93,6 +106,8 @@ public Action Command_ChangeClassDemo(int client, int args)
 }
 public Action Command_ChangeClassMedic(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 5;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -101,6 +116,8 @@ public Action Command_ChangeClassMedic(int client, int args)
 }
 public Action Command_ChangeClassHeavy(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 6;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -109,6 +126,8 @@ public Action Command_ChangeClassHeavy(int client, int args)
 }
 public Action Command_ChangeClassPyro(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 7;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -117,6 +136,8 @@ public Action Command_ChangeClassPyro(int client, int args)
 }
 public Action Command_ChangeClassSpy(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 8;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -125,6 +146,8 @@ public Action Command_ChangeClassSpy(int client, int args)
 }
 public Action Command_ChangeClassEngi(int client, int args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(!SB_ValidPlayer(client)) return Plugin_Continue;
 	int itemnumber = 9;
 	PlayerNextClass[client]=view_as<TFClassType>(itemnumber);
@@ -132,7 +155,10 @@ public Action Command_ChangeClassEngi(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action:Command_jointeam(client, args) {
+public Action:Command_jointeam(client, args)
+{
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	decl String:argstr[16];
 	GetCmdArgString(argstr, sizeof(argstr));
 	if(StrEqual(argstr, "spectatearena")) {
@@ -152,6 +178,8 @@ public Action:Command_jointeam(client, args) {
 
 public Action:Command_Lives(client, args)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	for(int i=1;i<MaxClients;i++)
 	{
 		if(SB_ValidPlayer(i))
@@ -161,5 +189,5 @@ public Action:Command_Lives(client, args)
 			PrintToConsole(client,"%s has %d lives.",sClientName,GetPlayerProp(i,iLives));
 		}
 	}
-
+	return Plugin_Continue;
 }

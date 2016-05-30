@@ -14,6 +14,8 @@ TriggerEvent()
 
 public OnGameFrame()
 {
+	if(!g_sb_enabled) return;
+
 	//if(!started) return;
 	if(!playing) return;
 	if(GetClientCount()<2) return;

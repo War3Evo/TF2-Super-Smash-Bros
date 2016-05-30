@@ -43,6 +43,9 @@ int g_sb_medicmegaheal;
 float g_fsb_angles;
 float g_fsb_upward_force;
 
+Handle sb_enabled;
+bool g_sb_enabled = true;
+
 Handle sb_fc_bhop;
 
 int iTotalScoreOffset = -1;

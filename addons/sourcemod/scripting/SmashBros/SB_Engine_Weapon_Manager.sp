@@ -628,6 +628,8 @@ public ApplyWeapons(int client)
 }
 public Native_SB_ApplyWeapons(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return;
+
 	int client=GetNativeCell(1);
 	ApplyWeapons(client);
 }
@@ -648,6 +650,8 @@ public TF2Items_OnGiveNamedItem_Post(client, String:classname[], itemDefinitionI
 
 public Action:TF2Items_OnGiveNamedItem(client, String:classname[], iItemDefinitionIndex, &Handle:hItem)
 {
+	if(!g_sb_enabled) return Plugin_Stop;
+
 	if (IsClientObserver(client) || !IsPlayerAlive(client))
 	{
 		return Plugin_Stop;

@@ -11,6 +11,8 @@ public OnPluginStart_SB_001_CreateTimer()
 
 public Action:Timer_Uber_Regen(Handle:timer, any:user)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	for (int i=1; i<=MaxClients; i++)
 	{
 		if (!SB_ValidPlayer(i,true,true))
@@ -62,4 +64,5 @@ public Action:Timer_Uber_Regen(Handle:timer, any:user)
 			}
 		}*/
 	}
+	return Plugin_Continue;
 }

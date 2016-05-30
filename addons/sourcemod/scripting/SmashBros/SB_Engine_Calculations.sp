@@ -15,6 +15,8 @@ public SB_Engine_Calculations_SB_001_HookEvent()
 
 public Action:Event_Player_BuiltObject(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if(SB_ValidPlayer(client,true))
 	{
@@ -84,6 +86,8 @@ stock IsValidClient(client, bool:replaycheck = true)
 
 public Event_player_healonhit(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	if(!g_sb_enabled) return;
+
 	int client = GetClientOfUserId(GetEventInt(event, "entindex"));
 
 	if(SB_ValidPlayer(client))
@@ -101,6 +105,8 @@ public Event_player_healonhit(Handle:event, const String:name[], bool:dontBroadc
 
 public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const String:weapon[64])
 {
+	if(!g_sb_enabled) return;
+
 	if(SB_ValidPlayer(victim,true) && SB_ValidPlayer(attacker))
 	{
 		//int inflictor = SB_GetDamageInflictor();
@@ -208,6 +214,8 @@ public SB_Engine_Calculations_OnSBEventPostHurt(victim,attacker,dmgamount,const 
 // Must return so that program will wait for it
 public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, float damage, int damagecustom)
 {
+	if(!g_sb_enabled) return false;
+
 	if(!playing && bLateLoad)
 	{
 		int RS = GameRules_GetProp("m_iRoundState");
@@ -499,6 +507,8 @@ public bool SB_Engine_Calculations_OnSB_TakeDmgAllPre(int victim, int attacker, 
 
 public bool FakeDeath(int victim, int attacker)
 {
+	if(!g_sb_enabled) return false;
+
 	if(SB_ValidPlayer(victim))
 	{
 		if(GetPlayerProp(victim,iLives)>1)
@@ -562,6 +572,8 @@ public bool FakeDeath(int victim, int attacker)
 public void StartTheRound()
 {
 	playing=false;
+
+	if(!g_sb_enabled) return;
 
 	// engine calculations
 	firstblood=false;

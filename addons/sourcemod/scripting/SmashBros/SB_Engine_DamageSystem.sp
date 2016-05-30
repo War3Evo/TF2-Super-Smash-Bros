@@ -72,32 +72,40 @@ public void DamageModPercent(float num)
 
 public Native_SB_DamageModPercent(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return 0;
 	float num=GetNativeCell(1);
 	DamageModPercent(num);
+	return 1;
 }
 
 public NSB_GetDamageType(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return 0;
 	return g_CurDamageType;
 }
 public NSB_GetDamageInflictor(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return 0;
 	return g_CurInflictor;
 }
 public NSB_GetDamageStack(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return 0;
 	return damagestack;
 }
 
 // Damage Engine needs to know about sentries and dispensers and stuff...
 public OnEntityCreated(entity, const String:classname[])
 {
-	// Errors from this event... gives massive negative values.. should use entity > 0
-	// DONT REMOVE entity>0
-	// chdata recommended adding " StrContains(classname, "obj_", false) == 0"
-	if(entity>0 && IsValidEntity(entity) && StrContains(classname, "obj_", false) == 0)
+	if(g_sb_enabled)
 	{
-		SDKHook(entity, SDKHook_OnTakeDamage, SDK_Forwarded_OnTakeDamage);
+		// Errors from this event... gives massive negative values.. should use entity > 0
+		// DONT REMOVE entity>0
+		// chdata recommended adding " StrContains(classname, "obj_", false) == 0"
+		if(entity>0 && IsValidEntity(entity) && StrContains(classname, "obj_", false) == 0)
+		{
+			SDKHook(entity, SDKHook_OnTakeDamage, SDK_Forwarded_OnTakeDamage);
+		}
 	}
 }
 
@@ -114,6 +122,8 @@ public void SB_Engine_DamageSystem_OnClientDisconnect(int client)
 
 public Native_SB_IsOwnerSentry(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return false;
+
 	new client=GetNativeCell(1);
 	new bool:UseInternalInflictor=GetNativeCell(2);
 	new pSentry;
@@ -141,6 +151,7 @@ public Native_SB_IsOwnerSentry(Handle:plugin,numParams)
 
 public Native_SB_ChanceModifier(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return _:0.0;
 
 	new attacker=GetNativeCell(1);
 	if(attacker<=0 || attacker>MaxClients || !IsValidEdict(attacker))
@@ -177,6 +188,8 @@ new damagecustomCheck = -666;
 
 public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:damage,&damagetype,&weapon,Float:damageForce[3], Float:damagePosition[3], damagecustom)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	if(VictimCheck==victim
 	&&AttackerCheck==attacker
 	&&InflictorCheck==inflictor
@@ -309,6 +322,8 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
 
 public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetype, weapon, const Float:damageForce[3], const Float:damagePosition[3])
 {
+		if(!g_sb_enabled) return;
+
 		// GHOSTS!!
 		if (weapon == -1 && inflictor == -1)
 		{
@@ -356,5 +371,6 @@ public OnTakeDamagePostHook(victim, attacker, inflictor, Float:damage, damagetyp
 
 public Native_SB_GetSBDamageDealt(Handle:plugin,numParams)
 {
+	if(!g_sb_enabled) return 0;
 	return g_CurLastActualDamageDealt;
 }

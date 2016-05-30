@@ -8,6 +8,8 @@ stock GetEntityAngles(const iEntityIndex,Float:vecAngles[3]) {GetEntPropVector(i
 
 public void bloodspray(int client)
 {
+	if(!g_sb_enabled) return;
+
 	float vecAngles[3];
 	GetClientEyeAngles(client,vecAngles);
 	float target_pos[3];
@@ -96,6 +98,8 @@ public Action DeleteParticle(Handle Timer, any Particle)
 
 public CreateRagDoll(int owner)
 {
+	if(!g_sb_enabled) return;
+
 	//Spawn a corpse :o
 	int Ragdoll = CreateEntityByName("prop_ragdoll");
 	if(IsValidEntity(Ragdoll))

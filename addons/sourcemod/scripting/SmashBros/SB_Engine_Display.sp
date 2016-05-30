@@ -353,6 +353,8 @@ public void SB_Engine_Display_teamplay_round_start()
 
 public bool SB_Engine_Display_teamplay_round_active()
 {
+	if(!g_sb_enabled) return false;
+
 	//PrintToChatAll("%s",name);
 	if(NewMap)
 	{
@@ -372,6 +374,8 @@ public bool SB_Engine_Display_teamplay_round_active()
 
 public bool TeamBalanceTimer()
 {
+	if(!g_sb_enabled) return false;
+
 	//PrintToChatAll("Debug: Start of Balancing");
 
 	int redteamcount = SB_CountTeams(2);
@@ -492,6 +496,8 @@ public bool SB_Engine_Display_OnSB_TakeDmgAllPre(victim,attacker,Float:damage)
 
 stock void SendDialogToOne(client, String:text[], any:...)
 {
+	if(!g_sb_enabled) return;
+
 	char message[100];
 	VFormat(message, sizeof(message), text, 3);
 
@@ -503,6 +509,7 @@ stock void SendDialogToOne(client, String:text[], any:...)
 	CreateDialog(client, kv, DialogType_Msg);
 
 	CloseHandle(kv);
+	return;
 }
 /*
 public Action:DisplayInformation2(Handle:timer,any:userid)
@@ -521,6 +528,8 @@ public Action:DisplayInformation2(Handle:timer,any:userid)
 
 public Action:DisplayInformation(Handle:timer,any:userid)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	int RedTeam, BlueTeam;
 	CalculateTeamScores(RedTeam,BlueTeam);
 
@@ -644,6 +653,7 @@ public Action:DisplayInformation(Handle:timer,any:userid)
 		}
 	}
 
+	return Plugin_Continue;
 }
 
 
@@ -663,6 +673,7 @@ char ClassList[][] =
 
 public void ChangeClass_Menu(int client)
 {
+	if(!g_sb_enabled) return;
 //	PrintToChatAll("ChangeClass");
 
 	Handle hMenu = CreateMenu(MenuHandle_PickClass_Menu);
@@ -691,6 +702,7 @@ public void ChangeClass_Menu(int client)
 }
 public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, selection)
 {
+	if(!g_sb_enabled) return 0;
 	switch (action)
 	{
 		case MenuAction_Cancel:
@@ -723,19 +735,24 @@ public MenuHandle_PickClass_Menu(Handle:hMenu, MenuAction:action, param1, select
 			CloseHandle(hMenu);
 		}
 	}
+	return 1;
 }
 
 public SB_Engine_Display_OnSB_EventSpawn_Post(int client)
 {
+	if(!g_sb_enabled) return 1;
 	if(!displayedHelp[client])
 	{
 		displayedHelp[client]=true;
 		StartingHelpMenu(client);
 	}
+	return 1;
 }
 
 public SB_Engine_Display_SB_Engine_Internal_OnSB_SpawnPlayer(int client)
 {
+	if(!g_sb_enabled) return;
+
 	//if(SB_ValidPlayer(client) && PlayerNextClass[client]!=TFClass_Unknown)
 	if(PlayerNextClass[client]!=TFClass_Unknown)
 	{
@@ -807,6 +824,7 @@ public SB_Engine_Display_SB_Engine_Internal_OnSB_SpawnPlayer(int client)
 
 		ApplyWeapons(client);
 	}
+	return;
 }
 
 
@@ -822,6 +840,8 @@ public Action:Remove_Cond_44(Handle:timer, any:userid)
 
 public void StartingHelpMenu(int client)
 {
+	if(!g_sb_enabled) return;
+
 	Handle hMenu = CreateMenu(MenuHandle_Help_Menu);
 	SetMenuExitBackButton(hMenu, false);
 	SetMenuPagination(hMenu, MENU_NO_PAGINATION);
@@ -836,6 +856,8 @@ public void StartingHelpMenu(int client)
 }
 public MenuHandle_Help_Menu(Handle:hMenu, MenuAction:action, param1, selection)
 {
+	if(!g_sb_enabled) return;
+
 	switch (action)
 	{
 		case MenuAction_Cancel:

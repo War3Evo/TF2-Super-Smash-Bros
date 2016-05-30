@@ -9,7 +9,7 @@ public OnPluginStart_SB_001_AddCommandListener()
 
 public Action Command_InterceptSuicide(int client, char[] command, int args)
 {
-	if(!SB_ValidPlayer(client,true) || !playing)
+	if(!g_sb_enabled || !SB_ValidPlayer(client,true) || !playing)
 	{
 		return Plugin_Continue;
 	}
@@ -28,7 +28,7 @@ public Action Command_InterceptSuicide(int client, char[] command, int args)
 
 public Action Command_InterceptSpectate(int client, char[] command, int args)
 {
-	if(!SB_ValidPlayer(client,true) || !playing)
+	if(!g_sb_enabled || !SB_ValidPlayer(client,true) || !playing)
 	{
 		return Plugin_Continue;
 	}

@@ -2,11 +2,14 @@
 
 public TF2_OnConditionAdded(client, TFCond:condition)
 {
-	if(TF2_IsPlayerInCondition(client, TFCond_Bleeding))
+	if(g_sb_enabled)
 	{
-		TF2_RemoveCondition(client, TFCond_Bleeding);
-		int MaxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
-		SB_SetHealth(client, MaxHealth);
+		if(TF2_IsPlayerInCondition(client, TFCond_Bleeding))
+		{
+			TF2_RemoveCondition(client, TFCond_Bleeding);
+			int MaxHealth = GetEntProp(client, Prop_Data, "m_iMaxHealth");
+			SB_SetHealth(client, MaxHealth);
+		}
 	}
 }
 

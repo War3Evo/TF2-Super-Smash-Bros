@@ -2,6 +2,8 @@
 
 public SB_Engine_Internal_OnSB_EventDeath(int victim,int killer,int assister,int distance,int attacker_hpleft,Handle event)
 {
+	if(!g_sb_enabled) return;
+
 	if(GetEventBool(event, "sourcemod"))
 		return;
 

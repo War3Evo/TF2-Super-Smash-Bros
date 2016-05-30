@@ -77,6 +77,8 @@ public SB_Engine_Sound_SB_Engine_Internal_OnSB_RoundEnd()
 
 public Action:SoundTimer(Handle:timer,any:userid)
 {
+	if(!g_sb_enabled) return Plugin_Continue;
+
 	// Timer
 	int iTimer = CountDownTimer - GetTime();
 	switch (iTimer)
@@ -211,5 +213,6 @@ public Action:SoundTimer(Handle:timer,any:userid)
 			}
 		}
 	}
+	return Plugin_Continue;
 }
 

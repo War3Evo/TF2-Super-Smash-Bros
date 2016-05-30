@@ -4,6 +4,10 @@ public OnPluginStart_SB_001_CreateConVar()
 {
 	CreateConVar("Super_Smash_Bros_version", PLUGIN_VERSION, "Smash Bros version.", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
+	sb_enabled = CreateConVar("sb_enabled", "1", "1 to enable / 0 to disable Smash Bros", FCVAR_PLUGIN);
+	HookConVarChange(sb_enabled, OnConVarChange);
+
+
 	sb_round_time = CreateConVar("sb_roundtime", "300.0", "Round Time in Seconds", FCVAR_PLUGIN);
 	HookConVarChange(sb_round_time, OnConVarChange);
 
@@ -66,4 +70,6 @@ public OnConVarChange(Handle:hConvar, const String:strOldValue[], const String:s
 		g_sb_medicmegaheal = GetConVarInt(sb_medicmegaheal);
 	else if(hConvar == sb_medichealself)
 		g_sb_medichealself = GetConVarInt(sb_medichealself);
+	else if(hConvar == sb_enabled)
+		g_sb_enabled = GetConVarBool(sb_enabled);
 }

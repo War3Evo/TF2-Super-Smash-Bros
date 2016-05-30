@@ -2,6 +2,8 @@
 
 public SB_Engine_Internal_OnSB_RoundEnd()
 {
+	if(!g_sb_enabled) return;
+
 	new iEnt = -1;
 	iEnt = FindEntityByClassname(iEnt, "game_round_win");
 
